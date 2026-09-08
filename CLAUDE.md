@@ -73,3 +73,17 @@ const useCommunity = () => {
 - Workflows files can never be changed if they are already in origin/main, because changing a workflow will fail all its activities, instead create a new workflow with the version, and everywhere the workflow being called, change it to the new workflow version.
 - Workflows activities parameters cannot be changed, as it will break the workflow, if we need to change the parameters, if we need to change the parameters, we need to create a new activity with the new parameters, and then create a new workflow that uses the new activity.
 - Code must always be generic, there can't be a way that a specific logic, let's say facebook or instagram, appear in a file that use a generic logic, instead, we need to edit the interface of the provider, add another function, and then generically call it from the generic code, and then implement the specific logic in the provider implementation. we can't have something like if(facebookProvider) {} inside a non facebook provider file. 
+
+## Agent skills
+
+### Issue tracker
+
+Track specs and work in GitHub Issues for `tmih06/postiz-extra`, with native sub-issues for child tickets. Before reading or publishing tickets, read `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five canonical triage labels. Before applying triage labels, read `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use a single-context domain glossary and root ADR directory. Before domain exploration or design, read `docs/agents/domain.md`.
