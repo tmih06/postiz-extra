@@ -113,6 +113,84 @@
 
 To have the project up and running, please follow the [Quick Start Guide](https://docs.postiz.com/quickstart)
 
+## Fork CI/CD
+
+GitHub Actions runs on **every branch push**, tag push, pull request, merge queue
+event, and manual dispatch. There are no branch or changed-path filters.
+
+- **Build** (`.github/workflows/build.yml`): validates workflows with pinned
+  actionlint, installs the frozen pnpm lockfile, generates Prisma, builds the
+  frontend/backend/orchestrator, and packages the browser extension. Download
+  `extension-<run-id>-<attempt>` from the run's artifacts to obtain `extension.zip`.
+- **Build Containers** (`.github/workflows/build-containers.yml`): a reusable
+  workflow called only after the Build checks succeed, avoiding a second
+  application-check run. Builds native `linux/amd64` and `linux/arm64` images.
+- **CodeQL** (`.github/workflows/codeql.yml`): independently analyzes JavaScript
+  and TypeScript on the same events. It reports security findings separately;
+  container publication is gated by Build, not by CodeQL findings.
+
+CI currently uses Node **22.20.0** and pnpm **10.6.1**, matching the existing
+application and Docker toolchain. The planned Bun migration must update the
+workspace, lockfile, CI, and Docker installation together; it is not part of
+this workflow migration.
+
+### Image delivery
+
+Successful pushes publish a multi-platform image to the lowercase
+`ghcr.io/<owner>/<repository>` namespace. For this fork:
+`ghcr.io/tmih06/postiz-extra`.
+
+| Event | Image tags |
+| --- | --- |
+| Branch push | `branch-<sanitized-branch>`, `sha-<full-commit-sha>` |
+| Default-branch push | The branch/SHA tags above, plus `latest` |
+| Tag push | `tag-<sanitized-tag>`, `sha-<full-commit-sha>` |
+| Pull request, merge queue, manual dispatch | Build validation only; no registry login or publication |
+
+Ref prefixes prevent a feature branch or Git tag named `latest` from replacing
+the default-branch image. Prefer the full SHA tag or image digest for deployment:
+sanitized branch/tag names are mutable aliases and can collide after sanitization.
+Only image-publishing jobs receive package-write permission. They use GitHub's
+automatic `GITHUB_TOKEN`, not an upstream PAT or a custom registry secret.
+The repository must permit GitHub Actions and GHCR package creation; an existing
+package must grant this repository Actions access. New GHCR packages may initially
+be private, so configure package visibility/access before pulling from your VPS.
+CodeQL uploads require code scanning availability (public repositories support it).
+
+**No workflow deploys to the VPS, changes production data, merges branches, or
+publishes to the Chrome Web Store.** Container delivery means publishing an image,
+not installing it. Configure deployment separately when the replacement is ready.
+Local `.env` files and generated build artifacts are excluded from Docker contexts.
+
+### Removed upstream automation
+
+| Inherited configuration | Fork replacement or reason for removal |
+| --- | --- |
+| Extension build uploading to Nextcloud | Extension ZIP in GitHub Actions artifacts; no Nextcloud credentials |
+| Chrome Web Store publication | Removed upstream store/credential dependency; build artifacts remain available |
+| Scheduled Claude staging conflict resolution | Removed paid API/deploy-key dependency and automatic source pushes |
+| Stale issue/PR closure | Removed upstream-only issue policy; planned work is not auto-closed |
+| Website issue-label closure | Removed upstream-specific support routing and auto-closure |
+| Extensionless `eslint` workflow | GitHub never loaded it; referenced missing configs and suppressed failures |
+| Upstream container registry/tag-only publishing | Fork-owned GHCR delivery on all pushes |
+| Main/path-restricted CodeQL | Unfiltered security analysis |
+
+Workflow linting is not application ESLint coverage. The repository does not yet
+have a verified application test suite or a unified runnable lint command; CI
+does not use empty passing test jobs or suppress build failures to imply otherwise.
+
+To exercise the application build locally with the pinned toolchain:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm run build
+pnpm run build:extension
+docker build -f Dockerfile.dev -t localhost/postiz .
+```
+
+Workflow changes become active after they are committed and pushed to the branch.
+Manual dispatch additionally requires the entry workflow on the default branch.
+
 ## Sponsor Postiz
 
 We now give a few options to Sponsor Postiz:

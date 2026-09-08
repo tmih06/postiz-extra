@@ -12,6 +12,9 @@ dist
 /apps/workers/dist
 /apps/cron/dist
 /apps/commands/dist
+/apps/orchestrator/dist
+/apps/extension/dist
+/apps/extension/extension.zip
 .devcontainer
 **/.git
 **/*.md
@@ -21,3 +24,6 @@ dist
 .git
 .github
 reports
+.agents
+**/.env
+**/.env.*
