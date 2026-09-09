@@ -4,7 +4,7 @@ import { NavigationShell, type WorkspaceView } from '@/components/layout/navigat
 import { Composer } from '@/components/composer/composer';
 import { PostList } from '@/components/publications/post-list';
 import { CalendarView } from '@/components/publications/calendar-view';
-import { MeltiplyHarness } from '@/components/harness/postiz-harness';
+import { PostizHarness } from '@/components/harness/postiz-harness';
 import { MediaView } from '@/components/media/media-view';
 import { AnalyticsView } from '@/components/analytics/analytics-view';
 import { ChannelsView } from '@/components/channels/channels-view';
@@ -94,7 +94,7 @@ function WorkspaceRouter() {
         />
       )}
       {currentView === 'agent' && (
-        <MeltiplyHarness
+        <PostizHarness
           onScheduleAction={() => {
             handleNavigate('scheduled');
           }}

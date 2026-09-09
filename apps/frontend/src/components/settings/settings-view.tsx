@@ -28,9 +28,9 @@ export function SettingsView() {
   const [saved, setSaved] = useState(false);
 
   // Form states
-  const [orgName, setOrgName] = useState('Meltiply Workspace');
+  const [orgName, setOrgName] = useState('Postiz Workspace');
   const [timezone, setTimezone] = useState('UTC (Coordinated Universal Time)');
-  const [signatureText, setSignatureText] = useState('—\nFollow @meltiply for social publishing');
+  const [signatureText, setSignatureText] = useState('—\nFollow @postizapp for open-source social publishing');
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [failureAlerts, setFailureAlerts] = useState(true);
 
@@ -121,7 +121,7 @@ export function SettingsView() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-ink">Workspace Account</label>
                   <div className="rounded-control border border-line/60 bg-page/50 p-2.5 flex items-center justify-between text-xs">
-                    <span className="font-mono text-ink-2">{user?.email || 'admin@meltiply.com'}</span>
+                    <span className="font-mono text-ink-2">{user?.email || 'admin@postiz.com'}</span>
                     <StatusPill tone="green" dot={true}>Active Owner</StatusPill>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export function SettingsView() {
 
               <div className="space-y-3 max-w-lg">
                 <div className="rounded-control border border-line bg-page p-3 font-mono text-xs text-ink flex items-center justify-between">
-                  <span>meltiply_live_79a24bc109f…</span>
+                  <span>postiz_live_79a24bc109f…</span>
                   <StatusPill tone="green" dot={true}>Active Key</StatusPill>
                 </div>
                 <p className="text-[11.5px] text-ink-3">

@@ -23,7 +23,7 @@ interface Message {
   hasRecommendation?: boolean;
 }
 
-export function MeltiplyHarness({
+export function PostizHarness({
   onScheduleAction,
 }: {
   onScheduleAction?: () => void;
@@ -103,7 +103,7 @@ export function MeltiplyHarness({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[14px] font-bold text-ink leading-tight">
-                  Meltiply AI Publishing Studio
+                  Postiz AI Publishing Studio
                 </h2>
                 <StatusPill tone="green" dot={true}>
                   Agent Ready
@@ -141,7 +141,7 @@ export function MeltiplyHarness({
             return (
               <div key={msg.id} className="flex items-start gap-3">
                 <div className="flex size-7 shrink-0 items-center justify-center rounded-[8px] bg-foreground text-background font-bold text-xs mt-0.5">
-                  M
+                  P
                 </div>
 
                 <div className="flex-1 space-y-4 max-w-2xl">
@@ -162,7 +162,7 @@ export function MeltiplyHarness({
                         text={
                           msg.prompt
                             ? `I've prepared a customized multi-platform social package for "${msg.prompt}". The copy has been tuned for algorithm reach with tailored hooks for X, LinkedIn, and Threads, and queue slots have been allocated during your audience's peak activity window.`
-                            : "Welcome to Meltiply AI Studio. Connected to your publishing workspace. I can craft multi-platform campaigns, optimize queue schedules, analyze top posts, or suggest viral hooks."
+                            : "Welcome to Postiz AI Studio. Connected to your publishing workspace. I can craft multi-platform campaigns, optimize queue schedules, analyze top posts, or suggest viral hooks."
                         }
                         onDone={() => handleStreamingDone(msg.id)}
                       />
@@ -264,5 +264,4 @@ export function MeltiplyHarness({
   );
 }
 
-export const PostizHarness = MeltiplyHarness;
-export default MeltiplyHarness;
+export default PostizHarness;

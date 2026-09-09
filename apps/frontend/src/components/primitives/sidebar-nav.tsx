@@ -141,7 +141,8 @@ export function SidebarNav({
         .map((n: string) => n[0])
         .join('')
         .slice(0, 2)
-    : 'M';
+        .toUpperCase()
+    : 'P';
 
   return (
     <aside
@@ -175,7 +176,7 @@ export function SidebarNav({
                     {currentBrandName}
                   </span>
                   <span className="truncate text-[10.5px] font-medium text-ink-3 mt-1 leading-none">
-                    Meltiply Workspace
+                    Postiz Workspace
                   </span>
                 </div>
                 <ChevronDown className="size-3.5 shrink-0 text-ink-3" />
@@ -209,7 +210,7 @@ export function SidebarNav({
                 >
                   <div className="flex items-center gap-2">
                     <span className="flex size-5 items-center justify-center rounded bg-line font-bold text-[10px]">
-                      M
+                      P
                     </span>
                     <span>All Profiles</span>
                   </div>
@@ -421,7 +422,7 @@ export function SidebarNav({
                   {user?.name || 'Creator'}
                 </span>
                 <span className="text-[10px] text-ink-3 truncate font-mono">
-                  {user?.email || 'admin@meltiply.com'}
+                  {user?.email || 'admin@postiz.com'}
                 </span>
               </div>
             )}
