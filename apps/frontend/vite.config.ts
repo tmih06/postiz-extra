@@ -1,21 +1,37 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import path from 'node:path';
 
 export default defineConfig({
   plugins: [
     react(),
-    tsconfigPaths(),
   ],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'lucide-react',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-separator',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      'clsx',
+      'tailwind-merge',
+    ],
+  },
   server: {
     port: 4200,
     host: '0.0.0.0',
+    watch: {
+      ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
+    },
     proxy: {
       '/api': {
         target: process.env.BACKEND_INTERNAL_URL || 'http://localhost:3000',

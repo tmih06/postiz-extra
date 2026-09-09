@@ -4,7 +4,8 @@
   "compilerOptions": {
     "module": "CommonJS",
     "resolveJsonModule": true,
-    "declaration": true,
+    "declaration": false,
+    "tsBuildInfoFile": "./.tsbuildinfo",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
