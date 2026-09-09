@@ -1,35 +1,46 @@
 import React, { useState } from 'react';
 import { useWorkspace } from '@/context/workspace.context';
-import { ProfileSelector } from '@/components/workspace/profile-selector';
+import { SidebarNav, type WorkspaceView } from '@/components/primitives/sidebar-nav';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import {
   PenSquare,
+  Sparkles,
   Calendar,
   ListFilter,
   FileText,
   Image as ImageIcon,
   Clock,
+  BarChart3,
+  Share2,
+  Puzzle,
+  Settings,
   LogOut,
   Menu,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export type WorkspaceView =
-  | 'composer'
-  | 'scheduled'
-  | 'calendar'
-  | 'list'
-  | 'drafts'
-  | 'media';
+export type { WorkspaceView };
 
 interface NavigationShellProps {
   currentView: WorkspaceView;
   onNavigate: (view: WorkspaceView) => void;
   children: React.ReactNode;
 }
+
+const MOBILE_NAV_ITEMS: { id: WorkspaceView; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'composer', label: 'Composer', icon: PenSquare },
+  { id: 'agent', label: 'AI Studio', icon: Sparkles },
+  { id: 'scheduled', label: 'Upcoming', icon: Clock },
+  { id: 'calendar', label: 'Calendar', icon: Calendar },
+  { id: 'list', label: 'Publications', icon: ListFilter },
+  { id: 'drafts', label: 'Drafts', icon: FileText },
+  { id: 'media', label: 'Media Library', icon: ImageIcon },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'channels', label: 'Social Channels', icon: Share2 },
+  { id: 'plugs', label: 'Integrations', icon: Puzzle },
+  { id: 'settings', label: 'Settings', icon: Settings },
+];
 
 export function NavigationShell({
   currentView,
@@ -39,132 +50,44 @@ export function NavigationShell({
   const { user, logout } = useWorkspace();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { id: 'composer' as const, label: 'Composer', icon: PenSquare },
-    { id: 'scheduled' as const, label: 'Upcoming', icon: Clock },
-    { id: 'calendar' as const, label: 'Calendar', icon: Calendar },
-    { id: 'list' as const, label: 'Publications', icon: ListFilter },
-    { id: 'drafts' as const, label: 'Drafts', icon: FileText },
-    { id: 'media' as const, label: 'Media Library', icon: ImageIcon },
-  ];
-
   const handleNavClick = (view: WorkspaceView) => {
     onNavigate(view);
     setMobileMenuOpen(false);
   };
 
-  const userInitials = user?.name
-    ? user.name
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : 'U';
-
   return (
-    <div className="flex min-h-screen bg-background text-foreground antialiased">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-card shrink-0 select-none">
-        <div className="p-6 pb-4">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="size-7 rounded bg-foreground flex items-center justify-center text-background font-black text-sm tracking-tighter">
-              P
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-base tracking-tight leading-none">
-                POSTIZ
-              </span>
-              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 tracking-wider uppercase">
-                Publishing Workspace
-              </span>
-            </div>
-          </div>
+    <div className="flex min-h-screen bg-transparent text-ink antialiased">
+      {/* Desktop Collapsible Sidebar */}
+      <div className="hidden lg:flex shrink-0">
+        <SidebarNav currentView={currentView} onNavigate={onNavigate} />
+      </div>
 
-          <ProfileSelector />
-        </div>
-
-        <Separator className="my-2" />
-
-        <nav className="flex-1 px-3 py-2 flex flex-col gap-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleNavClick(item.id)}
-                className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]',
-                  isActive
-                    ? 'bg-foreground text-background shadow-sm'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                <Icon className={cn('size-4', isActive ? 'text-background' : 'text-muted-foreground')} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <Separator className="my-2" />
-
-        <div className="p-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <Avatar className="size-8">
-              <AvatarFallback>{userInitials}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col truncate">
-              <span className="text-xs font-semibold truncate leading-none">
-                {user?.name || 'Creator'}
-              </span>
-              <span className="text-[10px] text-muted-foreground truncate font-mono mt-1">
-                {user?.email || ''}
-              </span>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={logout}
-            title="Log out"
-            className="size-8 text-muted-foreground hover:text-foreground shrink-0"
-          >
-            <LogOut className="size-4" />
-          </Button>
-        </div>
-      </aside>
-
-      {/* Mobile Top Header */}
+      {/* Main Column */}
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-        <header className="lg:hidden flex h-14 items-center justify-between border-b border-border bg-card px-4 shrink-0">
+        {/* Mobile Header */}
+        <header className="lg:hidden flex h-14 items-center justify-between border-b border-line bg-surface/90 backdrop-blur-md px-4 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="size-6 rounded bg-foreground flex items-center justify-center text-background font-black text-xs">
+            <div className="size-7 rounded-[7px] bg-foreground flex items-center justify-center text-background font-black text-xs">
               P
             </div>
-            <span className="font-bold text-sm tracking-tight">POSTIZ</span>
+            <span className="font-bold text-sm tracking-tight text-ink">POSTIZ</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8"
-              onClick={() => setMobileMenuOpen((o) => !o)}
-            >
-              {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8 rounded-control border-line"
+            onClick={() => setMobileMenuOpen((o) => !o)}
+          >
+            {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+          </Button>
         </header>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-border bg-card p-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
-            <ProfileSelector />
-            <nav className="flex flex-col gap-1">
-              {navItems.map((item) => {
+          <div className="lg:hidden border-b border-line bg-surface p-4 flex flex-col gap-3 shadow-overlay z-50">
+            <nav className="grid grid-cols-2 gap-1.5">
+              {MOBILE_NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id;
                 return (
@@ -173,23 +96,28 @@ export function NavigationShell({
                     type="button"
                     onClick={() => handleNavClick(item.id)}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                      'flex items-center gap-2 rounded-control px-2.5 py-2 text-[13px] font-medium transition-colors text-left',
                       isActive
-                        ? 'bg-foreground text-background'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'bg-foreground text-background font-semibold'
+                        : 'text-ink-2 hover:bg-hover hover:text-ink'
                     )}
                   >
-                    <Icon className="size-4" />
-                    <span>{item.label}</span>
+                    <Icon className="size-4 shrink-0" />
+                    <span className="truncate">{item.label}</span>
                   </button>
                 );
               })}
             </nav>
-            <div className="pt-2 flex items-center justify-between border-t border-border">
-              <span className="text-xs text-muted-foreground truncate">
+            <div className="pt-2 flex items-center justify-between border-t border-line-soft">
+              <span className="text-xs text-ink-3 truncate">
                 {user?.email}
               </span>
-              <Button variant="ghost" size="sm" onClick={logout} className="text-xs">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="text-xs text-red hover:bg-red-tint hover:text-red"
+              >
                 <LogOut className="size-3.5 mr-1" /> Log out
               </Button>
             </div>
@@ -206,3 +134,5 @@ export function NavigationShell({
     </div>
   );
 }
+
+export default NavigationShell;
