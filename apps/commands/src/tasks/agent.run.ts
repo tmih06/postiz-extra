@@ -10,6 +10,13 @@ export class AgentRun {
     describe: 'Run the agent',
   })
   async agentRun() {
-    console.log(await this._agentGraphService.createGraph('hello', true));
+    for await (const event of this._agentGraphService.start('test', {
+      research: 'hello world research',
+      isPicture: false,
+      format: 'one_short',
+      tone: 'personal',
+    })) {
+      console.log(event);
+    }
   }
 }

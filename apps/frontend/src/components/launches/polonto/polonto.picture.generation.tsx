@@ -5,7 +5,18 @@ import { observer } from 'mobx-react-lite';
 import { InputGroup } from '@blueprintjs/core';
 import { Clean } from '@blueprintjs/icons';
 import { SectionTab } from 'polotno/side-panel';
-import { getImageSize } from 'polotno/utils/image';
+const getImageSize = (url: string): Promise<{ width: number; height: number }> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () =>
+      resolve({
+        width: img.naturalWidth || img.width,
+        height: img.naturalHeight || img.height,
+      });
+    img.onerror = reject;
+    img.src = url;
+  });
+};
 import { ImagesGrid } from 'polotno/side-panel/images-grid';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import useSWR from 'swr';

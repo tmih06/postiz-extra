@@ -20,6 +20,12 @@ const client = new NeynarAPIClient({
   apiKey: process.env.NEYNAR_SECRET_KEY || '00000000-000-0000-000-000000000000',
 });
 
+function toNeynarEmbeds(media: PostDetails<FarcasterDto>['media']) {
+  // Neynar OpenAPI types mistakenly require all union properties instead of anyOf
+  return (media?.map((m) => ({ url: m.path })) || []) as unknown as
+    Parameters<typeof client.publishCast>[0]['embeds'];
+}
+
 @Rules(
   'Farcaster/Warpcast can only accept pictures'
 )
@@ -103,13 +109,11 @@ export class FarcasterProvider
       firstPost?.settings?.subreddit.length === 0
         ? [undefined]
         : firstPost?.settings?.subreddit;
+    const embeds = toNeynarEmbeds(firstPost?.media);
 
     for (const channel of channels) {
       const data = await client.publishCast({
-        embeds:
-          firstPost?.media?.map((media) => ({
-            url: media.path,
-          })) || [],
+        embeds,
         signerUuid: accessToken,
         text: firstPost.message,
         ...(channel?.value?.id ? { channelId: channel?.value?.id } : {}),
@@ -145,13 +149,11 @@ export class FarcasterProvider
 
     // postId can be comma-separated if posted to multiple channels
     const parentIds = (lastCommentId || postId).split(',');
+    const embeds = toNeynarEmbeds(commentPost?.media);
 
     for (const parentHash of parentIds) {
       const data = await client.publishCast({
-        embeds:
-          commentPost?.media?.map((media) => ({
-            url: media.path,
-          })) || [],
+        embeds,
         signerUuid: accessToken,
         text: commentPost.message,
         parent: parentHash,
