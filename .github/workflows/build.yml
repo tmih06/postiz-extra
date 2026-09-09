@@ -59,6 +59,11 @@ jobs:
       - name: Install dependencies and generate Prisma client
         run: bun install --frozen-lockfile
 
+      - name: Verify lockfile immutability on repeated frozen install
+        run: |
+          bun install --frozen-lockfile
+          git diff --exit-code -- bun.lock
+
       - name: Discover and run tests
         run: bun run test
 

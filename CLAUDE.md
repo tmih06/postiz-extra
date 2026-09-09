@@ -7,16 +7,18 @@ You can find things like:
 - Team management
 - Media library
 
-This project is a monorepo with a root only package.json of dependencies.
-Made with PNPM.
-We have 3 important folders
+This project is a monorepo managed with Bun workspaces (Bun 1.3.14, Node >=22.12.0 <23.0.0).
+We have the following application folders:
 
-- apps/backend - this is where the API code is (NESTJS)
-- apps/orchestrator - this is temporal, it's for background jobs (NESTJS) it contains all the workflows and activities
-- apps/frontend - this is the code of the frontend (Vite ReactJS)
-- /libraries contains a lot of services shared between backend and orchestrator and frontend components.
+- apps/backend - NestJS API running on Node
+- apps/orchestrator - Temporal background jobs and workers (NestJS) running on Node; contains workflows and activities
+- apps/frontend - Next.js React frontend
+- apps/extension - Browser extension (Vite React)
+- apps/sdk - Node SDK
+- apps/commands - CLI commands
+- libraries/ - Shared services and modules between backend, orchestrator, and frontend
 
-We are using Bun as package manager and runtime.
+We use Bun as package manager and workspace script runner (`bun install --frozen-lockfile`, `bun run dev`, `bun run build`). Backend and orchestrator execute on Node.
 Never install frontend components from npmjs, focus on writing native components.
 
 The project uses tailwind 3, before writing any component look at:
@@ -70,8 +72,8 @@ const useCommunity = () => {
 - Avoid as much as possible creating new files with pure logic of algorithms, it's usually wrong
 - When you write code, make sure that what you add looks like something similar somewhere else in the code, don't make weird patterns
 - When you finished running, run another agents that matches the new code with the existing system code, to see that it looks similar and is not a weird pattern.
-- Workflows files can never be changed if they are already in origin/main, because changing a workflow will fail all its activities, instead create a new workflow with the version, and everywhere the workflow being called, change it to the new workflow version.
-- Workflows activities parameters cannot be changed, as it will break the workflow, if we need to change the parameters, if we need to change the parameters, we need to create a new activity with the new parameters, and then create a new workflow that uses the new activity.
+Temporal workflow files can never be changed if they are already in origin/main, because changing a workflow will fail all its activities; instead create a new workflow with the version, and everywhere the workflow is called, change it to the new workflow version.
+Temporal workflow activity parameters cannot be changed once merged to main, as it will break in-flight workflows; to change parameters, create a new activity with the new parameters, and create a new workflow that uses the new activity.
 - Code must always be generic, there can't be a way that a specific logic, let's say facebook or instagram, appear in a file that use a generic logic, instead, we need to edit the interface of the provider, add another function, and then generically call it from the generic code, and then implement the specific logic in the provider implementation. we can't have something like if(facebookProvider) {} inside a non facebook provider file. 
 
 ## Agent skills
