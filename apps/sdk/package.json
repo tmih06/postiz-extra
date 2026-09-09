@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "publish": "tsup && bun publish --access public"
+    "build": "tsup",
+    "publish": "bun run build && bun publish --access public"
   },
   "files": [
     "dist"
