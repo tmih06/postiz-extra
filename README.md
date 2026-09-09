@@ -102,7 +102,7 @@
 
 ## Tech Stack
 
-- Pnpm workspaces (Monorepo)
+- Bun workspaces (Monorepo)
 - NextJS (React)
 - NestJS
 - Prisma (Default to PostgreSQL)
@@ -119,9 +119,10 @@ GitHub Actions runs on **every branch push**, tag push, pull request, merge queu
 event, and manual dispatch. There are no branch or changed-path filters.
 
 - **Build** (`.github/workflows/build.yml`): validates workflows with pinned
-  actionlint, installs the frozen pnpm lockfile, generates Prisma, builds the
-  frontend/backend/orchestrator, and packages the browser extension. Download
-  `extension-<run-id>-<attempt>` from the run's artifacts to obtain `extension.zip`.
+  actionlint, installs the frozen Bun lockfile, generates Prisma, discovers tests,
+  and builds the frontend, backend, orchestrator, SDK, commands, and extension.
+  Download `extension-<run-id>-<attempt>` from the run's artifacts to obtain
+  `extension.zip`.
 - **Build Containers** (`.github/workflows/build-containers.yml`): a reusable
   workflow called only after the Build checks succeed, avoiding a second
   application-check run. Builds native `linux/amd64` and `linux/arm64` images.
@@ -129,10 +130,8 @@ event, and manual dispatch. There are no branch or changed-path filters.
   and TypeScript on the same events. It reports security findings separately;
   container publication is gated by Build, not by CodeQL findings.
 
-CI currently uses Node **22.20.0** and pnpm **10.6.1**, matching the existing
-application and Docker toolchain. The planned Bun migration must update the
-workspace, lockfile, CI, and Docker installation together; it is not part of
-this workflow migration.
+CI currently uses Node **22.20.0** and Bun **1.3.14**, matching the application
+and Docker toolchain.
 
 ### Image delivery
 
@@ -170,18 +169,44 @@ Local `.env` files and generated build artifacts are excluded from Docker contex
 | Upstream container registry/tag-only publishing | Fork-owned GHCR delivery on tag pushes |
 | Main/path-restricted CodeQL | Unfiltered security analysis |
 
-Workflow linting is not application ESLint coverage. The repository does not yet
-have a verified application test suite or a unified runnable lint command; CI
-does not use empty passing test jobs or suppress build failures to imply otherwise.
+Workflow linting is not application ESLint coverage. `bun run test` uses Vitest
+discovery: it runs matching tests and propagates failures, or explicitly reports
+`No test files found` when none exist. No application test suite currently exists;
+an empty discovery result is not application coverage.
 
 To exercise the application build locally with the pinned toolchain:
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm run build
-pnpm run build:extension
+bun install --frozen-lockfile
+bun run build
 docker build -f Dockerfile.dev -t localhost/postiz .
 ```
+
+For development, use Node **22.20.0** and Bun **1.3.14**. Configure `.env` from
+`.env.example`, start the development dependencies with `bun run dev:docker`,
+then run `bun run dev` (extension, orchestrator, backend, frontend) or
+`bun run dev-backend` (backend and frontend). The concurrent runner is pinned in
+the workspace; these commands do not download a runner on demand. The development
+Compose file uses fixed container names and ports: do not run it alongside an
+existing deployment with the same names or ports.
+
+`bun run build` builds all six retained applications without publishing.
+`bun run build:sdk` and `bun run build:commands` are also available individually;
+SDK publication remains a separate, explicit `bun run publish-sdk` command.
+NestJS and the Temporal worker still execute on Node, not Bun.
+
+`bunfig.toml` selects hoisted dependency linking (`linker = "hoisted"`),
+matching the repository's former `node-linker=hoisted` pnpm setting.
+Container startup runs the existing Prisma schema push, then supervises the three
+application `start` scripts using the pinned PM2 runtime and
+`ecosystem.config.cjs`. Each process has its own application working directory;
+PM2 is not given package manifests as ecosystem configurations. Run
+`bun run pm2` only against the database intended for that deployment.
+
+Installation explicitly trusts bcrypt's native setup and Prisma's client/engine
+generation scripts. Other third-party lifecycle scripts remain blocked by Bun;
+do not use a blanket trust-all flag. The root postinstall explicitly generates
+Prisma, and the frontend workspace postinstall fetches its GTM asset.
 
 Workflow changes become active after they are committed and pushed to the branch.
 Manual dispatch additionally requires the entry workflow on the default branch.

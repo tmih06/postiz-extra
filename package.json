@@ -9,34 +9,42 @@
   "engines": {
     "node": ">=22.12.0 <23.0.0"
   },
-  "packageManager": "pnpm@10.6.1",
+  "packageManager": "bun@1.3.14",
+  "workspaces": [
+    "apps/*",
+    "libraries/*"
+  ],
   "scripts": {
-    "dev": "pnpm run --filter ./apps/extension --filter ./apps/orchestrator --filter ./apps/backend --filter ./apps/frontend --parallel dev",
-    "dev-backend": "pnpm run --filter ./apps/backend --filter ./apps/frontend --parallel dev",
-    "pm2": "pnpm run pm2-run",
-    "publish-sdk": "pnpm run --filter ./apps/sdk publish",
-    "pm2-run": "pm2 delete all || true && pnpm run prisma-db-push && pnpm run --parallel pm2 && pm2 logs",
-    "dev:stripe": "pnpm dlx concurrently \"stripe listen --forward-to localhost:3000/stripe\" \"pnpm run dev\"",
-    "build": "pnpm -r --workspace-concurrency=1 --filter ./apps/frontend --filter ./apps/backend --filter ./apps/orchestrator run build",
-    "build:backend": "rm -rf apps/backend/dist && pnpm --filter ./apps/backend run build",
-    "build:frontend": "rm -rf apps/frontend/dist && pnpm --filter ./apps/frontend run build",
-    "build:orchestrator": "rm -rf apps/orchestrator/dist && pnpm --filter ./apps/orchestrator run build",
-    "build:extension": "rm -rf apps/extension/dist && pnpm --filter ./apps/extension run build",
-    "dev:backend": "rm -rf apps/backend/dist && pnpm --filter ./apps/backend run dev",
-    "dev:frontend": "rm -rf apps/frontend/dist && pnpm --filter ./apps/frontend run dev",
-    "dev:orchestrator": "rm -rf apps/orchestrator/dist && pnpm --filter ./apps/orchestrator run dev",
-    "start:prod:orchestrator": "pnpm --filter ./apps/orchestrator run start",
-    "start:prod:backend": "pnpm --filter ./apps/backend run start",
-    "start:prod:frontend": "pnpm --filter ./apps/frontend run start",
+    "dev": "concurrently --kill-others-on-fail -n \"ext,orch,back,front\" \"bun run dev:extension\" \"bun run dev:orchestrator\" \"bun run dev:backend\" \"bun run dev:frontend\"",
+    "dev-backend": "concurrently --kill-others-on-fail -n \"back,front\" \"bun run dev:backend\" \"bun run dev:frontend\"",
+    "pm2": "bun run pm2-run",
+    "publish-sdk": "bun run --cwd apps/sdk publish",
+    "pm2-run": "bun run prisma-db-push && pm2-runtime start ecosystem.config.cjs",
+    "dev:stripe": "concurrently \"stripe listen --forward-to localhost:3000/stripe\" \"bun run dev\"",
+    "build": "bun run build:backend && bun run build:orchestrator && bun run build:frontend && bun run build:extension && bun run build:sdk && bun run build:commands",
+    "build:backend": "rm -rf apps/backend/dist && bun run --cwd apps/backend build",
+    "build:frontend": "rm -rf apps/frontend/dist && bun run --cwd apps/frontend build",
+    "build:orchestrator": "rm -rf apps/orchestrator/dist && bun run --cwd apps/orchestrator build",
+    "build:extension": "rm -rf apps/extension/dist && bun run --cwd apps/extension build",
+    "dev:extension": "rm -rf apps/extension/dist && bun run --cwd apps/extension dev",
+    "dev:backend": "rm -rf apps/backend/dist && bun run --cwd apps/backend dev",
+    "dev:frontend": "rm -rf apps/frontend/dist && bun run --cwd apps/frontend dev",
+    "dev:orchestrator": "rm -rf apps/orchestrator/dist && bun run --cwd apps/orchestrator dev",
+    "start:prod:orchestrator": "bun run --cwd apps/orchestrator start",
+    "start:prod:backend": "bun run --cwd apps/backend start",
+    "start:prod:frontend": "bun run --cwd apps/frontend start",
     "dev:docker": "docker compose -f ./docker-compose.dev.yaml up -d",
-    "commands:build:development": "pnpm --filter ./apps/commands run build",
-    "prisma-generate": "pnpm dlx prisma@6.5.0 generate --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma",
-    "prisma-db-push": "pnpm dlx prisma@6.5.0 db push --accept-data-loss --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma",
-    "prisma-db-pull": "pnpm dlx prisma@6.5.0 db pull --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma",
-    "prisma-reset": "cd ./libraries/nestjs-libraries/src/database/prisma && pnpm dlx prisma@6.5.0 db push --force-reset && pnpx prisma@6.5.0 db push",
+    "commands:build:development": "bun run --cwd apps/commands build",
+    "prisma-generate": "bun x prisma@6.5.0 generate --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma",
+    "prisma-db-push": "bun x prisma@6.5.0 db push --accept-data-loss --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma",
+    "prisma-db-pull": "bun x prisma@6.5.0 db pull --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma",
+    "prisma-reset": "cd ./libraries/nestjs-libraries/src/database/prisma && bun x prisma@6.5.0 db push --force-reset && bun x prisma@6.5.0 db push",
     "docker-build": "./var/docker/docker-build.sh",
     "docker-create": "./var/docker/docker-create.sh",
-    "postinstall": "pnpm run prisma-generate"
+    "postinstall": "bun run prisma-generate && node scripts/patch-langchain-core.cjs",
+    "test": "vitest run --passWithNoTests",
+    "build:sdk": "bun run --cwd apps/sdk build",
+    "build:commands": "rm -rf apps/commands/dist && bun run --cwd apps/commands build"
   },
   "dependencies": {
     "@ag-ui/mastra": "^1.0.1",
@@ -251,7 +259,9 @@
     "yargs": "^17.7.2",
     "yup": "^1.4.0",
     "zod": "^3.25.76",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "@blueprintjs/core": "^6.10.0",
+    "@blueprintjs/icons": "^6.8.0"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.7.1",
@@ -301,22 +311,22 @@
     "typescript": "5.5.4",
     "vite": "^8.2.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "3.1.4"
+    "vitest": "3.1.4",
+    "concurrently": "9.2.1",
+    "pm2": "7.0.4"
   },
-  "volta": {
-    "node": "20.17.0"
+  "overrides": {
+    "multer": "^2.2.0",
+    "next": "16.3.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6"
   },
-  "pnpm": {
-    "overrides": {
-      "multer": "^2.2.0",
-      "next": "16.3.1",
-      "react": "19.2.4",
-      "react-dom": "19.2.4",
-      "@types/react": "19.1.8",
-      "@types/react-dom": "19.1.6"
-    },
-    "onlyBuiltDependencies": [
-      "bcrypt"
-    ]
-  }
+  "trustedDependencies": [
+    "bcrypt",
+    "@prisma/client",
+    "@prisma/engines",
+    "prisma"
+  ]
 }
