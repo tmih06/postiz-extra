@@ -36,8 +36,7 @@
     "prisma-reset": "cd ./libraries/nestjs-libraries/src/database/prisma && pnpm dlx prisma@6.5.0 db push --force-reset && pnpx prisma@6.5.0 db push",
     "docker-build": "./var/docker/docker-build.sh",
     "docker-create": "./var/docker/docker-create.sh",
-    "postinstall": "pnpm run prisma-generate",
-    "test": "jest --coverage --detectOpenHandles --reporters=default --reporters=jest-junit"
+    "postinstall": "pnpm run prisma-generate"
   },
   "dependencies": {
     "@ag-ui/mastra": "^1.0.1",
@@ -269,7 +268,6 @@
     "@types/chrome": "^0.0.319",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.6",
-    "@types/jest": "29.5.12",
     "@types/node": "18.16.9",
     "@types/node-telegram-bot-api": "^0.64.7",
     "@types/react": "19.1.8",
@@ -283,7 +281,6 @@
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
     "autoprefixer": "^10.4.17",
-    "babel-jest": "29.7.0",
     "cross-env": "^10.0.0",
     "eslint": "8.57.0",
     "eslint-config-next": "16.2.6",
@@ -293,18 +290,12 @@
     "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "4.6.0",
     "fs-extra": "^11.3.0",
-    "jest": "29.7.0",
-    "jest-environment-jsdom": "29.7.0",
-    "jest-environment-node": "^29.4.1",
-    "jest-junit": "^16.0.0",
-    "jest-mock-extended": "^4.0.0-beta1",
     "jsdom": "~22.1.0",
     "nodemon": "^3.1.9",
     "postcss": "8.5.26",
     "prettier": "^2.6.2",
     "prisma": "6.5.0",
     "react-refresh": "^0.10.0",
-    "ts-jest": "^29.1.0",
     "ts-node": "10.9.2",
     "tsup": "^8.5.0",
     "typescript": "5.5.4",
@@ -314,10 +305,6 @@
   },
   "volta": {
     "node": "20.17.0"
-  },
-  "jest-junit": {
-    "outputDirectory": "./reports",
-    "outputName": "junit.xml"
   },
   "pnpm": {
     "overrides": {

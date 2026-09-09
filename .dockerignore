@@ -12,7 +12,6 @@ dist
 /apps/orchestrator/dist
 /apps/extension/dist
 /apps/extension/extension.zip
-.devcontainer
 **/.git
 **/*.md
 **/LICENSE
