@@ -3,52 +3,77 @@ name: Build
 
 on:
   push:
-  merge_group:
   pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  workflow-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.2'
+          cache: false
+
+      - name: Install actionlint
+        run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+
+      - name: Validate GitHub Actions workflows
+        run: actionlint -color
+
   build:
     runs-on: ubuntu-latest
-    
-
-    strategy:
-      matrix:
-        node-version: ['22.12.0']
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    timeout-minutes: 45
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '22.20.0'
+          cache: pnpm
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-          run_install: false
+      - name: Install dependencies and generate Prisma client
+        run: pnpm install --frozen-lockfile
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-#      - name: Setup pnpm cache
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            ${{ env.STORE_PATH }}
-#            ${{ github.workspace }}/.next/cache
-#          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-#          restore-keys: |
-#            ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
+      - name: Build frontend, backend, and orchestrator
         run: pnpm run build
+
+      - name: Build extension
+        run: pnpm run build:extension
+
+      - name: Upload extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-${{ github.run_id }}-${{ github.run_attempt }}
+          path: apps/extension/extension.zip
+          if-no-files-found: error
+
+  containers:
+    needs: [workflow-validation, build]
+    uses: ./.github/workflows/build-containers.yml
+    permissions:
+      contents: read
+      packages: write
