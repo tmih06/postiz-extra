@@ -1,7 +1,5 @@
 # Component Inventory, Primitives & Architecture
-
-Guide for composing, extending, and structuring UI across the Postiz publishing workspace using Beautiful UI primitives, design tokens, and shadcn components.
-
+Guide for composing, extending, and structuring UI across the Meltiply publishing workspace using Beautiful UI primitives, design tokens, and shadcn components.
 ## Component Inventory
 
 ### 1. Atoms (`@/components/atoms/*`)
@@ -35,8 +33,7 @@ Specialized interaction primitives extracted from the Beautiful UI template:
 
 ### 3. Harness & Feature Views
 Primary application routes wired into the navigation shell:
-
-- **`PostizHarness` (`/agent`)**: Interactive AI Studio workspace orchestrating `PromptBar`, `ThinkingState`, `ToolChips`, `StreamingText`, and `ApprovalCard`.
+- **`MeltiplyHarness` (`/agent`)**: Interactive AI Studio workspace orchestrating `PromptBar`, `ThinkingState`, `ToolChips`, `StreamingText`, and `ApprovalCard`.
 - **`Composer` (`/`)**: Multi-platform publishing workspace with group-backed channel preselection, character counters, media upload, and scheduling options.
 - **`PostList` (`/scheduled`, `/list`, `/drafts`)**: High-density table and card views of queued, published, and drafted posts.
 - **`CalendarView` (`/calendar`)**: Visual month and week calendar displaying scheduled slots with quick-edit capabilities.

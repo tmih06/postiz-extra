@@ -5,9 +5,7 @@ license: Complete terms in LICENSE.txt
 ---
 
 # Frontend Design System
-
-A modern, tactile, high-contrast design system built on Beautiful UI tokens, shadcn/ui, Radix primitives, and Tailwind CSS, tailored for the Postiz publishing workspace.
-
+A modern, tactile, high-contrast design system built on Beautiful UI tokens, shadcn/ui, Radix primitives, and Tailwind CSS, tailored for the Meltiply publishing workspace.
 ## Visual Ethos: Cool Canvas, Restrained Ink, and Tactile Depth
 
 The interface relies on crisp hairline boundaries, layered single-digit opacity shadows, a neutral ink ramp, a subtle diagonal striped background canvas, and semantic color used strictly as an intentional condiment.

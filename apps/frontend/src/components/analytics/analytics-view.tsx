@@ -22,11 +22,11 @@ export function AnalyticsView() {
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d'>('30d');
 
   const platforms = [
-    { name: 'Twitter / X', handle: '@postizapp', followers: '14,280', posts: 38, engRate: '4.8%', change: '+12%' },
-    { name: 'LinkedIn', handle: 'Postiz Official', followers: '8,420', posts: 24, engRate: '5.2%', change: '+18%' },
-    { name: 'Instagram', handle: '@postiz.io', followers: '19,500', posts: 18, engRate: '3.9%', change: '+8%' },
-    { name: 'Threads', handle: '@postiz', followers: '6,100', posts: 31, engRate: '6.1%', change: '+29%' },
-    { name: 'YouTube', handle: 'Postiz HQ', followers: '3,890', posts: 6, engRate: '7.4%', change: '+15%' },
+    { name: 'Twitter / X', handle: '@meltiply', followers: '14,280', posts: 38, engRate: '4.8%', change: '+12%' },
+    { name: 'LinkedIn', handle: 'Meltiply Official', followers: '8,420', posts: 24, engRate: '5.2%', change: '+18%' },
+    { name: 'Instagram', handle: '@meltiply.app', followers: '19,500', posts: 18, engRate: '3.9%', change: '+8%' },
+    { name: 'Threads', handle: '@meltiply', followers: '6,100', posts: 31, engRate: '6.1%', change: '+29%' },
+    { name: 'YouTube', handle: 'Meltiply HQ', followers: '3,890', posts: 6, engRate: '7.4%', change: '+15%' },
   ];
 
   const topPosts = [
@@ -52,7 +52,7 @@ export function AnalyticsView() {
     },
     {
       id: 'p3',
-      title: 'Sneak peek at the new Postiz AI Studio harness and design tokens ✨',
+      title: 'Sneak peek at the new Meltiply AI Studio harness and design tokens ✨',
       channels: ['X', 'Threads', 'Instagram'],
       date: 'Aug 28, 2026',
       impressions: '36,100',

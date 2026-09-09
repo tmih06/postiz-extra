@@ -1,7 +1,5 @@
 # Clean Interactive Design & Micro-Interactions
-
-Principles and patterns for building tactile, responsive, and delightful micro-interactions across the Postiz workspace.
-
+Principles and patterns for building tactile, responsive, and delightful micro-interactions across the Meltiply workspace.
 ## Interaction Ethos
 
 Every transition must feel instantaneous and tactile, confirming actions without causing layout shift or drawing undue attention to the animation.

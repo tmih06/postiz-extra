@@ -68,9 +68,9 @@ export function NavigationShell({
         <header className="lg:hidden flex h-14 items-center justify-between border-b border-line bg-surface/90 backdrop-blur-md px-4 shrink-0">
           <div className="flex items-center gap-2">
             <div className="size-7 rounded-[7px] bg-foreground flex items-center justify-center text-background font-black text-xs">
-              P
+              M
             </div>
-            <span className="font-bold text-sm tracking-tight text-ink">POSTIZ</span>
+            <span className="font-bold text-sm tracking-tight text-ink">MELTIPLY</span>
           </div>
 
           <Button

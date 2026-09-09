@@ -44,10 +44,10 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
       <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col items-center text-center">
           <div className="size-10 rounded-lg bg-foreground flex items-center justify-center text-background font-black text-lg tracking-tighter mb-3 shadow-sm">
-            P
+            M
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Sign In to Postiz
+            Sign In to Meltiply
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Access your publishing workspace with session authentication
