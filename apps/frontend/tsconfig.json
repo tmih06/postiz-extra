@@ -16,7 +16,15 @@
         "name": "next"
       }
     ],
-    "types": ["node"]
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@gitroom/frontend/*": ["src/*"],
+      "@gitroom/helpers/*": ["../../libraries/helpers/src/*"],
+      "@gitroom/nestjs-libraries/*": ["../../libraries/nestjs-libraries/src/*"],
+      "@gitroom/react/*": ["../../libraries/react-shared-libraries/src/*"]
+    },
+    "types": ["node", "vite/client"]
   },
   "include": [
     "**/*.ts",
@@ -30,6 +38,7 @@
   ],
   "exclude": [
     "node_modules",
+    "vite.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
   ]

@@ -29,6 +29,8 @@
     "dev:extension": "rm -rf apps/extension/dist && bun run --cwd apps/extension dev",
     "dev:backend": "rm -rf apps/backend/dist && bun run --cwd apps/backend dev",
     "dev:frontend": "rm -rf apps/frontend/dist && bun run --cwd apps/frontend dev",
+    "dev:frontend:legacy": "bun run --cwd apps/frontend dev:legacy",
+    "build:frontend:legacy": "bun run --cwd apps/frontend build:legacy",
     "dev:orchestrator": "rm -rf apps/orchestrator/dist && bun run --cwd apps/orchestrator dev",
     "start:prod:orchestrator": "bun run --cwd apps/orchestrator start",
     "start:prod:backend": "bun run --cwd apps/backend start",
