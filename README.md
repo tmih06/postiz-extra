@@ -119,8 +119,9 @@ GitHub Actions runs on **every branch push**, tag push, pull request, merge queu
 event, and manual dispatch. There are no branch or changed-path filters.
 
 - **Build** (`.github/workflows/build.yml`): validates workflows with pinned
-  actionlint, installs the frozen Bun lockfile, generates Prisma, discovers tests,
-  and builds the frontend, backend, orchestrator, SDK, commands, and extension.
+  actionlint, installs the frozen Bun lockfile, verifies lockfile immutability
+  across repeated frozen installs, generates Prisma, discovers tests, and builds
+  the frontend, backend, orchestrator, SDK, commands, and extension.
   Download `extension-<run-id>-<attempt>` from the run's artifacts to obtain
   `extension.zip`.
 - **Build Containers** (`.github/workflows/build-containers.yml`): a reusable
@@ -171,8 +172,8 @@ Local `.env` files and generated build artifacts are excluded from Docker contex
 
 Workflow linting is not application ESLint coverage. `bun run test` uses Vitest
 discovery: it runs matching tests and propagates failures, or explicitly reports
-`No test files found` when none exist. No application test suite currently exists;
-an empty discovery result is not application coverage.
+`No test files found` when none exist. The Node dependency regression checks the
+backend's CopilotKit/LangChain loading boundary; it is not application coverage.
 
 To exercise the application build locally with the pinned toolchain:
 
@@ -182,13 +183,15 @@ bun run build
 docker build -f Dockerfile.dev -t localhost/postiz .
 ```
 
-For development, use Node **22.20.0** and Bun **1.3.14**. Configure `.env` from
-`.env.example`, start the development dependencies with `bun run dev:docker`,
-then run `bun run dev` (extension, orchestrator, backend, frontend) or
-`bun run dev-backend` (backend and frontend). The concurrent runner is pinned in
-the workspace; these commands do not download a runner on demand. The development
-Compose file uses fixed container names and ports: do not run it alongside an
-existing deployment with the same names or ports.
+For development, use Node **22.20.0** (Node >=22.12.0 <23.0.0) and Bun **1.3.14**.
+Configure `.env` from `.env.example`, then start development dependencies with
+`bun run dev:docker`. Once PostgreSQL and Temporal are ready, initialize the
+development database with `bun run prisma-db-push` and run `bun run dev`
+(extension, orchestrator, backend, frontend) or `bun run dev-backend` (backend
+and frontend). The concurrent runner is pinned in the workspace; these commands
+do not download a runner on demand. The development Compose file uses fixed
+container names and ports: do not run it alongside an existing deployment with
+the same names or ports. Schema push must target only the intended database.
 
 `bun run build` builds all six retained applications without publishing.
 `bun run build:sdk` and `bun run build:commands` are also available individually;
@@ -204,9 +207,16 @@ PM2 is not given package manifests as ecosystem configurations. Run
 `bun run pm2` only against the database intended for that deployment.
 
 Installation explicitly trusts bcrypt's native setup and Prisma's client/engine
-generation scripts. Other third-party lifecycle scripts remain blocked by Bun;
-do not use a blanket trust-all flag. The root postinstall explicitly generates
-Prisma, and the frontend workspace postinstall fetches its GTM asset.
+generation scripts (`trustedDependencies` in `package.json`: `bcrypt`,
+`@prisma/client`, `@prisma/engines`, `prisma`). The first-party `postiz-frontend`
+workspace is also trusted so its GTM asset hook runs when configured. Other
+third-party lifecycle scripts remain blocked by Bun; do not use a blanket
+trust-all flag. The root postinstall explicitly generates Prisma.
+
+The LangChain packages are pinned to the 0.3-core-compatible family required by
+the retained CopilotKit runtime. Upgrade them together only after the Node
+dependency regression and actual backend startup pass; a successful Nest build
+does not resolve or validate its external runtime dependencies.
 
 Workflow changes become active after they are committed and pushed to the branch.
 Manual dispatch additionally requires the entry workflow on the default branch.

@@ -2,21 +2,21 @@
 # Copilot Coding Agent Instructions for Postiz
 
 ## Project Architecture
-- Monorepo managed by NX, with apps in `apps/` and shared code in `libraries/`.
-- Main services: `frontend` (Next.js), `backend` (NestJS), `cron`, `commands`, `extension`, `sdk`, and `workers`.
+- Monorepo managed with Bun workspaces, with apps in `apps/` and shared code in `libraries/`.
+- Main services: `frontend` (Next.js), `backend` (NestJS on Node), `orchestrator` (Temporal worker on Node), `commands`, `extension` (Vite React), and `sdk`.
 - Data layer uses Prisma ORM (`libraries/nestjs-libraries/src/database/prisma/schema.prisma`) with PostgreSQL as the default database.
 - Redis (BullMQ) is used for queues and caching.
 - Email notifications via Resend.
 - Social login integrations (Instagram, Facebook) and Make.com/N8N integrations.
 
 ## Developer Workflows
-- Use Node.js 22+ and Bun 1.3+.
-- Install dependencies: `bun install`
+- Toolchain: Node >=22.12.0 <23.0.0 (pinned CI: 22.20.0) and Bun 1.3.14 (`bun@1.3.14`). Bun manages dependencies and workspace scripts; backend and orchestrator run on Node.
+- Install dependencies: `bun install --frozen-lockfile`
 - Build all apps: `bun run build`
-- Run all apps in dev mode: `bun run dev`
+- Run all apps in dev mode: `bun run dev` (or `bun run dev-backend` for backend + frontend)
 - Individual app scripts are in each app's `package.json` (e.g., `bun run --cwd apps/backend dev`).
+- Local development services: `bun run dev:docker` (or `docker compose -f ./docker-compose.dev.yaml up -d`, PostgreSQL user `postiz-local`, password `postiz-local-pwd`, database `postiz-db-local` on port 5432).
 - Prisma DB commands: `bun run prisma-generate`, `bun run prisma-db-push`, `bun run prisma-reset`.
-- Docker: `docker compose -f ./docker-compose.dev.yaml up -d`
 
 ## Conventions & Patterns
 - Use conventional commits (`feat:`, `fix:`, `chore:`).
