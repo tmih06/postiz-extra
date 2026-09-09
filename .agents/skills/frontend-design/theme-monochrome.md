@@ -1,98 +1,76 @@
-# Monochrome Theme & Minimal Aesthetic
+# Theme Tokens, Color Palette & Visual Description
 
-Black and white visual design system for clean, high-contrast, distraction-free interfaces using Tailwind CSS and shadcn/ui.
+The visual design system uses a cool near-white canvas, white cards, hairline borders, layered single-digit-opacity shadows, a neutral ink ramp, and semantic colors used sparingly as an intentional condiment.
 
-## Visual Ethos: Pure Monochrome
+## Visual Ethos
 
-The interface expresses hierarchy entirely through value, scale, weight, and whitespace—never chromatic accents. Every screen remains crisp, legible, and uncluttered.
+1. **Surfaces**: Cool, blue-tinted neutral backgrounds (`--page`, `--canvas`) that keep interfaces calm and legible. Interactive cards use solid, high-contrast surfaces (`--surface`) with subtle inset fields (`--inset`, `--field`).
+2. **Ink Ramp**: A 3-step value ramp (`--ink`, `--ink-2`, `--ink-3`) provides clear typographical hierarchy without color noise.
+3. **Hairline Boundaries**: Solid, crisp borders (`--line`, `--line-strong`) define edges cleanly rather than fuzzy alpha fades.
+4. **Textured Canvas**: The body features a subtle, fixed 45-degree repeating diagonal stripe texture (`--stripe-bg`, `--stripe`) that grounds floating surface cards and windows.
+5. **Layered Elevation**: Shadow stacks combine a solid 1px hairline ring with soft, multi-tier ambient occlusion for a tactile, floating feel.
 
-- **Primary Canvas**: Pure white (`oklch(1 0 0)`) in light mode; deep black (`oklch(0.145 0 0)`) in dark mode.
-- **Surface Elevation**: Convey depth with hairline borders (`border-border`) or subtle fills (`bg-muted/40`), never heavy drop shadows or gradient washes.
-- **Hierarchy by Contrast**: Use high-contrast headings (`text-foreground`), readable body text, and subdued metadata (`text-muted-foreground`).
-- **Restraint Over Decoration**: Omit colored status pills, gradient buttons, and decorative badges. Let content and typography command attention.
+## Token Specification Table
 
-## Token Mapping
+| Token Variable | Light Mode (OKLCH) | Dark Mode (OKLCH) | Tailwind Class | Purpose |
+|---|---|---|---|---|
+| `--page` | `oklch(0.985 0.001 286.376)` | `oklch(0.209 0.004 264.477)` | `bg-page`, `bg-background` | Viewport / main background |
+| `--canvas` | `oklch(0.961 0.002 247.84)` | `oklch(0.231 0.004 264.487)` | `bg-canvas` | Secondary canvas, rails |
+| `--surface` | `oklch(1 0 0)` | `oklch(0.26 0.006 271.191)` | `bg-surface`, `bg-card` | Cards, modals, elevated panels |
+| `--inset` | `oklch(0.979 0.002 247.839)` | `oklch(0.243 0.004 264.492)` | `bg-inset`, `bg-muted` | Recessed fields, tags |
+| `--hover` | `oklch(0.97 0.002 247.839)` | `oklch(0.289 0.006 271.22)` | `bg-hover` | Interactive hover fill |
+| `--hover-2` | `oklch(0.933 0.003 247.86)` | `oklch(0.318 0.007 274.747)` | `bg-hover-2` | Active item highlight |
+| `--ink` | `oklch(0.247 0.006 258.361)` | `oklch(0.964 0.002 247.839)` | `text-ink`, `text-foreground` | Primary text & titles |
+| `--ink-2` | `oklch(0.506 0.01 264.477)` | `oklch(0.731 0.008 260.731)` | `text-ink-2`, `text-muted-foreground` | Body text, explanations |
+| `--ink-3` | `oklch(0.695 0.009 264.505)` | `oklch(0.541 0.01 264.484)` | `text-ink-3` | Captions, metadata, icons |
+| `--line` | `oklch(0.946 0.003 264.542)` | `oklch(0.308 0.006 258.354)` | `border-line`, `border-border` | Standard 1px dividers |
+| `--line-strong` | `oklch(0.912 0.005 258.326)` | `oklch(0.356 0.007 264.474)` | `border-line-strong` | Active / focused borders |
+| `--accent` | `oklch(0.626 0.205 254.947)` | `oklch(0.68 0.173 253.301)` | `text-accent`, `bg-accent` | Brand violet/indigo accent |
+| `--accent-tint` | `oklch(0.96 0.019 252.878)` | `oklch(0.68 0.173 253.301 / 16%)` | `bg-accent-tint` | Pill backgrounds, selections |
+| `--green` | `oklch(0.603 0.155 150.883)` | `oklch(0.705 0.154 153.814)` | `text-green` | Success, published status |
+| `--green-tint` | `oklch(0.958 0.017 159.118)` | `oklch(0.705 0.154 153.814 / 14%)` | `bg-green-tint` | Success badge background |
+| `--orange` | `oklch(0.689 0.179 49.902)` | `oklch(0.746 0.156 55.642)` | `text-orange` | Warnings, review needed |
+| `--orange-tint`| `oklch(0.964 0.021 67.581)` | `oklch(0.746 0.156 55.642 / 14%)` | `bg-orange-tint` | Warning badge background |
+| `--red` | `oklch(0.621 0.192 23.042)` | `oklch(0.666 0.18 21.433)` | `text-red` | Destructive, failed posts |
+| `--red-tint` | `oklch(0.956 0.017 17.462)` | `oklch(0.666 0.18 21.433 / 14%)` | `bg-red-tint` | Error badge background |
 
-Always use semantic Tailwind utility classes mapped to the project's OKLCH CSS variables.
+## Striped Background Canvas
 
-| Token | Light Value | Dark Value | Purpose |
-|---|---|---|---|
-| `bg-background` | `oklch(1 0 0)` | `oklch(0.145 0 0)` | Primary page background |
-| `text-foreground` | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` | Primary text, titles, prominent icons |
-| `bg-card` | `oklch(1 0 0)` | `oklch(0.205 0 0)` | Elevated surfaces, modals, popovers |
-| `text-card-foreground`| `oklch(0.145 0 0)` | `oklch(0.985 0 0)` | Text inside cards and elevated panels |
-| `bg-muted` | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` | Subtle table rows, badge fills, input backgrounds |
-| `text-muted-foreground` | `oklch(0.556 0 0)` | `oklch(0.708 0 0)` | Secondary labels, timestamps, placeholders |
-| `border-border` | `oklch(0.922 0 0)` | `oklch(1 0 0 / 10%)` | 1px dividers, card boundaries, input outlines |
-| `bg-primary` | `oklch(0.205 0 0)` | `oklch(0.922 0 0)` | Inverted emphasis for primary action buttons |
-| `text-primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.205 0 0)` | High-contrast text on primary buttons |
-| `ring-ring` | `oklch(0.708 0 0)` | `oklch(0.556 0 0)` | Focused control outlines |
+The application background uses a fixed, subtle 45-degree repeating linear gradient:
 
-### Accent Exceptions
-Reserve color strictly for semantic alerts (e.g., `text-destructive` / `bg-destructive/10` for errors). Present warnings, success, and info states using monochrome treatments: icon plus clear text rather than saturated color blocks.
-
-## Typography Scale & Hierarchy
-
-Express information density through typography scale and font weight:
-
-```tsx
-// Page title: prominent, high-contrast, tight tracking
-<h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-  Scheduled Posts
-</h1>
-
-// Section heading: clear demarcation
-<h2 className="text-lg font-medium text-foreground">
-  Connected Channels
-</h2>
-
-// Body copy: comfortable reading measure (< 75 characters)
-<p className="text-sm text-foreground/90 leading-relaxed max-w-prose">
-  Configure posting times and account credentials for each social channel.
-</p>
-
-// Subtitle / meta information: muted, small
-<span className="text-xs text-muted-foreground">
-  Last synced 5 minutes ago
-</span>
-
-// Numerical data / metrics: bold numerals with muted descriptor
-<div className="flex items-baseline gap-2">
-  <span className="text-2xl font-bold tracking-tight text-foreground">1,248</span>
-  <span className="text-xs text-muted-foreground">impressions</span>
-</div>
+```css
+body {
+  background-color: var(--stripe-bg);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 7px,
+    var(--stripe) 7px,
+    var(--stripe) 8px
+  );
+  background-attachment: fixed;
+  color: var(--ink);
+  min-height: 100vh;
+}
 ```
 
-## Spatial Rhythm & Whitespace
+## Layered Shadow Stacks
 
-Whitespace is an active structural element, not dead space.
+Shadows are composed of a crisp hairline boundary coupled with smooth elevation layers:
 
-1. **Section Spacing**: Separate major layout sections with `space-y-8` or `gap-8` (32px).
-2. **Component Spacing**: Group related controls with `gap-3` (12px) or `gap-4` (16px).
-3. **Internal Padding**: Use consistent padding on containers: `p-4 sm:p-6`.
-4. **Hairline Dividers**: Use shadcn `<Separator />` or `border-b border-border` when whitespace alone is insufficient to separate distinct data sets.
+```css
+--shadow-hairline: 0 0 0 1px var(--line);
+--shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px oklch(0 0 0 / 0.04);
+--shadow-card: 0 0 0 1px var(--line), 0 1px 3px oklch(0 0 0 / 0.04), 0 1px 2px oklch(0 0 0 / 0.02);
+--shadow-raised: 0 0 0 1px var(--line), 0 4px 12px oklch(0 0 0 / 0.06);
+--shadow-overlay: 0 0 0 1px var(--line), 0 12px 32px oklch(0 0 0 / 0.12);
+--shadow-inset-field: inset 0 1px 2px oklch(0 0 0 / 0.08);
+```
 
-## Minimal Chrome Rules
+## Standard Radii Scale
 
-- **Borders over Shadows**: Use `border border-border` with `rounded-lg` or `rounded-md`. Prefer clean line work over multi-layered drop shadows.
-- **Muted Badge Patterns**: Status badges use monochrome variants (`variant="secondary"` or `variant="outline"`):
-  ```tsx
-  // Published / Active
-  <Badge variant="secondary" className="font-mono text-xs font-normal">
-    PUBLISHED
-  </Badge>
-
-  // Draft / Inactive
-  <Badge variant="outline" className="text-muted-foreground font-mono text-xs">
-    DRAFT
-  </Badge>
-  ```
-- **Iconography**: Render icons using `lucide-react` with thin or regular stroke weights (`strokeWidth={1.5}` or `1.75`), sized proportionally (`size-4` for inline text, `size-5` for action bars).
-
-## Completion Criteria
-
-Monochrome design is verified when:
-- [ ] No chromatic Tailwind color classes (`bg-blue-*`, `text-emerald-*`, `border-amber-*`) appear outside isolated destructive actions.
-- [ ] Contrast meets WCAG AA standards (minimum 4.5:1 for body copy, 3:1 for large headers).
-- [ ] Both light mode and dark mode render crisp, readable text with correct token inversion.
-- [ ] Layout uses borders and whitespace for hierarchy without relying on heavy box shadows or gradient backgrounds.
+Apply consistent corner rounding based on component role:
+- **6px (`rounded-chip`)**: Inline tokens, status pills, and small indicators.
+- **8px (`rounded-control`)**: Buttons, inputs, dropdown items, and navigation buttons.
+- **10px (`rounded-card`)**: Surface cards, forms, insight panels, and tables.
+- **14px (`rounded-window`)**: Modals, large floating dialogs, and workspace drawers.
