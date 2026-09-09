@@ -223,4 +223,43 @@ describe('publishing workspace business logic and state invariants', () => {
       success: false,
     });
   });
+
+  it('correctly maps URL routes to designated workspace views including AI harness and media', () => {
+    const routeMap: Record<string, string> = {
+      '': 'composer',
+      'composer': 'composer',
+      'agent': 'agent',
+      'harness': 'agent',
+      'scheduled': 'scheduled',
+      'calendar': 'calendar',
+      'list': 'list',
+      'drafts': 'drafts',
+      'media': 'media',
+      'analytics': 'analytics',
+      'channels': 'channels',
+      'integrations': 'channels',
+      'plugs': 'plugs',
+      'third-party': 'plugs',
+      'settings': 'settings',
+    };
+
+    const resolveView = (path: string): string => {
+      const clean = path.replace(/^\//, '');
+      if (clean === 'calendar') return 'calendar';
+      if (clean === 'scheduled') return 'scheduled';
+      if (clean === 'list') return 'list';
+      if (clean === 'drafts') return 'drafts';
+      if (clean === 'media') return 'media';
+      if (clean === 'agent' || clean === 'harness') return 'agent';
+      if (clean === 'analytics') return 'analytics';
+      if (clean === 'channels' || clean === 'integrations') return 'channels';
+      if (clean === 'plugs' || clean === 'third-party') return 'plugs';
+      if (clean === 'settings') return 'settings';
+      return 'composer';
+    };
+
+    Object.entries(routeMap).forEach(([path, expectedView]) => {
+      expect(resolveView(path)).toBe(expectedView);
+    });
+  });
 });

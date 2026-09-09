@@ -4,10 +4,15 @@ import { NavigationShell, type WorkspaceView } from '@/components/layout/navigat
 import { Composer } from '@/components/composer/composer';
 import { PostList } from '@/components/publications/post-list';
 import { CalendarView } from '@/components/publications/calendar-view';
+import { PostizHarness } from '@/components/harness/postiz-harness';
+import { MediaView } from '@/components/media/media-view';
+import { AnalyticsView } from '@/components/analytics/analytics-view';
+import { ChannelsView } from '@/components/channels/channels-view';
+import { PlugsView } from '@/components/plugs/plugs-view';
+import { SettingsView } from '@/components/settings/settings-view';
 import { LoginView } from '@/components/auth/login-view';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-
 function WorkspaceRouter() {
   const { user, isLoading } = useWorkspace();
   const [currentView, setCurrentView] = useState<WorkspaceView>(() => {
@@ -17,21 +22,29 @@ function WorkspaceRouter() {
     if (path === 'list') return 'list';
     if (path === 'drafts') return 'drafts';
     if (path === 'media') return 'media';
+    if (path === 'agent' || path === 'harness') return 'agent';
+    if (path === 'analytics') return 'analytics';
+    if (path === 'channels' || path === 'integrations') return 'channels';
+    if (path === 'plugs' || path === 'third-party') return 'plugs';
+    if (path === 'settings') return 'settings';
     return 'composer';
   });
   const [editingGroupId, setEditingGroupId] = useState<string | undefined>(undefined);
 
   // Sync with browser history
   useEffect(() => {
-    const handlePopState = () => {
       const path = window.location.pathname.replace(/^\//, '');
       if (path === 'calendar') setCurrentView('calendar');
       else if (path === 'scheduled') setCurrentView('scheduled');
       else if (path === 'list') setCurrentView('list');
       else if (path === 'drafts') setCurrentView('drafts');
       else if (path === 'media') setCurrentView('media');
+      else if (path === 'agent' || path === 'harness') setCurrentView('agent');
+      else if (path === 'analytics') setCurrentView('analytics');
+      else if (path === 'channels' || path === 'integrations') setCurrentView('channels');
+      else if (path === 'plugs' || path === 'third-party') setCurrentView('plugs');
+      else if (path === 'settings') setCurrentView('settings');
       else setCurrentView('composer');
-    };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -80,6 +93,13 @@ function WorkspaceRouter() {
           }}
         />
       )}
+      {currentView === 'agent' && (
+        <PostizHarness
+          onScheduleAction={() => {
+            handleNavigate('scheduled');
+          }}
+        />
+      )}
 
       {currentView === 'scheduled' && (
         <PostList
@@ -121,18 +141,20 @@ function WorkspaceRouter() {
       )}
 
       {currentView === 'media' && (
-        <div className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-              Media Library
-            </h2>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Upload and manage assets for reuse across social posts. Open the Composer to attach assets directly.
-            </p>
-          </div>
-          <Composer />
-        </div>
+        <MediaView
+          onUseInComposer={() => {
+            handleNavigate('composer');
+          }}
+        />
       )}
+
+      {currentView === 'analytics' && <AnalyticsView />}
+
+      {currentView === 'channels' && <ChannelsView />}
+
+      {currentView === 'plugs' && <PlugsView />}
+
+      {currentView === 'settings' && <SettingsView />}
     </NavigationShell>
   );
 }
