@@ -108,6 +108,8 @@ export interface PostDetailItem {
   status: string;
   state?: string;
   releaseId?: string | null;
+  errorMessage?: string | null;
+  error?: string | null;
   integration: ChannelIntegration;
   content: PostContentItem[];
   settings?: Record<string, unknown>;

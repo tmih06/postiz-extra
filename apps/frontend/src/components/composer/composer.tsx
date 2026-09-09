@@ -29,6 +29,7 @@ import type {
   MediaItem,
   PostSubmissionItem,
 } from '@/api/types';
+import { isVideoPath } from '@/lib/media';
 interface ChannelOverride {
   content: string;
   hasOverride: boolean;
@@ -47,6 +48,7 @@ export function Composer({
     integrations,
     selectedChannelIds,
     selectedCustomerId,
+    setSelectedChannelIds,
     refreshWorkspace,
   } = useWorkspace();
 
@@ -72,21 +74,62 @@ export function Composer({
 
   const storageKey = `postiz_composer_draft_${selectedCustomerId}`;
 
-  // Load draft from localStorage on mount/group change
+  // Load existing post group if initialGroup is provided
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.sharedContent !== undefined) setSharedContent(parsed.sharedContent);
-        if (parsed.sharedMedia) setSharedMedia(parsed.sharedMedia);
-        if (parsed.channelOverrides) setChannelOverrides(parsed.channelOverrides);
+    if (!initialGroup) {
+      // Load draft from localStorage on mount/group change
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.sharedContent !== undefined) setSharedContent(parsed.sharedContent);
+          if (parsed.sharedMedia) setSharedMedia(parsed.sharedMedia);
+          if (parsed.channelOverrides) setChannelOverrides(parsed.channelOverrides);
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
+      return;
     }
-  }, [storageKey]);
 
+    let isMounted = true;
+    (async () => {
+      try {
+        const postItems = await api.getPostByGroup(initialGroup);
+        if (!isMounted || !postItems?.length) return;
+        const first = postItems[0];
+        setSharedContent(first.content?.[0]?.content || '');
+        setSharedMedia(first.content?.[0]?.image || []);
+        if (first.publishDate) {
+          const d = new Date(first.publishDate);
+          d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+          setScheduleDate(d.toISOString().slice(0, 16));
+        }
+        const overrides: Record<string, ChannelOverride> = {};
+        const channelIds: string[] = [];
+        for (const p of postItems) {
+          if (p.integration?.id) {
+            channelIds.push(p.integration.id);
+            overrides[p.integration.id] = {
+              content: p.content?.[0]?.content || '',
+              hasOverride:
+                (p.content?.[0]?.content || '') !==
+                (first.content?.[0]?.content || ''),
+              settings: p.settings || {},
+            };
+          }
+        }
+        setChannelOverrides(overrides);
+        setSelectedChannelIds(channelIds);
+      } catch {
+        // ignore fetch error
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialGroup, api, setSelectedChannelIds, storageKey]);
   // Save draft to localStorage on edit
   useEffect(() => {
     try {
@@ -291,9 +334,9 @@ export function Composer({
       )}
 
       {/* Main Composer Card */}
-      <Card className="border border-border shadow-sm">
-        <CardHeader className="p-4 pb-2 border-b border-border">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Card className="border border-border shadow-sm">
+          <CardHeader className="p-4 pb-2 border-b border-border">
             <div className="flex items-center justify-between overflow-x-auto pb-1">
               <TabsList className="bg-muted">
                 <TabsTrigger value="shared" className="text-xs font-semibold">
@@ -315,95 +358,87 @@ export function Composer({
                 ))}
               </TabsList>
             </div>
-          </Tabs>
-        </CardHeader>
+          </CardHeader>
 
-        <CardContent className="p-4 space-y-4">
-          {activeTab === 'shared' ? (
-            /* Shared Content View */
-            <div className="flex flex-col gap-4">
-              <div className="relative">
-                <Textarea
-                  placeholder="What do you want to publish? Share across all selected destinations..."
-                  value={sharedContent}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setSharedContent(e.target.value)}
-                  className="min-h-[160px] text-base resize-y font-normal bg-background"
-                />
-                <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
-                  <span>
-                    Targeting {selectedChannels.length} channel
-                    {selectedChannels.length === 1 ? '' : 's'}
-                  </span>
-                  <span className="font-mono">{sharedContent.length} characters</span>
-                </div>
-              </div>
-
-              {/* Media Attachments */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-foreground">
-                    Attached Media ({sharedMedia.length})
-                  </span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setMediaModalOpen(true)}
-                    className="h-8 text-xs gap-1.5"
-                  >
-                    <ImageIcon className="size-3.5" />
-                    Add Media
-                  </Button>
-                </div>
-
-                {sharedMedia.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    {sharedMedia.map((m, idx) => {
-                      const isVideo =
-                        m.path.endsWith('.mp4') ||
-                        m.path.endsWith('.mov') ||
-                        m.path.endsWith('.webm');
-                      return (
-                        <div
-                          key={m.id + idx}
-                          className="relative group aspect-square rounded-lg border border-border overflow-hidden bg-muted"
-                        >
-                          {isVideo ? (
-                            <video
-                              src={m.path}
-                              className="size-full object-cover"
-                            />
-                          ) : (
-                            <img
-                              src={m.path}
-                              alt={m.name || 'media'}
-                              className="size-full object-cover"
-                            />
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveMedia(idx)}
-                            className="absolute top-1 right-1 size-5 rounded-full bg-background/80 text-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground shadow"
-                          >
-                            <X className="size-3" />
-                          </button>
-                          <div className="absolute bottom-0 inset-x-0 bg-background/80 px-1 text-[9px] truncate text-foreground">
-                            {m.name}
-                          </div>
-                        </div>
-                      );
-                    })}
+          <CardContent className="p-4 flex flex-col gap-4">
+            <TabsContent value="shared" className="mt-0">
+              {/* Shared Content View */}
+              <div className="flex flex-col gap-4">
+                <div className="relative">
+                  <Textarea
+                    placeholder="What do you want to publish? Share across all selected destinations..."
+                    value={sharedContent}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setSharedContent(e.target.value)}
+                    className="min-h-[160px] text-base resize-y font-normal bg-background"
+                  />
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+                    <span>
+                      Targeting {selectedChannels.length} channel
+                      {selectedChannels.length === 1 ? '' : 's'}
+                    </span>
+                    <span className="font-mono">{sharedContent.length} characters</span>
                   </div>
-                )}
+                </div>
+
+                {/* Media Attachments */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-foreground">
+                      Attached Media ({sharedMedia.length})
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setMediaModalOpen(true)}
+                      className="h-8 text-xs gap-1.5"
+                    >
+                      <ImageIcon className="size-3.5" />
+                      Add Media
+                    </Button>
+                  </div>
+
+                  {sharedMedia.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                      {sharedMedia.map((m, idx) => {
+                        const isVideo = isVideoPath(m.path);
+                        return (
+                          <div
+                            key={m.id + idx}
+                            className="relative group aspect-square rounded-lg border border-border overflow-hidden bg-muted"
+                          >
+                            {isVideo ? (
+                              <video
+                                src={m.path}
+                                className="size-full object-cover"
+                              />
+                            ) : (
+                              <img
+                                src={m.path}
+                                alt={m.name || 'media'}
+                                className="size-full object-cover"
+                              />
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveMedia(idx)}
+                              className="absolute top-1 right-1 size-5 rounded-full bg-background/80 text-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground shadow"
+                            >
+                              <X className="size-3" />
+                            </button>
+                            <div className="absolute bottom-0 inset-x-0 bg-background/80 px-1 text-[9px] truncate text-foreground">
+                              {m.name}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            /* Channel-Specific Customization View */
-            (() => {
-              const currentChannel = selectedChannels.find(
-                (ch: ChannelIntegration) => ch.id === activeTab
-              );
-              if (!currentChannel) return null;
+            </TabsContent>
+
+            {selectedChannels.map((currentChannel: ChannelIntegration) => {
               const override = channelOverrides[currentChannel.id] || {
                 content: sharedContent,
                 hasOverride: false,
@@ -411,72 +446,77 @@ export function Composer({
               };
 
               return (
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between border-b border-border pb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-foreground">
-                        {currentChannel.name}
-                      </span>
-                      <Badge variant="outline" className="font-mono text-xs uppercase">
-                        {currentChannel.providerIdentifier}
-                      </Badge>
-                    </div>
+                <TabsContent
+                  key={currentChannel.id}
+                  value={currentChannel.id}
+                  className="mt-0"
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between border-b border-border pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-foreground">
+                          {currentChannel.name}
+                        </span>
+                        <Badge variant="outline" className="font-mono text-xs uppercase">
+                          {currentChannel.providerIdentifier}
+                        </Badge>
+                      </div>
 
-                    <Button
-                      type="button"
-                      variant={override.hasOverride ? 'secondary' : 'outline'}
-                      size="sm"
-                      onClick={() =>
-                        handleChannelOverrideChange(currentChannel.id, {
-                          hasOverride: !override.hasOverride,
-                          content: override.hasOverride
-                            ? sharedContent
-                            : override.content,
-                        })
-                      }
-                      className="text-xs"
-                    >
-                      {override.hasOverride
-                        ? 'Remove Custom Override'
-                        : 'Customize for This Channel'}
-                    </Button>
-                  </div>
-
-                  {override.hasOverride && (
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-medium text-muted-foreground">
-                        Custom Text for {currentChannel.name}
-                      </label>
-                      <Textarea
-                        value={override.content}
-                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      <Button
+                        type="button"
+                        variant={override.hasOverride ? 'secondary' : 'outline'}
+                        size="sm"
+                        onClick={() =>
                           handleChannelOverrideChange(currentChannel.id, {
-                            content: e.target.value,
+                            hasOverride: !override.hasOverride,
+                            content: override.hasOverride
+                              ? sharedContent
+                              : override.content,
                           })
                         }
-                        className="min-h-[120px] text-sm resize-y"
-                      />
-                      <span className="text-[10px] text-muted-foreground self-end font-mono">
-                        {override.content.length} characters
-                      </span>
+                        className="text-xs"
+                      >
+                        {override.hasOverride
+                          ? 'Remove Custom Override'
+                          : 'Customize for This Channel'}
+                      </Button>
                     </div>
-                  )}
 
-                  {/* Provider Specific Settings */}
-                  <PlatformSettings
-                    provider={currentChannel.providerIdentifier}
-                    channelName={currentChannel.name}
-                    settings={override.settings}
-                    onChange={(newSettings) =>
-                      handleChannelOverrideChange(currentChannel.id, {
-                        settings: newSettings,
-                      })
-                    }
-                  />
-                </div>
+                    {override.hasOverride && (
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Custom Text for {currentChannel.name}
+                        </label>
+                        <Textarea
+                          value={override.content}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                            handleChannelOverrideChange(currentChannel.id, {
+                              content: e.target.value,
+                            })
+                          }
+                          className="min-h-[120px] text-sm resize-y"
+                        />
+                        <span className="text-[10px] text-muted-foreground self-end font-mono">
+                          {override.content.length} characters
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Provider Specific Settings */}
+                    <PlatformSettings
+                      provider={currentChannel.providerIdentifier}
+                      channelName={currentChannel.name}
+                      settings={override.settings}
+                      onChange={(newSettings) =>
+                        handleChannelOverrideChange(currentChannel.id, {
+                          settings: newSettings,
+                        })
+                      }
+                    />
+                  </div>
+                </TabsContent>
               );
-            })()
-          )}
+            })}
 
           <Separator className="my-4" />
 
@@ -559,6 +599,7 @@ export function Composer({
           </div>
         </CardContent>
       </Card>
+      </Tabs>
 
       <MediaLibraryModal
         open={mediaModalOpen}

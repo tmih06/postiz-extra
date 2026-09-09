@@ -262,6 +262,29 @@ export function CalendarView({ onSelectPost }: CalendarViewProps) {
                         <p className="truncate text-foreground/90 font-medium mt-0.5">
                           {content || 'Post draft'}
                         </p>
+                        <div className="flex flex-wrap items-center gap-1 mt-1">
+                          {(post.posts ?? []).map((chPost) => {
+                            const s = (chPost.status || '').toUpperCase();
+                            const isSuccess = s === 'SUCCESS' || s === 'PUBLISHED';
+                            const isError = s === 'ERROR' || s === 'FAILED';
+                            const provider = chPost.integration?.providerIdentifier || '';
+                            return (
+                              <span
+                                key={chPost.id}
+                                title={`${chPost.integration?.name || 'Channel'}: ${s}`}
+                                className={cn(
+                                  'inline-flex items-center gap-0.5 rounded px-1 text-[8px] font-mono uppercase font-semibold border',
+                                  isSuccess && 'border-border bg-secondary text-secondary-foreground',
+                                  isError && 'border-destructive/40 bg-destructive/15 text-destructive',
+                                  !isSuccess && !isError && 'border-border bg-muted/60 text-muted-foreground'
+                                )}
+                              >
+                                {provider}
+                                {isSuccess ? '✓' : isError ? '!' : '…'}
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
                     );
                   })}

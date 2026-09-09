@@ -41,7 +41,7 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 antialiased">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col items-center text-center">
           <div className="size-10 rounded-lg bg-foreground flex items-center justify-center text-background font-black text-lg tracking-tighter mb-3 shadow-sm">
             P
@@ -56,7 +56,7 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
 
         <Card className="border border-border shadow-sm">
           <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {error && (
                 <div className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
                   <AlertCircle className="size-4 shrink-0" />
@@ -64,7 +64,7 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
                 </div>
               )}
 
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="email"
                   className="text-xs font-semibold text-foreground flex items-center gap-1.5"
@@ -84,7 +84,7 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="password"
                   className="text-xs font-semibold text-foreground flex items-center gap-1.5"

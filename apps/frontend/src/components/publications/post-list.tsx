@@ -150,11 +150,11 @@ export function PostList({
 
       {/* Posts Listing */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="border border-border">
               <CardContent className="p-6">
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   <div className="flex justify-between">
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-4 w-20" />
@@ -177,7 +177,7 @@ export function PostList({
           </EmptyDescription>
         </Empty>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {posts.map((postGroup) => {
             const groupId = postGroup.group || postGroup.id;
             const primaryPost = postGroup.posts?.[0];
@@ -241,7 +241,6 @@ export function PostList({
                       </div>
                     )}
                   </div>
-
                   {/* Channel Delivery Outcomes */}
                   <div className="flex flex-col gap-2 pt-2 border-t border-border/40">
                     <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
@@ -252,21 +251,29 @@ export function PostList({
                         const channelName = chPost.integration?.name || 'Channel';
                         const provider = chPost.integration?.providerIdentifier || '';
                         const status = chPost.status || 'PENDING';
+                        const errorDetail = chPost.errorMessage || chPost.error;
 
                         return (
                           <div
                             key={chPost.id}
-                            className="flex items-center gap-2 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs"
+                            className="flex flex-col gap-1 rounded-lg border border-border bg-background p-2 text-xs"
                           >
-                            <span className="font-medium text-foreground truncate max-w-[120px]">
-                              {channelName}
-                            </span>
-                            {provider && (
-                              <Badge variant="outline" className="font-mono text-[9px] uppercase">
-                                {provider}
-                              </Badge>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-foreground truncate max-w-[120px]">
+                                {channelName}
+                              </span>
+                              {provider && (
+                                <Badge variant="outline" className="font-mono text-[9px] uppercase">
+                                  {provider}
+                                </Badge>
+                              )}
+                              {getStatusBadge(status)}
+                            </div>
+                            {errorDetail && (
+                              <span className="text-[10px] text-destructive max-w-xs break-words">
+                                {errorDetail}
+                              </span>
                             )}
-                            {getStatusBadge(status)}
                           </div>
                         );
                       })}

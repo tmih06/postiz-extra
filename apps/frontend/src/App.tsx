@@ -48,13 +48,13 @@ function WorkspaceRouter() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
-        <div className="w-full max-w-md space-y-4">
+        <div className="w-full max-w-md flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <Skeleton className="size-8 rounded-lg" />
             <Skeleton className="h-6 w-32" />
           </div>
           <Card className="border border-border">
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-6 flex flex-col gap-4">
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-10 w-full rounded-md" />
@@ -121,7 +121,7 @@ function WorkspaceRouter() {
       )}
 
       {currentView === 'media' && (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Media Library

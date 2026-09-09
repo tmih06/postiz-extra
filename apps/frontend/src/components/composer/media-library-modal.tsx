@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Upload, Image as ImageIcon, Search, Check, Trash2, Loader2 } from 'lucide-react';
 import type { UploadedMedia, MediaItem } from '@/api/types';
 import { cn } from '@/lib/utils';
-
+import { isVideoPath } from '@/lib/media';
 interface MediaLibraryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -150,7 +150,7 @@ export function MediaLibraryModal({
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {mediaList.map((item) => {
-                const isVideo = item.path.endsWith('.mp4') || item.path.endsWith('.mov') || item.path.endsWith('.webm');
+                const isVideo = isVideoPath(item.path);
                 return (
                   <div
                     key={item.id}
