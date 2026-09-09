@@ -136,20 +136,15 @@ this workflow migration.
 
 ### Image delivery
 
-Successful pushes publish a multi-platform image to the lowercase
+Pushing a new Git tag publishes a multi-platform image to the lowercase
 `ghcr.io/<owner>/<repository>` namespace. For this fork:
 `ghcr.io/tmih06/postiz-extra`.
 
-| Event | Image tags |
+| Event | Action / Image tags |
 | --- | --- |
-| Branch push | `branch-<sanitized-branch>`, `sha-<full-commit-sha>` |
-| Default-branch push | The branch/SHA tags above, plus `latest` |
-| Tag push | `tag-<sanitized-tag>`, `sha-<full-commit-sha>` |
-| Pull request, merge queue, manual dispatch | Build validation only; no registry login or publication |
+| Tag push | Builds and publishes multi-platform image: `<git-tag>`, `latest`, `sha-<full-commit-sha>` |
+| Branch push, pull request, merge queue, manual dispatch | Build validation only (`push: false`); no registry login or publication |
 
-Ref prefixes prevent a feature branch or Git tag named `latest` from replacing
-the default-branch image. Prefer the full SHA tag or image digest for deployment:
-sanitized branch/tag names are mutable aliases and can collide after sanitization.
 Only image-publishing jobs receive package-write permission. They use GitHub's
 automatic `GITHUB_TOKEN`, not an upstream PAT or a custom registry secret.
 The repository must permit GitHub Actions and GHCR package creation; an existing
@@ -172,7 +167,7 @@ Local `.env` files and generated build artifacts are excluded from Docker contex
 | Stale issue/PR closure | Removed upstream-only issue policy; planned work is not auto-closed |
 | Website issue-label closure | Removed upstream-specific support routing and auto-closure |
 | Extensionless `eslint` workflow | GitHub never loaded it; referenced missing configs and suppressed failures |
-| Upstream container registry/tag-only publishing | Fork-owned GHCR delivery on all pushes |
+| Upstream container registry/tag-only publishing | Fork-owned GHCR delivery on tag pushes |
 | Main/path-restricted CodeQL | Unfiltered security analysis |
 
 Workflow linting is not application ESLint coverage. The repository does not yet
