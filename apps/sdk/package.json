@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "publish": "tsup && pnpm publish --access public"
+    "publish": "tsup && bun publish --access public"
   },
   "files": [
     "dist"

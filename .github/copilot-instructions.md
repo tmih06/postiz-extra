@@ -10,12 +10,12 @@
 - Social login integrations (Instagram, Facebook) and Make.com/N8N integrations.
 
 ## Developer Workflows
-- Use Node.js 20.17.0 and pnpm 8+.
-- Install dependencies: `pnpm install`
-- Build all apps: `pnpm run build`
-- Run all apps in dev mode: `pnpm run dev`
-- Individual app scripts are in each app's `package.json` (e.g., `pnpm --filter ./apps/backend run dev`).
-- Prisma DB commands: `pnpm run prisma-generate`, `pnpm run prisma-db-push`, `pnpm run prisma-reset`.
+- Use Node.js 22+ and Bun 1.3+.
+- Install dependencies: `bun install`
+- Build all apps: `bun run build`
+- Run all apps in dev mode: `bun run dev`
+- Individual app scripts are in each app's `package.json` (e.g., `bun run --cwd apps/backend dev`).
+- Prisma DB commands: `bun run prisma-generate`, `bun run prisma-db-push`, `bun run prisma-reset`.
 - Docker: `docker compose -f ./docker-compose.dev.yaml up -d`
 
 ## Conventions & Patterns
@@ -36,7 +36,7 @@
 - `libraries/` — Shared code and modules
 - `docker-compose.dev.yaml` — Local development Docker setup
 - `.env` — Environment configuration
-- `pnpm-workspace.yaml` — Workspace package management
+- `bun.lock` — Bun lockfile
 - `README.md` — General project overview
 - `libraries/nestjs-libraries/src/database/prisma/schema.prisma` — Database schema
 

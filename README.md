@@ -119,7 +119,7 @@ GitHub Actions runs on **every branch push**, tag push, pull request, merge queu
 event, and manual dispatch. There are no branch or changed-path filters.
 
 - **Build** (`.github/workflows/build.yml`): validates workflows with pinned
-  actionlint, installs the frozen pnpm lockfile, generates Prisma, builds the
+  actionlint, installs the frozen Bun lockfile, generates Prisma, builds the
   frontend/backend/orchestrator, and packages the browser extension. Download
   `extension-<run-id>-<attempt>` from the run's artifacts to obtain `extension.zip`.
 - **Build Containers** (`.github/workflows/build-containers.yml`): a reusable
@@ -129,10 +129,8 @@ event, and manual dispatch. There are no branch or changed-path filters.
   and TypeScript on the same events. It reports security findings separately;
   container publication is gated by Build, not by CodeQL findings.
 
-CI currently uses Node **22.20.0** and pnpm **10.6.1**, matching the existing
-application and Docker toolchain. The planned Bun migration must update the
-workspace, lockfile, CI, and Docker installation together; it is not part of
-this workflow migration.
+CI currently uses Node **22.20.0** and Bun **1.3.14**, matching the application
+and Docker toolchain.
 
 ### Image delivery
 
@@ -177,9 +175,9 @@ does not use empty passing test jobs or suppress build failures to imply otherwi
 To exercise the application build locally with the pinned toolchain:
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm run build
-pnpm run build:extension
+bun install --frozen-lockfile
+bun run build
+bun run build:extension
 docker build -f Dockerfile.dev -t localhost/postiz .
 ```
 
