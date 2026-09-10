@@ -31,8 +31,11 @@ if (
   process.exit(2);
 }
 
-// Keep interactive work responsive. Each child also has a fixed V8 heap budget.
-setPriority(0, 10);
+// Keep interactive work responsive. Each child has a fixed V8 heap budget locally; CI runners have dedicated memory.
+const isCI = process.env.CI === 'true' || process.env.CI === '1' || Boolean(process.env.GITHUB_ACTIONS);
+if (!isCI) {
+  setPriority(0, 10);
+}
 
 const selected = scope === 'all' ? Object.keys(scopes) : [scope];
 const paths = [...new Set(selected.flatMap((name) => scopes[name]))];
@@ -65,8 +68,9 @@ for (const check of checks) {
     const result = spawnSync(
       process.execPath,
       [
-        '--max-old-space-size=512',
-        '--max-semi-space-size=16',
+        ...(isCI
+          ? []
+          : ['--max-old-space-size=512', '--max-semi-space-size=16']),
         resolve(
           dirname(require.resolve(`${check.package}/package.json`)),
           check.executable
