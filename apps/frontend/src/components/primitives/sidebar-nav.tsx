@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/context/workspace.context';
+import type { CustomerProfile } from '@/api/types';
 import {
   PenSquare,
   Sparkles,
@@ -69,10 +70,166 @@ const PRIMARY_NAV_ITEMS: NavItem[] = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+interface WorkspaceDropdownProps {
+  customers: CustomerProfile[];
+  selectedCustomer: CustomerProfile | null;
+  onSelectCustomer: (customer: CustomerProfile | null) => void;
+  onManage: () => void;
+}
+
+function WorkspaceDropdown({
+  customers,
+  selectedCustomer,
+  onSelectCustomer,
+  onManage,
+}: WorkspaceDropdownProps) {
+  return (
+    <div
+      className="absolute left-0 top-full z-50 mt-1 w-60 rounded-card border border-line bg-surface p-1.5 shadow-overlay backdrop-blur-md"
+      style={{ animation: 'pop-in 160ms cubic-bezier(0.23,1,0.32,1) both' }}
+    >
+      <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-3">
+        Switch Brand Profile
+      </div>
+
+      <div className="flex flex-col gap-0.5">
+        <button
+          type="button"
+          onClick={() => onSelectCustomer(null)}
+          className={cn(
+            'flex w-full items-center justify-between rounded-control px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors',
+            !selectedCustomer
+              ? 'bg-hover-2 text-ink font-semibold'
+              : 'text-ink-2 hover:bg-hover'
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <span className="flex size-5 items-center justify-center rounded bg-line font-bold text-[10px]">
+              P
+            </span>
+            <span>All Profiles</span>
+          </div>
+          {!selectedCustomer && <Check className="size-3.5 text-accent" />}
+        </button>
+
+        {customers.map((c) => {
+          const isSelected = selectedCustomer?.id === c.id;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onSelectCustomer(c)}
+              className={cn(
+                'flex w-full items-center justify-between rounded-control px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors',
+                isSelected
+                  ? 'bg-hover-2 text-ink font-semibold'
+                  : 'text-ink-2 hover:bg-hover'
+              )}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded bg-line/80 font-bold text-[10px]">
+                  {c.name.charAt(0).toUpperCase()}
+                </span>
+                <span className="truncate">{c.name}</span>
+              </div>
+              {isSelected && <Check className="size-3.5 text-accent shrink-0" />}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-1.5 border-t border-line-soft pt-1.5">
+        <button
+          type="button"
+          onClick={onManage}
+          className="flex w-full items-center gap-2 rounded-control px-2.5 py-1.5 text-left text-[12px] font-medium text-ink-2 hover:bg-hover hover:text-ink transition-colors"
+        >
+          <Plus className="size-3.5 text-ink-3" />
+          <span>Manage Profiles & Teams</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+interface QuickSearchProps {
+  collapsed: boolean;
+  searchOpen: boolean;
+  searchQuery: string;
+  searchInputRef: React.RefObject<HTMLInputElement | null>;
+  onOpenSearch: () => void;
+  onCloseSearch: () => void;
+  onChangeQuery: (query: string) => void;
+}
+
+function QuickSearch({
+  collapsed,
+  searchOpen,
+  searchQuery,
+  searchInputRef,
+  onOpenSearch,
+  onCloseSearch,
+  onChangeQuery,
+}: QuickSearchProps) {
+  if (searchOpen && !collapsed) {
+    return (
+      <div className="px-2 py-1">
+        <div className="relative flex items-center">
+          <Search className="absolute left-2.5 size-3.5 text-ink-3 pointer-events-none" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onChangeQuery(e.target.value)}
+            placeholder="Jump to..."
+            className="h-8 w-full rounded-control border border-line bg-page pl-8 pr-7 text-[13px] text-ink placeholder:text-ink-3 focus:border-line-strong focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={onCloseSearch}
+            className="absolute right-2 text-ink-3 hover:text-ink"
+          >
+            <X className="size-3.5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-2 py-1">
+      <button
+        type="button"
+        onClick={onOpenSearch}
+        className="flex h-8 w-full items-center rounded-control border border-line/60 bg-page/60 px-1.5 text-left text-[13px] text-ink-3 transition-colors hover:border-line hover:bg-hover hover:text-ink overflow-hidden"
+        title={collapsed ? 'Search' : undefined}
+      >
+        <span className="flex size-7 shrink-0 items-center justify-center">
+          <Search className="size-3.5" />
+        </span>
+        <AnimatePresence initial={false}>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -4 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="ml-1.5 flex flex-1 items-center justify-between overflow-hidden"
+            >
+              <span>Search</span>
+              <span className="font-mono text-[10.5px] rounded border border-line bg-surface px-1 py-0.2 text-ink-3">
+                ⌘K
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </button>
+    </div>
+  );
+}
 export function SidebarNav({
   currentView,
   onNavigate,
-  onSelectRecent,
+  onSelectRecent: _onSelectRecent,
   className = '',
 }: SidebarNavProps) {
   const { user, customers, selectedCustomer, setSelectedCustomer, logout } = useWorkspace();
@@ -148,43 +305,33 @@ export function SidebarNav({
   return (
     <aside
       className={cn(
-        'relative flex flex-col border-r border-line bg-surface select-none transition-[width] duration-250',
+        'relative flex flex-col border-r border-line bg-surface select-none transition-[width] duration-300',
         collapsed ? 'w-[56px]' : 'w-[240px]',
         className
       )}
-      style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+      style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }}
     >
-      <LayoutGroup id="sidebar-layout">
         {/* Brand & Workspace Switcher */}
-        <div className="relative p-2.5 pb-2">
+        <div className="relative p-2 pb-2">
           <div ref={workspaceMenuRef} className="relative">
-            <motion.button
-              layout
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            <button
               type="button"
               onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-              className={cn(
-                'flex w-full items-center gap-2 rounded-control p-1.5 text-left transition-colors hover:bg-hover active:scale-[0.98]',
-                collapsed && 'justify-center p-1'
-              )}
+              className="flex w-full items-center rounded-control p-1.5 text-left transition-colors hover:bg-hover active:scale-[0.98]"
               title={currentBrandName}
             >
-              <motion.div
-                layout
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-foreground text-background font-black text-xs shadow-hairline"
-              >
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-foreground text-background font-black text-xs shadow-hairline">
                 {brandMonogram}
-              </motion.div>
+              </div>
 
-              <AnimatePresence mode="popLayout" initial={false}>
+              <AnimatePresence initial={false}>
                 {!collapsed && (
                   <motion.div
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -6 }}
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex min-w-0 flex-1 items-center justify-between overflow-hidden"
+                    className="ml-2 flex min-w-0 flex-1 items-center justify-between overflow-hidden"
                   >
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate text-[13px] font-bold tracking-tight text-ink leading-none">
@@ -198,141 +345,39 @@ export function SidebarNav({
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.button>
+            </button>
 
           {/* Workspace Dropdown */}
           {workspaceMenuOpen && (
-            <div
-              className="absolute left-0 top-full z-50 mt-1 w-60 rounded-card border border-line bg-surface p-1.5 shadow-overlay backdrop-blur-md"
-              style={{ animation: 'pop-in 160ms cubic-bezier(0.23,1,0.32,1) both' }}
-            >
-              <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-3">
-                Switch Brand Profile
-              </div>
-
-              <div className="flex flex-col gap-0.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCustomer(null);
-                    setWorkspaceMenuOpen(false);
-                  }}
-                  className={cn(
-                    'flex w-full items-center justify-between rounded-control px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors',
-                    !selectedCustomer
-                      ? 'bg-hover-2 text-ink font-semibold'
-                      : 'text-ink-2 hover:bg-hover'
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="flex size-5 items-center justify-center rounded bg-line font-bold text-[10px]">
-                      P
-                    </span>
-                    <span>All Profiles</span>
-                  </div>
-                  {!selectedCustomer && <Check className="size-3.5 text-accent" />}
-                </button>
-
-                {customers.map((c) => {
-                  const isSelected = selectedCustomer?.id === c.id;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCustomer(c);
-                        setWorkspaceMenuOpen(false);
-                      }}
-                      className={cn(
-                        'flex w-full items-center justify-between rounded-control px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors',
-                        isSelected
-                          ? 'bg-hover-2 text-ink font-semibold'
-                          : 'text-ink-2 hover:bg-hover'
-                      )}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <span className="flex size-5 shrink-0 items-center justify-center rounded bg-line/80 font-bold text-[10px]">
-                          {c.name.charAt(0).toUpperCase()}
-                        </span>
-                        <span className="truncate">{c.name}</span>
-                      </div>
-                      {isSelected && <Check className="size-3.5 text-accent shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-1.5 border-t border-line-soft pt-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setWorkspaceMenuOpen(false);
-                    onNavigate('settings');
-                  }}
-                  className="flex w-full items-center gap-2 rounded-control px-2.5 py-1.5 text-left text-[12px] font-medium text-ink-2 hover:bg-hover hover:text-ink transition-colors"
-                >
-                  <Plus className="size-3.5 text-ink-3" />
-                  <span>Manage Profiles & Teams</span>
-                </button>
-              </div>
-            </div>
+            <WorkspaceDropdown
+              customers={customers}
+              selectedCustomer={selectedCustomer}
+              onSelectCustomer={(c) => {
+                setSelectedCustomer(c);
+                setWorkspaceMenuOpen(false);
+              }}
+              onManage={() => {
+                setWorkspaceMenuOpen(false);
+                onNavigate('settings');
+              }}
+            />
           )}
         </div>
       </div>
 
       {/* Quick Search */}
-      {!collapsed ? (
-        <div className="px-2.5 py-1">
-          {searchOpen ? (
-            <div className="relative flex items-center">
-              <Search className="absolute left-2.5 size-3.5 text-ink-3 pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Jump to..."
-                className="h-8 w-full rounded-control border border-line bg-page pl-8 pr-7 text-[13px] text-ink placeholder:text-ink-3 focus:border-line-strong focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSearchOpen(false);
-                }}
-                className="absolute right-2 text-ink-3 hover:text-ink"
-              >
-                <X className="size-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleOpenSearch}
-              className="flex h-8 w-full items-center justify-between rounded-control border border-line/60 bg-page/60 px-2.5 text-left text-[13px] text-ink-3 transition-colors hover:border-line hover:bg-hover hover:text-ink"
-            >
-              <div className="flex items-center gap-2">
-                <Search className="size-3.5" />
-                <span>Search</span>
-              </div>
-              <span className="font-mono text-[10.5px] rounded border border-line bg-surface px-1 py-0.2 text-ink-3">
-                ⌘K
-              </span>
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="flex justify-center px-2 py-1">
-          <button
-            type="button"
-            onClick={handleOpenSearch}
-            className="flex size-8 items-center justify-center rounded-control text-ink-2 hover:bg-hover hover:text-ink transition-colors"
-            title="Search"
-          >
-            <Search className="size-4" />
-          </button>
-        </div>
-      )}
+      <QuickSearch
+        collapsed={collapsed}
+        searchOpen={searchOpen}
+        searchQuery={searchQuery}
+        searchInputRef={searchInputRef}
+        onOpenSearch={handleOpenSearch}
+        onCloseSearch={() => {
+          setSearchQuery('');
+          setSearchOpen(false);
+        }}
+        onChangeQuery={setSearchQuery}
+      />
 
       {/* Navigation List */}
       <nav className="flex-1 overflow-y-auto px-2 py-2 hide-scrollbar">
@@ -353,7 +398,7 @@ export function SidebarNav({
                 onClick={() => onNavigate(item.id)}
                 className={cn(
                   'relative z-10 flex h-8 items-center rounded-[7px] text-left transition-all active:scale-[0.98]',
-                  collapsed ? 'justify-center px-0' : 'px-2.5',
+                  'px-1.5',
                   isActive
                     ? 'bg-hover-2 font-semibold text-ink group-hover/glide:bg-transparent'
                     : 'text-ink-2 hover:text-ink font-medium'
@@ -362,21 +407,21 @@ export function SidebarNav({
               >
                 <span
                   className={cn(
-                    'flex size-4 shrink-0 items-center justify-center',
+                    'flex size-7 shrink-0 items-center justify-center',
                     isActive ? 'text-ink' : 'text-ink-2'
                   )}
                 >
                   <Icon className="size-4" />
                 </span>
 
-                <AnimatePresence mode="popLayout" initial={false}>
+                <AnimatePresence initial={false}>
                   {!collapsed && (
                     <motion.div
                       initial={{ opacity: 0, x: -4 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -4 }}
                       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="ml-2.5 flex flex-1 items-center justify-between overflow-hidden"
+                      className="ml-1.5 flex flex-1 items-center justify-between overflow-hidden"
                     >
                       <span className="truncate text-[13.5px] tracking-tight">
                         {item.label}
@@ -397,36 +442,31 @@ export function SidebarNav({
 
       {/* Footer Controls: Theme, Collapse, User */}
         {/* Footer Controls: Theme, Collapse, User */}
-        <motion.div
-          layout
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="border-t border-line p-2 flex flex-col gap-1 overflow-hidden"
-        >
-          <motion.div
-            layout
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className={cn(
-              'flex items-center',
-              collapsed ? 'flex-col gap-1' : 'justify-between px-1'
-            )}
+        <div className="border-t border-line p-2 flex flex-col gap-1">
+          <div
+            className="relative w-full transition-[height] duration-300"
+            style={{
+              height: collapsed ? '60px' : '28px',
+              transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
           >
-            <motion.button
-              layout
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            <button
               type="button"
               onClick={toggleTheme}
-              className="flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors shrink-0"
+              className="absolute left-1.5 top-0 flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors shrink-0"
               title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
             >
               {isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-            </motion.button>
+            </button>
 
-            <motion.button
-              layout
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            <button
               type="button"
               onClick={() => setCollapsed(!collapsed)}
-              className="flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors shrink-0"
+              className="absolute right-1.5 flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink shrink-0"
+              style={{
+                top: collapsed ? '32px' : '0px',
+                transition: 'top 300ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 150ms ease, color 150ms ease',
+              }}
               title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {collapsed ? (
@@ -434,56 +474,37 @@ export function SidebarNav({
               ) : (
                 <PanelLeftClose className="size-3.5" />
               )}
-            </motion.button>
-          </motion.div>
+            </button>
+          </div>
 
           {/* User profile row */}
-          <motion.div
-            layout
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className={cn(
-              'flex items-center rounded-control p-1 text-left transition-colors hover:bg-hover/70 min-h-[36px] overflow-hidden',
-              collapsed ? 'justify-center' : 'justify-between'
-            )}
-          >
-            <motion.div
-              layout
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-2 min-w-0"
-            >
-              <motion.div
-                layout
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="shrink-0"
-              >
-                <Avatar className="size-7 border border-line shrink-0">
-                  <AvatarFallback className="text-[11px] font-bold bg-muted text-ink">
-                    {userInitials}
-                  </AvatarFallback>
-                </Avatar>
-              </motion.div>
+          <div className="flex items-center rounded-control p-1.5 text-left transition-colors hover:bg-hover/70 min-h-[36px] overflow-hidden">
+            <Avatar className="size-7 border border-line shrink-0">
+              <AvatarFallback className="text-[11px] font-bold bg-muted text-ink">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
 
-              <AnimatePresence mode="popLayout" initial={false}>
-                {!collapsed && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -6 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex flex-col truncate leading-tight overflow-hidden"
-                  >
-                    <span className="text-[12.5px] font-semibold text-ink truncate">
-                      {user?.name || 'Creator'}
-                    </span>
-                    <span className="text-[10px] text-ink-3 truncate font-mono">
-                      {user?.email || 'admin@postiz.com'}
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -6 }}
+                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  className="ml-2.5 flex flex-1 min-w-0 flex-col justify-center leading-tight overflow-hidden"
+                >
+                  <span className="text-[12.5px] font-semibold text-ink truncate">
+                    {user?.name || 'Creator'}
+                  </span>
+                  <span className="text-[10px] text-ink-3 truncate font-mono">
+                    {user?.email || 'admin@postiz.com'}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <AnimatePresence mode="popLayout" initial={false}>
+            <AnimatePresence initial={false}>
               {!collapsed && (
                 <motion.button
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -491,7 +512,9 @@ export function SidebarNav({
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
                   type="button"
-                  onClick={logout}
+                  onClick={() => {
+                    logout().catch(() => {});
+                  }}
                   className="size-6 shrink-0 flex items-center justify-center rounded text-ink-3 hover:bg-red-tint hover:text-red transition-colors ml-1"
                   title="Sign out"
                 >
@@ -499,9 +522,8 @@ export function SidebarNav({
                 </motion.button>
               )}
             </AnimatePresence>
-          </motion.div>
-        </motion.div>
-      </LayoutGroup>
+          </div>
+        </div>
     </aside>
   );
 }
