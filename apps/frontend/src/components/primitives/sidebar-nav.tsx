@@ -1,33 +1,31 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/context/workspace.context';
 import type { CustomerProfile } from '@/api/types';
 import {
-  PenSquare,
-  Sparkles,
-  Clock,
-  Calendar,
-  ListFilter,
-  FileText,
-  Image as ImageIcon,
-  BarChart3,
-  Share2,
-  Puzzle,
-  Settings,
-  Search,
-  ChevronDown,
-  Check,
-  Plus,
-  PanelLeftClose,
-  PanelLeft,
-  Moon,
-  Sun,
-  LogOut,
-  X,
-} from 'lucide-react';
+  AnimatedSquarePen,
+  AnimatedSparkles,
+  AnimatedClock,
+  AnimatedCalendar,
+  AnimatedListFilter,
+  AnimatedFileText,
+  AnimatedImage,
+  AnimatedBarChart,
+  AnimatedShare,
+  AnimatedPuzzle,
+  AnimatedSettings,
+  AnimatedSearch,
+  AnimatedChevronDown,
+  AnimatedCheck,
+  AnimatedPlus,
+  AnimatedThemeToggle,
+  AnimatedCollapseToggle,
+  AnimatedLogOut,
+  AnimatedX,
+} from '@/components/ui/animated-icons';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { GlideMenu } from './glide-menu';
+import { SidebarGlideHighlight } from './sidebar-glide-highlight';
 
 export type WorkspaceView =
   | 'composer'
@@ -45,7 +43,7 @@ export type WorkspaceView =
 export interface NavItem {
   id: WorkspaceView;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; isHovered?: boolean }>;
   badge?: string;
 }
 
@@ -57,17 +55,17 @@ export interface SidebarNavProps {
 }
 
 const PRIMARY_NAV_ITEMS: NavItem[] = [
-  { id: 'composer', label: 'Composer', icon: PenSquare },
-  { id: 'agent', label: 'AI Studio', icon: Sparkles, badge: 'AI' },
-  { id: 'scheduled', label: 'Scheduled', icon: Clock },
-  { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'list', label: 'Publications', icon: ListFilter },
-  { id: 'drafts', label: 'Drafts', icon: FileText },
-  { id: 'media', label: 'Media Library', icon: ImageIcon },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { id: 'channels', label: 'Social Channels', icon: Share2 },
-  { id: 'plugs', label: 'Integrations', icon: Puzzle },
-  { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'composer', label: 'Composer', icon: AnimatedSquarePen },
+  { id: 'agent', label: 'AI Studio', icon: AnimatedSparkles, badge: 'AI' },
+  { id: 'scheduled', label: 'Scheduled', icon: AnimatedClock },
+  { id: 'calendar', label: 'Calendar', icon: AnimatedCalendar },
+  { id: 'list', label: 'Publications', icon: AnimatedListFilter },
+  { id: 'drafts', label: 'Drafts', icon: AnimatedFileText },
+  { id: 'media', label: 'Media Library', icon: AnimatedImage },
+  { id: 'analytics', label: 'Analytics', icon: AnimatedBarChart },
+  { id: 'channels', label: 'Social Channels', icon: AnimatedShare },
+  { id: 'plugs', label: 'Integrations', icon: AnimatedPuzzle },
+  { id: 'settings', label: 'Settings', icon: AnimatedSettings },
 ];
 
 interface WorkspaceDropdownProps {
@@ -109,7 +107,7 @@ function WorkspaceDropdown({
             </span>
             <span>All Profiles</span>
           </div>
-          {!selectedCustomer && <Check className="size-3.5 text-accent" />}
+          {!selectedCustomer && <AnimatedCheck className="size-3.5 text-accent" />}
         </button>
 
         {customers.map((c) => {
@@ -132,7 +130,7 @@ function WorkspaceDropdown({
                 </span>
                 <span className="truncate">{c.name}</span>
               </div>
-              {isSelected && <Check className="size-3.5 text-accent shrink-0" />}
+              {isSelected && <AnimatedCheck className="size-3.5 text-accent shrink-0" />}
             </button>
           );
         })}
@@ -144,7 +142,7 @@ function WorkspaceDropdown({
           onClick={onManage}
           className="flex w-full items-center gap-2 rounded-control px-2.5 py-1.5 text-left text-[12px] font-medium text-ink-2 hover:bg-hover hover:text-ink transition-colors"
         >
-          <Plus className="size-3.5 text-ink-3" />
+          <AnimatedPlus className="size-3.5 text-ink-3" />
           <span>Manage Profiles & Teams</span>
         </button>
       </div>
@@ -174,7 +172,7 @@ function QuickSearch({
     return (
       <div className="px-2 py-1">
         <div className="relative flex items-center">
-          <Search className="absolute left-2.5 size-3.5 text-ink-3 pointer-events-none" />
+          <AnimatedSearch className="absolute left-2.5 size-3.5 text-ink-3 pointer-events-none" />
           <input
             ref={searchInputRef}
             type="text"
@@ -188,7 +186,7 @@ function QuickSearch({
             onClick={onCloseSearch}
             className="absolute right-2 text-ink-3 hover:text-ink"
           >
-            <X className="size-3.5" />
+            <AnimatedX className="size-3.5" />
           </button>
         </div>
       </div>
@@ -204,7 +202,7 @@ function QuickSearch({
         title={collapsed ? 'Search' : undefined}
       >
         <span className="flex size-7 shrink-0 items-center justify-center">
-          <Search className="size-3.5" />
+          <AnimatedSearch className="size-3.5" />
         </span>
         <AnimatePresence initial={false}>
           {!collapsed && (
@@ -247,6 +245,11 @@ export function SidebarNav({
     }
     return false;
   });
+  const [hoveredNavId, setHoveredNavId] = useState<WorkspaceView | null>(null);
+  const [themeHovered, setThemeHovered] = useState(false);
+  const [collapseHovered, setCollapseHovered] = useState(false);
+  const [wsHovered, setWsHovered] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
   const workspaceMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -321,6 +324,8 @@ export function SidebarNav({
             <button
               type="button"
               onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+              onMouseEnter={() => setWsHovered(true)}
+              onMouseLeave={() => setWsHovered(false)}
               className="flex w-full items-center rounded-control p-1.5 text-left transition-colors hover:bg-hover active:scale-[0.98]"
               title={currentBrandName}
             >
@@ -345,7 +350,7 @@ export function SidebarNav({
                         Postiz Workspace
                       </span>
                     </div>
-                    <ChevronDown className="size-3.5 shrink-0 text-ink-3 ml-1" />
+                    <AnimatedChevronDown isHovered={wsHovered} className="size-3.5 shrink-0 text-ink-3 ml-1" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -384,12 +389,9 @@ export function SidebarNav({
       />
 
       {/* Navigation List */}
-      <nav className="flex-1 overflow-y-auto px-2 py-2 hide-scrollbar">
-        <GlideMenu
-          rowSelector="[data-nav-row]"
-          highlightClassName="rounded-[7px] bg-hover"
-          className="flex flex-col gap-0.5"
-        >
+      <nav ref={navRef} className="relative flex-1 overflow-y-auto px-2 py-2 hide-scrollbar">
+        <SidebarGlideHighlight containerRef={navRef} itemSelector="[data-nav-row]" />
+        <div className="flex flex-col gap-0.5">
           {filteredNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -400,6 +402,8 @@ export function SidebarNav({
                 data-nav-row
                 type="button"
                 onClick={() => onNavigate(item.id)}
+                onMouseEnter={() => setHoveredNavId(item.id)}
+                onMouseLeave={() => setHoveredNavId(null)}
                 className={cn(
                   'relative z-10 flex h-8 items-center rounded-[7px] text-left transition-all active:scale-[0.98]',
                   'px-1.5',
@@ -415,7 +419,7 @@ export function SidebarNav({
                     isActive ? 'text-ink' : 'text-ink-2'
                   )}
                 >
-                  <Icon className="size-4" />
+                  <Icon className="size-4" isHovered={hoveredNavId === item.id} />
                 </span>
 
                 <AnimatePresence initial={false}>
@@ -441,7 +445,7 @@ export function SidebarNav({
               </button>
             );
           })}
-        </GlideMenu>
+        </div>
       </nav>
 
       {/* Footer Controls: Theme, Collapse, User */}
@@ -457,15 +461,18 @@ export function SidebarNav({
             <button
               type="button"
               onClick={toggleTheme}
+              onMouseEnter={() => setThemeHovered(true)}
+              onMouseLeave={() => setThemeHovered(false)}
               className="absolute left-1.5 top-0 flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors shrink-0"
               title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
             >
-              {isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+              <AnimatedThemeToggle isDark={isDark} isHovered={themeHovered} className="size-3.5" />
             </button>
-
             <button
               type="button"
               onClick={() => setCollapsed(!collapsed)}
+              onMouseEnter={() => setCollapseHovered(true)}
+              onMouseLeave={() => setCollapseHovered(false)}
               className="absolute right-1.5 flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink shrink-0"
               style={{
                 top: collapsed ? '32px' : '0px',
@@ -473,11 +480,7 @@ export function SidebarNav({
               }}
               title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
-              {collapsed ? (
-                <PanelLeft className="size-3.5" />
-              ) : (
-                <PanelLeftClose className="size-3.5" />
-              )}
+              <AnimatedCollapseToggle collapsed={collapsed} isHovered={collapseHovered} className="size-3.5" />
             </button>
           </div>
 
@@ -522,7 +525,7 @@ export function SidebarNav({
                   className="size-6 shrink-0 flex items-center justify-center rounded text-ink-3 hover:bg-red-tint hover:text-red transition-colors ml-1"
                   title="Sign out"
                 >
-                  <LogOut className="size-3.5" />
+                  <AnimatedLogOut className="size-3.5" />
                 </motion.button>
               )}
             </AnimatePresence>
