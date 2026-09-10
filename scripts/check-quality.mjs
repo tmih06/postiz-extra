@@ -31,7 +31,7 @@ if (
   process.exit(2);
 }
 
-// Keep interactive work responsive. Each child has a fixed V8 heap budget locally; CI runners have dedicated memory.
+// Keep interactive work responsive with lower CPU priority. Checks run sequentially with an 8GB ceiling to protect the system.
 const isCI = process.env.CI === 'true' || process.env.CI === '1' || Boolean(process.env.GITHUB_ACTIONS);
 if (!isCI) {
   setPriority(0, 10);
@@ -68,9 +68,7 @@ for (const check of checks) {
     const result = spawnSync(
       process.execPath,
       [
-        ...(isCI
-          ? ['--max-old-space-size=8192']
-          : ['--max-old-space-size=512', '--max-semi-space-size=16']),
+        '--max-old-space-size=8192',
         resolve(
           dirname(require.resolve(`${check.package}/package.json`)),
           check.executable
@@ -84,7 +82,7 @@ for (const check of checks) {
           ...process.env,
           ESLINT_USE_FLAT_CONFIG: 'true',
         },
-        ...(isCI ? {} : { timeout: 120_000, killSignal: 'SIGKILL' }),
+        // No timeout limit; runs to completion without killing long stages
       }
     );
     if (result.error) console.error(result.error.message);

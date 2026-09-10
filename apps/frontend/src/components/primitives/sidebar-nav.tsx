@@ -232,7 +232,11 @@ export function SidebarNav({
   onSelectRecent: _onSelectRecent,
   className = '',
 }: SidebarNavProps) {
-  const { user, customers, selectedCustomer, setSelectedCustomer, logout } = useWorkspace();
+  const { user, customers, selectedCustomerId, setSelectedCustomerId, logout } = useWorkspace();
+  const selectedCustomer = customers.find((c: CustomerProfile) => c.id === selectedCustomerId) || null;
+  const setSelectedCustomer = (customer: CustomerProfile | null) => {
+    setSelectedCustomerId(customer ? customer.id : 'all');
+  };
   const [collapsed, setCollapsed] = useState(false);
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
