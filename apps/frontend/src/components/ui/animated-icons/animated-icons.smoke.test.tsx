@@ -21,6 +21,7 @@ import {
   AnimatedCollapseToggle,
   AnimatedLogOut,
   AnimatedX,
+  useIconLoop,
 } from './index';
 
 import { SidebarNav } from '@/components/primitives/sidebar-nav';
@@ -171,6 +172,27 @@ describe('Sidebar Animated Lucide Icons', () => {
 
       // Gliding highlight items inside the flex-1 nav range
       expect(html).toContain('data-nav-row');
+    });
+  });
+
+  describe('useIconLoop repeating and full-cycle animation management', () => {
+    it('exports useIconLoop as a valid hook function', () => {
+      expect(typeof useIconLoop).toBe('function');
+    });
+
+    it('renders icons with useIconLoop attached when hovered', () => {
+      const penHtml = renderToStaticMarkup(<AnimatedSquarePen isHovered={true} className="size-4" />);
+      expect(penHtml).toContain('<svg');
+      expect(penHtml).toContain('d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"');
+
+      const gearHtml = renderToStaticMarkup(<AnimatedSettings isHovered={true} className="size-4" />);
+      expect(gearHtml).toContain('<svg');
+
+      const themeHtml = renderToStaticMarkup(<AnimatedThemeToggle isDark={true} isHovered={true} className="size-3.5" />);
+      expect(themeHtml).toContain('<circle cx="12" cy="12" r="4"');
+
+      const collapseHtml = renderToStaticMarkup(<AnimatedCollapseToggle collapsed={false} isHovered={true} className="size-3.5" />);
+      expect(collapseHtml).toContain('d="m16 15-3-3 3-3"');
     });
   });
 });

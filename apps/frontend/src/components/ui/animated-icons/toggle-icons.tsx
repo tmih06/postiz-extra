@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import type { AnimatedIconProps } from './types';
+import { useIconLoop } from './use-icon-loop';
 
 export interface AnimatedThemeToggleProps extends Omit<AnimatedIconProps, 'children'> {
   isDark: boolean;
 }
 
-// Multi-variant Theme Toggle: Animates between Sun and Moon on toggle + micro-hover
+// Multi-variant Theme Toggle: Smooth morph between Sun and Moon on toggle + repeating micro-hover
 export function AnimatedThemeToggle({
   isDark,
   size,
@@ -21,6 +22,7 @@ export function AnimatedThemeToggle({
 }: AnimatedThemeToggleProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -58,14 +60,16 @@ export function AnimatedThemeToggle({
             >
               {/* Sun center circle */}
               <circle cx="12" cy="12" r="4" />
-              {/* 8 Sun rays that pulse/shimmer on hover */}
+              {/* 8 Sun rays that shimmer in full loop while hovered */}
               <motion.g
-                animate={
-                  active
-                    ? { rotate: [0, 20, -15, 0] }
-                    : { rotate: 0 }
-                }
-                transition={{ duration: 0.7, ease: 'easeInOut' }}
+                animate={controls}
+                variants={{
+                  normal: { rotate: 0 },
+                  animate: {
+                    rotate: [0, 20, -15, 0],
+                    transition: { duration: 0.7, ease: 'easeInOut' },
+                  },
+                }}
                 style={{ originX: '12px', originY: '12px' }}
               >
                 <line x1="12" y1="2" x2="12" y2="4" />
@@ -97,12 +101,14 @@ export function AnimatedThemeToggle({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              animate={
-                active
-                  ? { rotate: [0, -12, 12, -4, 0] }
-                  : { rotate: 0 }
-              }
-              transition={{ duration: 0.7, ease: 'easeInOut' }}
+              animate={controls}
+              variants={{
+                normal: { rotate: 0 },
+                animate: {
+                  rotate: [0, -12, 12, -4, 0],
+                  transition: { duration: 0.7, ease: 'easeInOut' },
+                },
+              }}
               style={{ originX: '12px', originY: '12px' }}
             >
               <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
@@ -118,7 +124,7 @@ export interface AnimatedCollapseToggleProps extends Omit<AnimatedIconProps, 'ch
   collapsed: boolean;
 }
 
-// Multi-variant Collapse Toggle: Animates chevron pointing direction on toggle + micro-hover
+// Multi-variant Collapse Toggle: smooth morph between left (collapse) and right (expand) + repeating micro-hover
 export function AnimatedCollapseToggle({
   collapsed,
   size,
@@ -130,6 +136,7 @@ export function AnimatedCollapseToggle({
 }: AnimatedCollapseToggleProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -158,7 +165,7 @@ export function AnimatedCollapseToggle({
         <rect height="18" rx="2" width="18" x="3" y="3" />
         {/* Sidebar partition line */}
         <path d="M9 3v18" />
-        {/* Animated Chevron: smooth morph between left (collapse) and right (expand) + hover nudge */}
+        {/* Animated Chevron: smooth morph between left (collapse) and right (expand) + full cycle hover nudge */}
         <AnimatePresence mode="wait" initial={false}>
           {collapsed ? (
             // Expand chevron (points right, expands sidebar)
@@ -166,7 +173,15 @@ export function AnimatedCollapseToggle({
               key="expand"
               d="m14 9 3 3-3 3"
               initial={{ opacity: 0, x: -2 }}
-              animate={{ opacity: 1, x: active ? 2 : 0 }}
+              animate={controls}
+              variants={{
+                normal: { opacity: 1, x: 0 },
+                animate: {
+                  opacity: 1,
+                  x: [0, 2.5, 0],
+                  transition: { duration: 0.5, ease: 'easeInOut' },
+                },
+              }}
               exit={{ opacity: 0, x: 2 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
             />
@@ -176,7 +191,15 @@ export function AnimatedCollapseToggle({
               key="collapse"
               d="m16 15-3-3 3-3"
               initial={{ opacity: 0, x: 2 }}
-              animate={{ opacity: 1, x: active ? -2 : 0 }}
+              animate={controls}
+              variants={{
+                normal: { opacity: 1, x: 0 },
+                animate: {
+                  opacity: 1,
+                  x: [0, -2.5, 0],
+                  transition: { duration: 0.5, ease: 'easeInOut' },
+                },
+              }}
               exit={{ opacity: 0, x: -2 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
             />

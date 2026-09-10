@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import type { AnimatedIconProps } from './types';
+import { useIconLoop } from './use-icon-loop';
 
 // 1. Search: Magnifying glass with searching translate & angle sweep
 export function AnimatedSearch({
@@ -16,6 +17,7 @@ export function AnimatedSearch({
 }: AnimatedIconProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -39,16 +41,16 @@ export function AnimatedSearch({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        animate={
-          active
-            ? {
-                x: [0, -1.5, 1.5, -0.5, 0],
-                y: [0, -1.5, 1.5, -0.5, 0],
-                rotate: [0, -6, 6, 0],
-              }
-            : { x: 0, y: 0, rotate: 0 }
-        }
-        transition={{ duration: 0.5, ease: 'easeInOut' }}
+        animate={controls}
+        variants={{
+          normal: { x: 0, y: 0, rotate: 0 },
+          animate: {
+            x: [0, -1.5, 1.5, -0.5, 0],
+            y: [0, -1.5, 1.5, -0.5, 0],
+            rotate: [0, -6, 6, 0],
+            transition: { duration: 0.55, ease: 'easeInOut' },
+          },
+        }}
         style={{ originX: '11px', originY: '11px' }}
       >
         <circle cx="11" cy="11" r="8" />
@@ -69,6 +71,7 @@ export function AnimatedX({
 }: AnimatedIconProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -92,8 +95,15 @@ export function AnimatedX({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        animate={active ? { rotate: 90, scale: [1, 1.15, 1] } : { rotate: 0, scale: 1 }}
-        transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+        animate={controls}
+        variants={{
+          normal: { rotate: 0, scale: 1 },
+          animate: {
+            rotate: [0, 90],
+            scale: [1, 1.15, 1],
+            transition: { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] },
+          },
+        }}
       >
         <path d="M18 6 6 18M6 6l12 12" />
       </motion.svg>
@@ -112,6 +122,7 @@ export function AnimatedChevronDown({
 }: AnimatedIconProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -138,8 +149,11 @@ export function AnimatedChevronDown({
       >
         <motion.path
           d="m6 9 6 6 6-6"
-          animate={active ? { y: [0, 2.5, 0] } : { y: 0 }}
-          transition={{ duration: 0.35, ease: 'easeOut' }}
+          animate={controls}
+          variants={{
+            normal: { y: 0 },
+            animate: { y: [0, 2.5, 0], transition: { duration: 0.4, ease: 'easeOut' } },
+          }}
         />
       </svg>
     </div>
@@ -157,6 +171,7 @@ export function AnimatedCheck({
 }: AnimatedIconProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -183,8 +198,14 @@ export function AnimatedCheck({
       >
         <motion.path
           d="M20 6 9 17l-5-5"
-          animate={active ? { scale: [1, 1.25, 0.95, 1] } : { scale: 1 }}
-          transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+          animate={controls}
+          variants={{
+            normal: { scale: 1 },
+            animate: {
+              scale: [1, 1.25, 0.95, 1],
+              transition: { duration: 0.45, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
           style={{ originX: '12px', originY: '12px' }}
         />
       </svg>
@@ -203,6 +224,7 @@ export function AnimatedPlus({
 }: AnimatedIconProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -226,8 +248,14 @@ export function AnimatedPlus({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        animate={active ? { rotate: 90 } : { rotate: 0 }}
-        transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+        animate={controls}
+        variants={{
+          normal: { rotate: 0 },
+          animate: {
+            rotate: [0, 90],
+            transition: { duration: 0.45, ease: [0.34, 1.56, 0.64, 1] },
+          },
+        }}
       >
         <path d="M5 12h14M12 5v14" />
       </motion.svg>
@@ -246,6 +274,7 @@ export function AnimatedLogOut({
 }: AnimatedIconProps) {
   const [internalHovered, setInternalHovered] = useState(false);
   const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
 
   return (
     <div
@@ -270,12 +299,16 @@ export function AnimatedLogOut({
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        {/* Door frame */}
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        {/* Exiting arrow */}
         <motion.g
-          animate={active ? { x: [0, 3.5, 0] } : { x: 0 }}
-          transition={{ duration: 0.45, ease: 'easeInOut' }}
+          animate={controls}
+          variants={{
+            normal: { x: 0 },
+            animate: {
+              x: [0, 3.5, 0],
+              transition: { duration: 0.5, ease: 'easeInOut' },
+            },
+          }}
         >
           <polyline points="16 17 21 12 16 7" />
           <line x1="21" y1="12" x2="9" y2="12" />
