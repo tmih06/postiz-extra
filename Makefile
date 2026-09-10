@@ -10,6 +10,8 @@ SERVICE ?=
 CONFIRM ?=
 
 .PHONY: help doctor env install setup dev dev-backend dev-frontend dev-api dev-worker dev-extension dev-legacy deps deps-stop deps-down deps-logs status health db-generate db-push db-studio db-reset build build-backend build-frontend build-orchestrator build-extension build-sdk build-commands build-legacy test clean
+.PHONY: dev-seed
+.PHONY: check check-frontend check-backend
 
 help: ## List commands (default)
 	@printf 'Postiz local development\n\nFirst run: make setup && make dev\nStop dev: Ctrl-C; stop dependencies: make deps-stop\nUI: http://localhost:4200\n\n'
@@ -57,6 +59,9 @@ dev-extension: ## Build and watch the browser extension
 
 dev-legacy: env ## Run legacy Next.js handlers/UI on port 4201
 	bun run dev:frontend:legacy
+
+dev-seed: deps ## Create local-only test login (dev@example.com / PostizLocal123!); never reset existing passwords
+	bun scripts/seed-local-user.ts
 
 deps: env ## Start isolated dependencies and wait until healthy
 	$(COMPOSE) up -d --wait
@@ -112,6 +117,15 @@ build-legacy: ## Build the legacy Next.js frontend
 
 test: ## Run the existing Vitest suite
 	bun run test
+
+check: ## Strict types, lint, and duplication checks for all apps and libraries
+	node scripts/check-quality.mjs all
+
+check-frontend: ## Check frontend, shared React code, and helpers
+	node scripts/check-quality.mjs frontend
+
+check-backend: ## Check API, worker, commands, SDK, NestJS libraries, and helpers
+	node scripts/check-quality.mjs backend
 
 clean: ## Remove generated builds/caches only; stop app watchers first
 	rm -rf apps/backend/dist apps/orchestrator/dist apps/frontend/dist apps/extension/dist apps/commands/dist apps/sdk/dist apps/frontend/.next

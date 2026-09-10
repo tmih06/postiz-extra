@@ -267,6 +267,7 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.7.1",
+    "@eslint/js": "8.57.0",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.2.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.17",
@@ -292,7 +293,9 @@
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
+    "agentation-mcp": "^1.2.0",
     "autoprefixer": "^10.5.5",
+    "concurrently": "9.2.1",
     "cross-env": "^10.1.0",
     "eslint": "8.57.0",
     "eslint-config-next": "16.2.6",
@@ -302,8 +305,10 @@
     "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "4.6.0",
     "fs-extra": "^11.4.0",
+    "jscpd": "4.0.5",
     "jsdom": "~22.1.0",
     "nodemon": "^3.1.14",
+    "pm2": "7.0.4",
     "postcss": "8.5.26",
     "prettier": "^2.8.8",
     "prisma": "6.5.0",
@@ -313,9 +318,7 @@
     "typescript": "5.5.4",
     "vite": "^8.2.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "3.1.4",
-    "concurrently": "9.2.1",
-    "pm2": "7.0.4"
+    "vitest": "3.1.4"
   },
   "overrides": {
     "multer": "^2.2.0",

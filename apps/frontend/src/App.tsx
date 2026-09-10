@@ -13,6 +13,7 @@ import { SettingsView } from '@/components/settings/settings-view';
 import { LoginView } from '@/components/auth/login-view';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Agentation } from 'agentation';
 function WorkspaceRouter() {
   const { user, isLoading } = useWorkspace();
   const [currentView, setCurrentView] = useState<WorkspaceView>(() => {
@@ -33,6 +34,7 @@ function WorkspaceRouter() {
 
   // Sync with browser history
   useEffect(() => {
+    const handlePopState = () => {
       const path = window.location.pathname.replace(/^\//, '');
       if (path === 'calendar') setCurrentView('calendar');
       else if (path === 'scheduled') setCurrentView('scheduled');
@@ -45,6 +47,7 @@ function WorkspaceRouter() {
       else if (path === 'plugs' || path === 'third-party') setCurrentView('plugs');
       else if (path === 'settings') setCurrentView('settings');
       else setCurrentView('composer');
+    };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -163,6 +166,7 @@ export function App() {
   return (
     <WorkspaceProvider>
       <WorkspaceRouter />
+      <Agentation endpoint={import.meta.env.VITE_AGENTATION_ENDPOINT} />
     </WorkspaceProvider>
   );
 }

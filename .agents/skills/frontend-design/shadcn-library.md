@@ -72,3 +72,9 @@ Use standard slot patterns (`asChild`) on buttons when wrapping links, and ensur
   Publish Now
 </Button>
 ```
+
+### 3. Open-Source Sourcing & Adaptation (`Existing > Rebuild`)
+Prioritize finding and adopting existing permissive open-source components before custom recreation:
+- Query open registries and repositories (e.g. shadcn registries, 21st.dev, Radix UI) for components matching design requirements.
+- Verify open-source license compatibility (MIT, Apache-2.0, BSD, ISC, Unlicense).
+- Restyle imported markup with local design tokens (`bg-surface`, `text-ink`, `border-line`, `shadow-card`) to preserve Beautiful UI aesthetic consistency.

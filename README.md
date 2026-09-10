@@ -113,6 +113,40 @@
 
 To have the project up and running, please follow the [Quick Start Guide](https://docs.postiz.com/quickstart)
 
+### Code quality checks
+
+After installing the locked dependencies and generating Prisma (`make install`):
+
+```sh
+make check-frontend # Frontend, shared React library, and helpers
+make check-backend  # API, Temporal worker, commands, SDK, NestJS library, and helpers
+make check          # Both scopes plus extension; detects cross-scope duplicates
+```
+
+These read-only commands run strict TypeScript checks (including unused imports,
+missing names, implicit `any`, and null safety), type-aware ESLint with zero
+warnings, and copy/paste detection. ESLint rejects explicit/unsafe `any`, unhandled
+promises, inconsistent identifier casing, excessive complexity/nesting, and common
+React correctness/performance hazards. Duplicate blocks of at least 10 lines and
+100 tokens fail the check; comments and whitespace are ignored.
+
+Checks include application/library source and tests, excluding dependency and
+build output. Existing violations are not baselined or hidden: a failing check
+must not be presented as a pass. Build compiler settings are unchanged.
+Generated Prisma types must be available; no running database or Docker is needed.
+
+The runner uses Node, runs one checker at a time at reduced scheduling priority,
+caps each checker's V8 old-space heap at 512 MiB, and kills a stage after two
+minutes. A resource failure aborts remaining stages and fails the command; it does
+not mean the code passed. The heap cap is **not** a total-process RAM limit.
+Larger checks may need a dedicated CI machine rather than a developer workstation.
+
+Static analysis cannot judge whether a name conveys the right domain meaning or
+guarantee runtime performance. Sequential awaits can be necessary for ordering or
+rate limits; review such findings instead of blindly parallelizing them. Document
+justified lint exceptions locally. Profiling, query plans, load tests, and code
+review remain necessary. These commands do not automatically run in CI.
+
 ## Fork CI/CD
 
 GitHub Actions runs on **every branch push**, tag push, pull request, merge queue

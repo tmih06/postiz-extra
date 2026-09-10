@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/context/workspace.context';
 import {
@@ -153,36 +154,51 @@ export function SidebarNav({
       )}
       style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
     >
-      {/* Brand & Workspace Switcher */}
-      <div className="relative p-2.5 pb-2">
-        <div ref={workspaceMenuRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-            className={cn(
-              'flex w-full items-center gap-2 rounded-control p-1.5 text-left transition-colors hover:bg-hover active:scale-[0.98]',
-              collapsed && 'justify-center p-1'
-            )}
-            title={currentBrandName}
-          >
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-foreground text-background font-black text-xs shadow-hairline">
-              {brandMonogram}
-            </div>
+      <LayoutGroup id="sidebar-layout">
+        {/* Brand & Workspace Switcher */}
+        <div className="relative p-2.5 pb-2">
+          <div ref={workspaceMenuRef} className="relative">
+            <motion.button
+              layout
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              type="button"
+              onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+              className={cn(
+                'flex w-full items-center gap-2 rounded-control p-1.5 text-left transition-colors hover:bg-hover active:scale-[0.98]',
+                collapsed && 'justify-center p-1'
+              )}
+              title={currentBrandName}
+            >
+              <motion.div
+                layout
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-foreground text-background font-black text-xs shadow-hairline"
+              >
+                {brandMonogram}
+              </motion.div>
 
-            {!collapsed && (
-              <>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] font-bold tracking-tight text-ink leading-none">
-                    {currentBrandName}
-                  </span>
-                  <span className="truncate text-[10.5px] font-medium text-ink-3 mt-1 leading-none">
-                    Postiz Workspace
-                  </span>
-                </div>
-                <ChevronDown className="size-3.5 shrink-0 text-ink-3" />
-              </>
-            )}
-          </button>
+              <AnimatePresence mode="popLayout" initial={false}>
+                {!collapsed && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -6 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex min-w-0 flex-1 items-center justify-between overflow-hidden"
+                  >
+                    <div className="flex min-w-0 flex-col">
+                      <span className="truncate text-[13px] font-bold tracking-tight text-ink leading-none">
+                        {currentBrandName}
+                      </span>
+                      <span className="truncate text-[10.5px] font-medium text-ink-3 mt-1 leading-none">
+                        Postiz Workspace
+                      </span>
+                    </div>
+                    <ChevronDown className="size-3.5 shrink-0 text-ink-3 ml-1" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
 
           {/* Workspace Dropdown */}
           {workspaceMenuOpen && (
@@ -353,18 +369,26 @@ export function SidebarNav({
                   <Icon className="size-4" />
                 </span>
 
-                {!collapsed && (
-                  <>
-                    <span className="ml-2.5 truncate text-[13.5px] tracking-tight">
-                      {item.label}
-                    </span>
-                    {item.badge && (
-                      <span className="ml-auto rounded-full bg-accent-tint px-1.5 py-0.5 text-[10px] font-bold text-accent-ink uppercase leading-none">
-                        {item.badge}
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {!collapsed && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -4 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -4 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      className="ml-2.5 flex flex-1 items-center justify-between overflow-hidden"
+                    >
+                      <span className="truncate text-[13.5px] tracking-tight">
+                        {item.label}
                       </span>
-                    )}
-                  </>
-                )}
+                      {item.badge && (
+                        <span className="ml-auto rounded-full bg-accent-tint px-1.5 py-0.5 text-[10px] font-bold text-accent-ink uppercase leading-none">
+                          {item.badge}
+                        </span>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </button>
             );
           })}
@@ -372,74 +396,112 @@ export function SidebarNav({
       </nav>
 
       {/* Footer Controls: Theme, Collapse, User */}
-      <div className="border-t border-line p-2 flex flex-col gap-1">
-        <div
-          className={cn(
-            'flex items-center',
-            collapsed ? 'flex-col gap-1' : 'justify-between px-1'
-          )}
+        {/* Footer Controls: Theme, Collapse, User */}
+        <motion.div
+          layout
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="border-t border-line p-2 flex flex-col gap-1 overflow-hidden"
         >
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors"
-            title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
-          >
-            {isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setCollapsed(!collapsed)}
-            className="flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? (
-              <PanelLeft className="size-3.5" />
-            ) : (
-              <PanelLeftClose className="size-3.5" />
+          <motion.div
+            layout
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className={cn(
+              'flex items-center',
+              collapsed ? 'flex-col gap-1' : 'justify-between px-1'
             )}
-          </button>
-        </div>
-
-        {/* User profile row */}
-        <div
-          className={cn(
-            'flex items-center rounded-control p-1 text-left transition-colors hover:bg-hover/70',
-            collapsed ? 'justify-center' : 'justify-between'
-          )}
-        >
-          <div className="flex items-center gap-2 truncate">
-            <Avatar className="size-7 border border-line shrink-0">
-              <AvatarFallback className="text-[11px] font-bold bg-muted text-ink">
-                {userInitials}
-              </AvatarFallback>
-            </Avatar>
-
-            {!collapsed && (
-              <div className="flex flex-col truncate leading-tight">
-                <span className="text-[12.5px] font-semibold text-ink truncate">
-                  {user?.name || 'Creator'}
-                </span>
-                <span className="text-[10px] text-ink-3 truncate font-mono">
-                  {user?.email || 'admin@postiz.com'}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {!collapsed && (
-            <button
+          >
+            <motion.button
+              layout
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               type="button"
-              onClick={logout}
-              className="size-6 flex items-center justify-center rounded text-ink-3 hover:bg-red-tint hover:text-red transition-colors"
-              title="Sign out"
+              onClick={toggleTheme}
+              className="flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors shrink-0"
+              title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
             >
-              <LogOut className="size-3.5" />
-            </button>
-          )}
-        </div>
-      </div>
+              {isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+            </motion.button>
+
+            <motion.button
+              layout
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              type="button"
+              onClick={() => setCollapsed(!collapsed)}
+              className="flex size-7 items-center justify-center rounded-control text-ink-3 hover:bg-hover hover:text-ink transition-colors shrink-0"
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {collapsed ? (
+                <PanelLeft className="size-3.5" />
+              ) : (
+                <PanelLeftClose className="size-3.5" />
+              )}
+            </motion.button>
+          </motion.div>
+
+          {/* User profile row */}
+          <motion.div
+            layout
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className={cn(
+              'flex items-center rounded-control p-1 text-left transition-colors hover:bg-hover/70 min-h-[36px] overflow-hidden',
+              collapsed ? 'justify-center' : 'justify-between'
+            )}
+          >
+            <motion.div
+              layout
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-center gap-2 min-w-0"
+            >
+              <motion.div
+                layout
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="shrink-0"
+              >
+                <Avatar className="size-7 border border-line shrink-0">
+                  <AvatarFallback className="text-[11px] font-bold bg-muted text-ink">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+              </motion.div>
+
+              <AnimatePresence mode="popLayout" initial={false}>
+                {!collapsed && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -6 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex flex-col truncate leading-tight overflow-hidden"
+                  >
+                    <span className="text-[12.5px] font-semibold text-ink truncate">
+                      {user?.name || 'Creator'}
+                    </span>
+                    <span className="text-[10px] text-ink-3 truncate font-mono">
+                      {user?.email || 'admin@postiz.com'}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            <AnimatePresence mode="popLayout" initial={false}>
+              {!collapsed && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  type="button"
+                  onClick={logout}
+                  className="size-6 shrink-0 flex items-center justify-center rounded text-ink-3 hover:bg-red-tint hover:text-red transition-colors ml-1"
+                  title="Sign out"
+                >
+                  <LogOut className="size-3.5" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
+      </LayoutGroup>
     </aside>
   );
 }

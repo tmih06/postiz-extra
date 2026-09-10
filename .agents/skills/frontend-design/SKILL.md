@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Design clean, tactile, high-contrast dashboard UI using the Beautiful UI design system, shadcn/ui, Tailwind CSS, and AI harness primitives. Use when creating or reshaping views, composing design tokens, styling collapsible sidebars, or building agent workflows.
+description: Design clean, tactile, high-contrast dashboard UI using the Beautiful UI design system, shadcn/ui, Tailwind CSS, and AI harness primitives. Use when creating or reshaping views, sourcing open-source components, composing design tokens, styling collapsible sidebars, or building agent workflows.
 license: Complete terms in LICENSE.txt
 ---
 
@@ -45,22 +45,34 @@ Consult these specialized sub-files for specific implementation domains:
 
 Execute frontend tasks using this disciplined sequence:
 
-### 1. Structure the View
+### 1. Source Existing Open-Source Implementations (`Existing > Rebuild`)
+Always search online for free, open-source implementations matching the UI design requirements before authoring custom components:
+- **Search Open-Source First**: Query component registries and repositories (e.g., shadcn registries, 21st.dev, v0, Radix, Tailwind UI open-source implementations, GitHub) for existing components fulfilling the requirement.
+- **Inspect License**: Verify the candidate's license. Only accept permissive licenses compatible with the workspace (e.g., MIT, Apache-2.0, BSD, ISC, Unlicense). Reject copyleft or proprietary terms.
+- **Surface to User**: When a qualifying implementation is found, notify the user before writing custom code:
+  - Report that the component has already been implemented open-source online.
+  - Provide the component name, source URL, and verified license.
+  - Ask if they want to adopt and adapt the existing component instead of recreating it from scratch (`existing > rebuild`).
+- **Proceed by User Choice**:
+  - **Adopt**: Bring in the open-source component, adapt its styling to Beautiful UI tokens (`bg-surface`, `text-ink`, `border-line`, `shadow-card`), and wire props.
+  - **Rebuild or Not Found**: If no suitable open-source implementation exists, or if the user explicitly prefers a custom build, proceed to Step 2.
+
+### 2. Structure the View
 - Determine user workflow, primary call-to-action, and data states (loading, empty, populated).
 - Organize content into cards (`bg-surface rounded-card border border-line shadow-card`).
 
-### 2. Apply Design System Tokens
+### 3. Apply Design System Tokens
 - Utilize semantic utilities (`bg-surface`, `bg-page`, `text-ink`, `text-ink-2`, `border-line`, `shadow-card`).
 - Use the fixed diagonal stripe background on the viewport container.
 - Establish hierarchy via font weight (`font-semibold`) and ink contrast rather than heavy background washes.
 
-### 3. Leverage Atoms and Primitives
+### 4. Leverage Atoms and Primitives
 - Use `StatusPill` for channel or publishing status (`green`, `orange`, `red`, `accent`, `neutral`).
 - Use `ValuePill` for inline counts, dates, and metrics within running text.
 - Use `EntityChip` for customer profiles and social account badges.
 - Use `SegmentedControl` for mode and timeframe toggles.
 
-### 4. Provide Tactile Interactive Feedback
+### 5. Provide Tactile Interactive Feedback
 - Ensure clickable surfaces support hover (`hover:bg-hover`), active press feedback (`active:scale-[0.98]`), and focus rings (`focus-visible:ring-1`).
 - Animate agent interactions with `ThinkingState`, `StreamingText`, and `LoadingState`.
 - Incorporate `GlideMenu` for cursor-following hover highlights on list items.
@@ -68,6 +80,7 @@ Execute frontend tasks using this disciplined sequence:
 ## Quality Floor & Critique Checklist
 
 Before finalizing any frontend implementation, verify against this bar:
+- [ ] **Existing > Rebuild Audit**: Verified whether a permissive open-source implementation already exists before building from scratch; surfaced candidate and license to the user when found.
 - [ ] **Design Token Hygiene**: All surfaces, text, borders, and shadows use the design tokens (`--page`, `--surface`, `--ink`, `--line`, `--shadow-card`).
 - [ ] **Accessibility & Contrast**: Text contrast meets WCAG AA standards (minimum 4.5:1). Keyboard navigation works smoothly across all controls.
 - [ ] **Collapsible Layout**: Sidebar transitions cleanly between expanded (240px) and collapsed (56px) without icon drift or text clipping.
