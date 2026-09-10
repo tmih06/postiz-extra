@@ -83,13 +83,36 @@ Use a suitably provisioned CI environment for checks that cannot finish safely.
 - Remove unused imports, variables, and obsolete code; import every referenced
   symbol. Check consumers when changing a contract.
 - Prefer the existing implementation over duplicated logic, unnecessary algorithm
-  files, or new abstractions. Explain complex logic and non-obvious invariants.
+  files, or new abstractions.
 - Avoid avoidable allocations, repeated computation, unbounded queries, N+1 data
   access, and unnecessary React renders. Measure performance-sensitive changes;
   static checks cannot guarantee latency, throughput, or memory usage.
 - Review ordering, transactions, concurrency limits, and provider rate limits before
   replacing sequential awaits with parallel work. A lint finding is not permission
   to change semantics. Any justified exception needs a local explanation.
+
+### Function comments
+
+- Agents must add or update a comment for every function or method they create or
+  change. Place it immediately above the declaration, using the surrounding
+  documentation style. Cover small callbacks in the enclosing function's comment
+  when they have no independent contract.
+- State the purpose and feature requirement the function serves, why it is needed,
+  and how its approach achieves that purpose. Explain design choices and
+  non-obvious invariants rather than narrating statements.
+- Describe the input-to-output contract: meaningful input constraints, units and
+  defaults; returned results; and relevant edge cases, errors, side effects, or
+  external state. Include a compact input → output example when prose alone leaves
+  the transformation ambiguous.
+- Keep comments proportional: usually 2–6 concise lines, shorter for simple
+  contracts and longer only for necessary behavioral detail. Use names and types
+  for structural facts; use comments for semantics a signature cannot express.
+  Put local explanations beside complex branches rather than bloating the header.
+- Before completing a change, check every affected function's comment against its
+  implementation and verified behavior. A maintainer must be able to derive
+  representative inputs and expected outputs and identify what a refactor or
+  optimization must preserve. Update stale comments in the same change; document
+  implemented behavior, not an unfulfilled feature request.
 
 ## Backend and workflow contracts
 
