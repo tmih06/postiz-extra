@@ -27,6 +27,9 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { SidebarGlideHighlight } from './sidebar-glide-highlight';
 
+/**
+ * Identifier union of all navigable top-level workspace views.
+ */
 export type WorkspaceView =
   | 'composer'
   | 'agent'
@@ -40,20 +43,33 @@ export type WorkspaceView =
   | 'plugs'
   | 'settings';
 
+/**
+ * Specification for a single primary sidebar navigation item.
+ */
 export interface NavItem {
+  /** Unique view identifier matched against active `currentView`. */
   id: WorkspaceView;
+  /** Display text in expanded sidebar mode and accessibility title tooltip. */
   label: string;
+  /** Animated icon component rendered in the navigation row. */
   icon: React.ComponentType<{ className?: string; isHovered?: boolean }>;
+  /** Optional badge indicator label (e.g. 'AI'). */
   badge?: string;
 }
 
+/**
+ * Configuration properties for the `SidebarNav` root navigation component.
+ */
 export interface SidebarNavProps {
+  /** Currently active workspace view identifier. */
   currentView: WorkspaceView;
+  /** Callback invoked when the user selects a navigation row or view trigger. */
   onNavigate: (view: WorkspaceView) => void;
+  /** Optional callback invoked when selecting a recent post item. */
   onSelectRecent?: (postId: string) => void;
+  /** Additional CSS class names applied to the root `<aside>` container. */
   className?: string;
 }
-
 const PRIMARY_NAV_ITEMS: NavItem[] = [
   { id: 'composer', label: 'Composer', icon: AnimatedSquarePen },
   { id: 'agent', label: 'AI Studio', icon: AnimatedSparkles, badge: 'AI' },
@@ -68,13 +84,26 @@ const PRIMARY_NAV_ITEMS: NavItem[] = [
   { id: 'settings', label: 'Settings', icon: AnimatedSettings },
 ];
 
+/**
+ * Properties for the workspace profile selection popover.
+ */
 interface WorkspaceDropdownProps {
+  /** List of customer/brand profiles available in the current workspace. */
   customers: CustomerProfile[];
+  /** Currently active customer profile, or `null` if representing 'All Profiles'. */
   selectedCustomer: CustomerProfile | null;
+  /** Callback triggered when selecting a customer profile or 'All Profiles'. */
   onSelectCustomer: (customer: CustomerProfile | null) => void;
+  /** Callback to navigate to settings/management view. */
   onManage: () => void;
 }
 
+/**
+ * Renders the popover menu allowing users to switch between brand profiles or navigate to profile management.
+ *
+ * @param props - Dropdown state, customer collection, and selection handlers.
+ * @returns Rendered floating profile switcher menu.
+ */
 function WorkspaceDropdown({
   customers,
   selectedCustomer,
@@ -149,16 +178,33 @@ function WorkspaceDropdown({
     </div>
   );
 }
+/**
+ * Properties for the quick search input / toggle button inside the sidebar.
+ */
 interface QuickSearchProps {
+  /** Whether the parent sidebar is currently collapsed to icon-only mode. */
   collapsed: boolean;
+  /** Whether the inline search text field is active and expanded. */
   searchOpen: boolean;
+  /** Current search query string filter. */
   searchQuery: string;
+  /** React ref to the search input element for imperative autofocus. */
   searchInputRef: React.RefObject<HTMLInputElement | null>;
+  /** Callback to activate inline search mode. */
   onOpenSearch: () => void;
+  /** Callback to close inline search mode and clear query. */
   onCloseSearch: () => void;
+  /** Callback when the search filter input text changes. */
   onChangeQuery: (query: string) => void;
 }
 
+/**
+ * Renders either a compact/expanded search trigger button or an inline search input
+ * allowing quick filtering of sidebar navigation links.
+ *
+ * @param props - Search state flags, text query, and toggle handlers.
+ * @returns Quick search button or active input element.
+ */
 function QuickSearch({
   collapsed,
   searchOpen,
@@ -224,6 +270,21 @@ function QuickSearch({
     </div>
   );
 }
+/**
+ * Renders the primary collapsible application navigation sidebar.
+ *
+ * Features:
+ * - Collapsible state (expanded 240px vs collapsed 56px icon-only rail).
+ * - Gliding physics hover highlight overlay via `SidebarGlideHighlight`.
+ * - Brand & Workspace profile switcher with interactive popover.
+ * - Interactive quick search / jump filter across navigation destinations.
+ * - Theme toggle (dark/light mode syncing with document root and `localStorage`).
+ * - User profile info with sign-out trigger.
+ * - Instant font-weight bolding on active nav items using `transition-colors` without interpolation lag.
+ *
+ * @param props - Navigation state (`currentView`), navigation callback, and optional styling.
+ * @returns Rendered sidebar `<aside>` element.
+ */
 export function SidebarNav({
   currentView,
   onNavigate,
@@ -405,7 +466,7 @@ export function SidebarNav({
                 onMouseEnter={() => setHoveredNavId(item.id)}
                 onMouseLeave={() => setHoveredNavId(null)}
                 className={cn(
-                  'relative z-10 flex h-8 items-center rounded-[7px] text-left transition-all active:scale-[0.98]',
+                  'relative z-10 flex h-8 items-center rounded-[7px] text-left transition-colors active:scale-[0.98]',
                   'px-1.5',
                   isActive
                     ? 'bg-hover-2 font-semibold text-ink group-hover/glide:bg-transparent'

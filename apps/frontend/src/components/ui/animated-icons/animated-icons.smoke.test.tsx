@@ -173,6 +173,15 @@ describe('Sidebar Animated Lucide Icons', () => {
       // Gliding highlight items inside the flex-1 nav range
       expect(html).toContain('data-nav-row');
     });
+
+    it('uses transition-colors on nav row buttons for instant bolding without font-weight transition delay', () => {
+      const html = renderToStaticMarkup(
+        <SidebarNav currentView="settings" onNavigate={() => {}} />
+      );
+
+      expect(html).not.toMatch(/data-nav-row[^>]*class="[^"]*transition-all/);
+      expect(html).toMatch(/data-nav-row[^>]*class="[^"]*transition-colors/);
+    });
   });
 
   describe('useIconLoop repeating and full-cycle animation management', () => {
