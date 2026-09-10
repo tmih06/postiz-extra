@@ -145,7 +145,7 @@ Static analysis cannot judge whether a name conveys the right domain meaning or
 guarantee runtime performance. Sequential awaits can be necessary for ordering or
 rate limits; review such findings instead of blindly parallelizing them. Document
 justified lint exceptions locally. Profiling, query plans, load tests, and code
-review remain necessary. These commands do not automatically run in CI.
+review remain necessary. These commands also run automatically in CI as the `check` job in `.github/workflows/build.yml`.
 
 ## Fork CI/CD
 
@@ -153,13 +153,13 @@ GitHub Actions runs on **every branch push**, tag push, pull request, merge queu
 event, and manual dispatch. There are no branch or changed-path filters.
 
 - **Build** (`.github/workflows/build.yml`): validates workflows with pinned
-  actionlint, installs the frozen Bun lockfile, verifies lockfile immutability
-  across repeated frozen installs, generates Prisma, discovers tests, and builds
-  the frontend, backend, orchestrator, SDK, commands, and extension.
-  Download `extension-<run-id>-<attempt>` from the run's artifacts to obtain
-  `extension.zip`.
+  actionlint, runs strict code quality checks (`make check`), installs the frozen
+  Bun lockfile, verifies lockfile immutability across repeated frozen installs,
+  generates Prisma, discovers tests, and builds the frontend, backend,
+  orchestrator, SDK, commands, and extension. Download
+  `extension-<run-id>-<attempt>` from the run's artifacts to obtain `extension.zip`.
 - **Build Containers** (`.github/workflows/build-containers.yml`): a reusable
-  workflow called only after the Build checks succeed, avoiding a second
+  workflow called only after the Build and Check jobs succeed, avoiding a second
   application-check run. Builds native `linux/amd64` and `linux/arm64` images.
 - **CodeQL** (`.github/workflows/codeql.yml`): independently analyzes JavaScript
   and TypeScript on the same events. It reports security findings separately;

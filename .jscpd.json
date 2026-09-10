@@ -1,0 +1,17 @@
+{
+  "threshold": 0,
+  "minLines": 10,
+  "minTokens": 100,
+  "mode": "mild",
+  "format": ["typescript", "tsx", "javascript", "jsx"],
+  "reporters": ["console"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/build/**",
+    "**/out/**",
+    "**/coverage/**",
+    "**/*.d.ts"
+  ]
+}

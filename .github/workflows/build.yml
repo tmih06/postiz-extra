@@ -77,8 +77,34 @@ jobs:
           path: apps/extension/extension.zip
           if-no-files-found: error
 
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+
+      - name: Install dependencies and generate Prisma client
+        run: bun install --frozen-lockfile
+
+      - name: Run code quality checks
+        run: make check
+
   containers:
-    needs: [workflow-validation, build]
+    needs: [workflow-validation, build, check]
     uses: ./.github/workflows/build-containers.yml
     permissions:
       contents: read
