@@ -20,6 +20,21 @@ interface CalendarViewProps {
   onSelectPost?: (group: string) => void;
 }
 
+/**
+ * Interactive monthly calendar view displaying scheduled, published, and draft post groups.
+ *
+ * Aggregates posts by date across a 7-day grid, providing month pagination, "Today" jumping,
+ * customer profile filtering, and post detail selection callbacks for editing or inspection.
+ * Handles month padding calculations for leading and trailing days from adjacent months.
+ *
+ * Invariants:
+ * - Queries backend posts within UTC start/end boundaries of the selected calendar month.
+ * - Re-computes calendar grid days (including prev/next month fill) whenever month or year changes.
+ * - Filters posts per day slot matching year, month, and day integers.
+ *
+ * @param props.onSelectPost - Optional callback invoked with `postGroup.group` (or `id`)
+ *   when a post chip or day slot is selected.
+ */
 export function CalendarView({ onSelectPost }: CalendarViewProps) {
   const { api, selectedCustomerId } = useWorkspace();
   const [currentDate, setCurrentDate] = useState(() => new Date());

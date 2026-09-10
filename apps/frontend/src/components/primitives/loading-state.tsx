@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Shimmer } from '@/components/atoms/shimmer';
 
+/**
+ * Props for the {@link LoadingState} inline indicator component.
+ */
 export interface LoadingStateProps {
+  /** Descriptive loading message shown alongside shimmer animation (default: 'Processing publishing workflow'). */
   label?: string;
+  /** Visual dot shape variant: 'Dots' (rounded-full) or 'Drive' (rounded-[1px] micro-squares). */
   variant?: 'Drive' | 'Dots';
+  /** Optional CSS class overrides for the container. */
   className?: string;
 }
 
@@ -14,6 +20,20 @@ const chevronDelays = [
   270, 180, 270,
 ];
 
+/**
+ * Inline loading indicator with animated 3x3 pixel matrix, text shimmer, and live elapsed timer.
+ *
+ * Renders a 3x3 chevron dot matrix with staggered wave animation delays (0ms–270ms) to indicate background
+ * activity, accompanied by a shimmering accessible text label and a monospace 0.1s resolution elapsed timer.
+ *
+ * @example
+ * ```tsx
+ * <LoadingState label="Scheduling social posts" variant="Dots" />
+ * ```
+ *
+ * @param props - Configuration for label text, pixel variant shape, and style classes.
+ * @returns An inline row containing animated dot matrix, shimmer label, and elapsed counter.
+ */
 export function LoadingState({
   label = 'Processing publishing workflow',
   variant = 'Dots',

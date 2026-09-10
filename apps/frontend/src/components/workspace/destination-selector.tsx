@@ -6,6 +6,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Check, AlertCircle, Share2, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Destination channel selector toolbar for choosing target social media accounts.
+ *
+ * Filters connected integrations according to the currently active workspace brand profile
+ * (including ungrouped channels), displays real-time connection status badges (disabled, expired token,
+ * incomplete setup), and handles multi-select toggling via workspace context.
+ */
 export function DestinationSelector() {
   const {
     integrations,

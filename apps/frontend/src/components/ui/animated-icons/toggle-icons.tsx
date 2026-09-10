@@ -6,11 +6,29 @@ import { cn } from '@/lib/utils';
 import type { AnimatedIconProps } from './types';
 import { useIconLoop } from './use-icon-loop';
 
+/**
+ * Properties for the {@link AnimatedThemeToggle} component.
+ *
+ * @property isDark - Current theme mode; controls whether sun (`false`) or moon (`true`) is rendered.
+ */
 export interface AnimatedThemeToggleProps extends Omit<AnimatedIconProps, 'children'> {
   isDark: boolean;
 }
 
-// Multi-variant Theme Toggle: Smooth morph between Sun and Moon on toggle + repeating micro-hover
+/**
+ * Animated theme toggle icon rendering a smooth morph between Sun (light mode) and Moon (dark mode).
+ *
+ * Feature requirements & motion behaviors:
+ * - **Toggle Transition**: Uses `<AnimatePresence mode="wait">` to transition between Sun and Moon states with
+ *   spring-based rotation and scaling (`initial: rotate -90, scale 0` -> `animate: rotate 0, scale 1` -> `exit: rotate 90, scale 0`).
+ * - **Sun Hover**: Main sun center undergoes a continuous 360° rotation loop while outer ray paths pulse in opacity (0.4 to 1.0)
+ *   and stroke width (2.0 to 2.4).
+ * - **Moon Hover**: Moon crescent rocks with subtle tilt (-12° to 12°) and pop scale (1.0 to 1.15) alongside twinkling stars.
+ * - Supports internal hover tracking and external `isHovered` prop synchronization with 2-second resting loop cycles.
+ *
+ * @param props - Component properties including `isDark`, dimensions (`size`), custom styles (`className`), and hover events.
+ * @returns Rendered animated theme toggle element.
+ */
 export function AnimatedThemeToggle({
   isDark,
   size,
@@ -120,11 +138,28 @@ export function AnimatedThemeToggle({
   );
 }
 
+/**
+ * Properties for the {@link AnimatedCollapseToggle} component.
+ *
+ * @property collapsed - Collapsed state of the sidebar or drawer; controls arrow orientation and container layout.
+ */
 export interface AnimatedCollapseToggleProps extends Omit<AnimatedIconProps, 'children'> {
   collapsed: boolean;
 }
 
-// Multi-variant Collapse Toggle: smooth morph between left (collapse) and right (expand) + repeating micro-hover
+/**
+ * Animated sidebar collapse/expand toggle icon.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Collapse State Morph**: Renders a panel boundary with a directional chevron. When `collapsed` changes,
+ *   the chevron flips 180° via spring rotation (`collapsed ? 180 : 0`).
+ * - **Hover Feedback**: On hover, the directional chevron slides horizontally (`x: [0, -3, 0]` when expanded, `x: [0, 3, 0]` when collapsed)
+ *   with a spring bounce to visually signal the collapsible collapse/expand direction.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Component properties including `collapsed`, dimensions (`size`), custom styles (`className`), and hover events.
+ * @returns Rendered animated collapse toggle element.
+ */
 export function AnimatedCollapseToggle({
   collapsed,
   size,

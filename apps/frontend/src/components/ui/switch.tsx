@@ -2,6 +2,21 @@ import * as React from 'react';
 import * as SwitchPrimitives from '@radix-ui/react-switch';
 import { cn } from '@/lib/utils';
 
+/**
+ * Accessible toggle switch component built on `@radix-ui/react-switch`.
+ *
+ * Renders an interactive sliding switch representing a binary on/off state with
+ * full keyboard navigation, ARIA switch semantics, and smooth thumb translation.
+ *
+ * @param props - Radix switch root properties (e.g. `checked`, `defaultChecked`, `onCheckedChange`, `disabled`),
+ *                forwarding element ref and merging custom `className` styling.
+ * @returns An accessible switch control with animated sliding thumb.
+ *
+ * @example
+ * ```tsx
+ * <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Enable notifications" />
+ * ```
+ */
 export const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>

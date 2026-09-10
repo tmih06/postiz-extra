@@ -6,7 +6,17 @@ import { cn } from '@/lib/utils';
 import type { AnimatedIconProps } from './types';
 import { useIconLoop } from './use-icon-loop';
 
-// 1. Search: Magnifying glass with searching translate & angle sweep
+/**
+ * Animated search magnifying glass icon with directional search translation and tilt sweep.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Search Sweep**: On hover loop, smoothly translates across the X/Y axes (`[-1.5px, +1.5px]`)
+ *   combined with an angular tilt (`[-6°, +6°]`) pivoting from the lens center (11px, 11px) over 0.55s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated search icon element.
+ */
 export function AnimatedSearch({
   size,
   className,
@@ -60,7 +70,17 @@ export function AnimatedSearch({
   );
 }
 
-// 2. Clear/Close: X with crisp 90deg spring rotation
+/**
+ * Animated close/dismiss 'X' icon with a crisp spring rotation and scaling pulse.
+ *
+ * Feature requirements & motion behaviors:
+ * - **90° Spring Twist**: On hover loop, rotates 90° clockwise accompanied by a tactile pop-scale bounce
+ *   (`scale: [1, 1.15, 1]`) using custom cubic bezier spring physics (`[0.34, 1.56, 0.64, 1]`) over 0.4s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated X dismiss icon element.
+ */
 export function AnimatedX({
   size,
   className,
@@ -111,7 +131,17 @@ export function AnimatedX({
   );
 }
 
-// 3. ChevronDown: Smooth downward nudge
+/**
+ * Animated dropdown chevron icon with a gentle downward nudge.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Down Nudge**: On hover loop, subtly displaces the chevron path vertically downwards by 2.5px
+ *   before rebounding to resting position over 0.4s with `easeOut` easing.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated chevron down icon element.
+ */
 export function AnimatedChevronDown({
   size,
   className,
@@ -160,7 +190,17 @@ export function AnimatedChevronDown({
   );
 }
 
-// 4. Check: Pop scale checkmark
+/**
+ * Animated checkmark icon with pop-scale tactile confirmation.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Pop Scale Bounce**: On hover loop, scales the checkmark path (`scale: [1, 1.25, 0.95, 1]`)
+ *   centered at (12px, 12px) using snappy spring easing (`[0.34, 1.56, 0.64, 1]`) over 0.45s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated check icon element.
+ */
 export function AnimatedCheck({
   size,
   className,
@@ -213,7 +253,17 @@ export function AnimatedCheck({
   );
 }
 
-// 5. Plus: 90-degree spring spin
+/**
+ * Animated plus/add icon with spring-assisted 90° rotation.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Spring Spin**: On hover loop, rotates the crosshairs 90° clockwise using a spring overshoot curve
+ *   (`[0.34, 1.56, 0.64, 1]`) over 0.45s to signal creation or addition.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated plus icon element.
+ */
 export function AnimatedPlus({
   size,
   className,
@@ -263,7 +313,17 @@ export function AnimatedPlus({
   );
 }
 
-// 6. Sign Out: Arrow sliding right out of doorway
+/**
+ * Animated log out / sign out icon with arrow ejection motion.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Doorway Exit Slide**: On hover loop, slides the exit arrow rightwards (`x: [0, 3.5, 0]`) through the doorway
+ *   boundary with smooth `easeInOut` interpolation over 0.5s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated log out icon element.
+ */
 export function AnimatedLogOut({
   size,
   className,

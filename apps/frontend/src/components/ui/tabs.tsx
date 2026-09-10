@@ -2,8 +2,20 @@ import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cn } from '@/lib/utils';
 
+/**
+ * Root state container for tab navigation built on `@radix-ui/react-tabs`.
+ *
+ * Manages active tab state, keyboard navigation (arrow keys), and ARIA tablist/tab/tabpanel
+ * associations. Can be used controlled (`value`, `onValueChange`) or uncontrolled (`defaultValue`).
+ */
 export const Tabs = TabsPrimitive.Root;
 
+/**
+ * Container grouping individual tab triggers in a pill-styled muted bar.
+ *
+ * @param props - Radix TabsList props and forwarded ref, merging custom styling with flex centering and muted background.
+ * @returns The rendered tab list container.
+ */
 export const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
@@ -19,6 +31,16 @@ export const TabsList = React.forwardRef<
 ));
 TabsList.displayName = TabsPrimitive.List.displayName;
 
+/**
+ * Interactive tab trigger button activating a corresponding tab panel.
+ *
+ * Automatically reflects active state via `data-[state=active]` with background highlight,
+ * foreground contrast, elevation shadow, and focus-visible ring styles.
+ *
+ * @param props - Radix TabsTrigger props (must include `value` string matching a `TabsContent`),
+ *                forwarding element ref and merging custom class names.
+ * @returns An accessible interactive tab button.
+ */
 export const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
@@ -34,6 +56,16 @@ export const TabsTrigger = React.forwardRef<
 ));
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
+/**
+ * Tab content panel displayed conditionally when its `value` matches the active tab.
+ *
+ * Mounts/unmounts or reveals content corresponding to the selected tab with focus outline rings
+ * and top margin spacing.
+ *
+ * @param props - Radix TabsContent props (must include `value` matching a `TabsTrigger`),
+ *                forwarding element ref and merging custom class names.
+ * @returns The active tab panel element.
+ */
 export const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>

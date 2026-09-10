@@ -1,3 +1,14 @@
+/**
+ * @file Local development database seed script.
+ *
+ * Idempotently provisions a default activated test user (`dev@example.com`) and default organization
+ * (`Local Development`) in the isolated local Docker PostgreSQL database.
+ *
+ * Safety guarantees:
+ * - Refuses execution if `NODE_ENV === 'production'`.
+ * - Refuses execution if `DATABASE_URL` points to anything other than the isolated local Docker
+ *   database on `127.0.0.1:15432` / `localhost:15432` with database `postiz-db-local`.
+ */
 import { Provider } from '@prisma/client';
 import { AuthService } from '@gitroom/helpers/auth/auth.service';
 import { OrganizationRepository } from '@gitroom/nestjs-libraries/database/prisma/organizations/organization.repository';
@@ -6,9 +17,22 @@ import {
   PrismaService,
 } from '@gitroom/nestjs-libraries/database/prisma/prisma.service';
 
+/** Default email address for local development login. */
 const email = 'dev@example.com';
+/** Default plaintext password for local development login. */
 const password = 'PostizLocal123!';
 
+/**
+ * Main execution entry point for local user and organization database seeding.
+ *
+ * Connects to PostgreSQL via Prisma, performs strict safety checks on connection parameters,
+ * verifies whether the test user exists (verifying password hash and active status if present),
+ * or creates a new organization and user with bcrypt-hashed credentials if absent.
+ *
+ * @throws {Error} When executed against a non-local database, production environment, or if
+ *                 the test email is occupied by an incompatible/deleted/inactive account.
+ * @returns A promise resolving upon successful seed verification and Prisma disconnect.
+ */
 async function main() {
   const database = new URL(process.env.DATABASE_URL || '');
   // Public test credentials must only reach the isolated Docker development DB.

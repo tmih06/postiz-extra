@@ -1,9 +1,27 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Properties for the styled multiline text input component, extending standard HTML textarea attributes.
+ */
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
+/**
+ * Styled multiline textarea component with unified border, background, focus ring, and disabled styles.
+ *
+ * Enforces a minimum height (80px), full width, and responsive text sizing, forwarding refs to the
+ * underlying `<textarea>` element for form management (e.g. react-hook-form) and auto-resizing.
+ *
+ * @param props - Standard HTML textarea attributes (`value`, `onChange`, `placeholder`, `rows`, etc.)
+ *                and forwarded element ref.
+ * @returns The styled textarea element.
+ *
+ * @example
+ * ```tsx
+ * <Textarea placeholder="Type your post caption here..." rows={4} />
+ * ```
+ */
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (

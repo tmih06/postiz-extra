@@ -11,6 +11,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Users, Briefcase } from 'lucide-react';
 
+/**
+ * Workspace brand profile dropdown selector.
+ *
+ * Allows filtering destinations and workspace context by individual customer profile or
+ * switching to `'all'` to view all connected brand integrations with channel count badges.
+ */
 export function ProfileSelector() {
   const {
     customers,
@@ -19,6 +25,12 @@ export function ProfileSelector() {
     setSelectedCustomerId,
   } = useWorkspace();
 
+  /**
+   * Computes the number of connected channel integrations mapped to a specific customer profile.
+   *
+   * @param customerId - Unique identifier of the brand customer profile.
+   * @returns Total count of associated channel integrations.
+   */
   const getChannelCount = (customerId: string) => {
     return integrations.filter((ch: ChannelIntegration) => ch.customerId === customerId).length;
   };

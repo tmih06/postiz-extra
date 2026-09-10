@@ -3,18 +3,33 @@ import { cn } from '@/lib/utils';
 import { ChevronDown, BarChart2, PenTool, Image, Calendar, CheckCircle2, Loader2 } from 'lucide-react';
 import { StatusPill } from '@/components/atoms/status-pill';
 
+/**
+ * Data representation of an individual agent tool execution step.
+ */
 export type ToolChipStep = {
+  /** Unique identifier for the tool execution item. */
   id: string;
+  /** Semantic icon category representing the tool domain. */
   icon: 'analytics' | 'composer' | 'media' | 'schedule';
+  /** Descriptive primary text for the tool action. */
   label: string;
+  /** Short monospace chip/tag detailing arguments or query target (e.g. `'x_engagement_30d'`). */
   chip: string;
+  /** Lifecycle execution status of the tool call (`'done'`, `'running'`, or `'pending'`). */
   status: 'done' | 'running' | 'pending';
+  /** Optional expandable log output, bullet points, or diagnostics lines. */
   details?: string[];
 };
 
+/**
+ * Props configuring the tool execution chips list.
+ */
 export interface ToolChipsProps {
+  /** Array of tool step definitions to display (defaults to standard agent workflow steps). */
   steps?: ToolChipStep[];
+  /** Header label displayed above the tool execution list (defaults to `'4 agent tool calls'`). */
   header?: string;
+  /** Optional extra CSS classes applied to the root card container. */
   className?: string;
 }
 
@@ -67,6 +82,16 @@ const ICONS = {
   schedule: Calendar,
 };
 
+/**
+ * Agent tool execution progress list with collapsible step inspection.
+ *
+ * Displays an ordered series of background tool invocations, their real-time execution
+ * state indicators (`Done`, `Running` with spinner, `Pending`), monospace payload chips,
+ * completion counter, and expandable detail logs for inspecting structured agent outputs.
+ *
+ * @param props Step definitions, custom header text, and root container classes.
+ * @returns A card component containing expandable tool execution steps.
+ */
 export function ToolChips({
   steps = DEFAULT_STEPS,
   header = '4 agent tool calls',

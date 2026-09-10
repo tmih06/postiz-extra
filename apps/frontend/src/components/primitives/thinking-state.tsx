@@ -2,20 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown, Check, Loader2, Sparkles } from 'lucide-react';
 
+/**
+ * Step row item rendered inside the collapsible thinking progress list.
+ */
 export type ThinkingRow = {
+  /** Primary description label for this thinking step. */
   primary: string;
+  /** Optional secondary subtitle or detail tags (e.g. channel names). */
   secondary?: string;
+  /** Whether to format primary text with monospace font. */
   mono?: boolean;
+  /** Optional explicit completion override. */
   done?: boolean;
 };
 
+/**
+ * Props for the {@link ThinkingState} component.
+ */
 export interface ThinkingStateProps {
+  /** Header label displayed while thought generation is still active (default: 'Thinking'). */
   label?: string;
+  /** Header label displayed when thinking duration finishes (default: 'Thought for 2.8s'). */
   doneLabel?: string;
+  /** Ordered list of thinking steps to iterate through. */
   rows?: ThinkingRow[];
+  /** Total duration in seconds before marking thinking complete (default: 2.8s). */
   durationSeconds?: number;
+  /** Initial expanded/collapsed state of the thinking steps drawer (default: true). */
   initiallyOpen?: boolean;
+  /** Callback fired once total elapsed time reaches `durationSeconds`. */
   onDone?: () => void;
+  /** Optional CSS class overrides for the container card. */
   className?: string;
 }
 
@@ -26,6 +43,29 @@ const DEFAULT_ROWS: ThinkingRow[] = [
   { primary: 'Calculating queue time slots for highest reach' },
 ];
 
+/**
+ * Interactive collapsible thinking indicator simulating AI reasoning and multi-step pipeline execution.
+ *
+ * Displays a pulsing AI sparkle icon, animated elapsed timer, and expandable step-by-step progress checklist.
+ * Advances through `rows` evenly across `durationSeconds` using synchronized timer intervals (100ms timer
+ * ticks for smooth decimal elapsed count and `(durationSeconds * 1000) / rows.length` per step transition).
+ * Invokes `onDone` when execution reaches completion.
+ *
+ * @example
+ * ```tsx
+ * <ThinkingState
+ *   durationSeconds={3.2}
+ *   rows={[
+ *     { primary: 'Retrieving historical post engagement data' },
+ *     { primary: 'Optimizing publish schedule time slots' },
+ *   ]}
+ *   onDone={() => setReady(true)}
+ * />
+ * ```
+ *
+ * @param props - Component configuration including duration, step rows, labels, and done callback.
+ * @returns An expandable reasoning card with animated progress indicators and timer.
+ */
 export function ThinkingState({
   label = 'Thinking',
   doneLabel = 'Thought for 2.8s',

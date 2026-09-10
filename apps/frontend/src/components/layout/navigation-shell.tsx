@@ -42,6 +42,23 @@ const MOBILE_NAV_ITEMS: { id: WorkspaceView; label: string; icon: React.Componen
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+/**
+ * Top-level responsive navigation shell providing the main application frame,
+ * desktop collapsible sidebar, mobile navigation header and drawer, and view outlet.
+ *
+ * Manages responsive navigation transitions between core workspace views (composer,
+ * calendar, publications, media, analytics, settings) and exposes session-level actions
+ * like user logout while displaying current workspace user details.
+ *
+ * Invariants:
+ * - Automatically closes mobile menu drawer upon navigating to any view.
+ * - Renders desktop sidebar on large breakpoints (`lg:flex`) and switches to mobile
+ *   header/drawer overlay on smaller viewports.
+ *
+ * @param props.currentView - Active workspace tab identifier controlling highlighted nav items.
+ * @param props.onNavigate - Callback invoked with selected view id when navigation links are clicked.
+ * @param props.children - Main view content rendered inside the scrollable content canvas.
+ */
 export function NavigationShell({
   currentView,
   onNavigate,

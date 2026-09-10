@@ -1,6 +1,23 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Circular SVG progress meter visualizing fractional completion between 0 and 1.
+ *
+ * Computes circle circumference $c = 2 \pi r$ (where radius $r = \frac{\text{size} - \text{stroke}}{2}$ using stroke width 2.5px)
+ * and updates `strokeDashoffset` to $c \times (1 - \text{clamp}(progress, 0, 1))$ with smooth cubic-bezier easing.
+ * Rotates the SVG by -90 degrees so the progress sweep starts at the 12 o'clock top position.
+ *
+ * @example
+ * ```tsx
+ * <ProgressRing progress={0.75} tone="green" size={32}>
+ *   75%
+ * </ProgressRing>
+ * ```
+ *
+ * @param props - Progress value (0..1), color tone variant ('accent' | 'orange' | 'green' | 'red'), diameter in px (default 28), optional center label, and styling classes.
+ * @returns An SVG circular progress ring container with optional centered child label.
+ */
 export function ProgressRing({
   progress,
   tone = 'accent',

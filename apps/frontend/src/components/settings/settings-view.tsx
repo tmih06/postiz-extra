@@ -20,8 +20,24 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Available navigation tabs within the workspace settings view.
+ */
 type SettingsTab = 'general' | 'profiles' | 'team' | 'signatures' | 'notifications' | 'api';
 
+/**
+ * Workspace settings and configuration management view.
+ *
+ * Houses sub-views and form controls for:
+ * - **General**: Organization name, publishing timezone, and owner account info.
+ * - **Brand Profiles**: Sub-brand and customer group listings with management actions.
+ * - **Team Members**: Teammates, role allocations, and invitation modal trigger.
+ * - **Signatures**: Default appended post footers, disclaimers, and hashtag blocks.
+ * - **Notifications**: Email digests and real-time failure alert subscriptions.
+ * - **API & Keys**: Developer secret tokens and programmatic access controls.
+ *
+ * @returns The rendered workspace settings page with side navigation and active configuration panel.
+ */
 export function SettingsView() {
   const { user, customers, selectedCustomer } = useWorkspace();
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
@@ -34,6 +50,11 @@ export function SettingsView() {
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [failureAlerts, setFailureAlerts] = useState(true);
 
+  /**
+   * Handles persisting setting modifications and triggers temporary saved state feedback.
+   *
+   * Sets `saved` state to true and automatically resets it back to false after 2000ms.
+   */
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

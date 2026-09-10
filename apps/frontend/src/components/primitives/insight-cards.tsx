@@ -2,19 +2,35 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Eye, Heart, Users, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
+/**
+ * Data payload defining a single high-level performance insight metric.
+ */
 export type InsightCardData = {
+  /** Unique identifier for the metric card. */
   id: string;
+  /** Display label for the metric (e.g. `'Total Impressions'`). */
   label: string;
+  /** Formatted primary value string (e.g. `'148,290'`). */
   value: string;
+  /** Human-readable delta percentage or status change string (e.g. `'+24.6%'`). */
   change: string;
+  /** Determines whether the trend direction is positive (green) or negative/stagnant (red). */
   isPositive: boolean;
+  /** Historical data series used to draw the inline mini sparkline trend graph. */
   points: number[];
+  /** Icon category associated with the metric topic. */
   icon: 'impressions' | 'engagement' | 'followers' | 'scheduled';
+  /** Descriptive explanation contextualizing the metric movements and attribution. */
   summary: string;
 };
 
+/**
+ * Props configuring the paginated insight cards carousel.
+ */
 export interface InsightCardsProps {
+  /** List of metric insight cards available for pagination (defaults to preconfigured analytics set). */
   cards?: InsightCardData[];
+  /** Optional extra CSS classes applied to the root card container. */
   className?: string;
 }
 
@@ -68,6 +84,15 @@ const ICONS = {
   scheduled: Calendar,
 };
 
+/**
+ * Renders a lightweight, unpadded SVG sparkline polyline graph.
+ *
+ * Scales the numeric data array across a fixed width (120px) and height (36px) box
+ * with 4px vertical padding buffers to avoid clipping stroke ends.
+ *
+ * @param props Contains the numeric data array `points` and sentiment flag `isPositive`.
+ * @returns An inline SVG polyline colored according to positive/negative performance.
+ */
 function Sparkline({ points, isPositive }: { points: number[]; isPositive: boolean }) {
   const min = Math.min(...points);
   const max = Math.max(...points);
@@ -99,6 +124,16 @@ function Sparkline({ points, isPositive }: { points: number[]; isPositive: boole
   );
 }
 
+/**
+ * Carousel card primitive displaying key marketing and audience health metrics.
+ *
+ * Features pagination buttons (`ChevronLeft` / `ChevronRight`), metric value readout,
+ * trending badge indicators (`TrendingUp` / `TrendingDown`), sparkline chart visualization,
+ * and natural-language performance summaries.
+ *
+ * @param props Carousel configuration options and card dataset.
+ * @returns An interactive metric insight card with carousel navigation controls.
+ */
 export function InsightCards({
   cards = DEFAULT_CARDS,
   className = '',

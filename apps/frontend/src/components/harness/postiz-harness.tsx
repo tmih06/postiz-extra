@@ -23,6 +23,23 @@ interface Message {
   hasRecommendation?: boolean;
 }
 
+/**
+ * AI Assistant publishing harness providing chat orchestration, tool execution rendering,
+ * campaign recommendations, diff previews, and autonomous queue scheduling workflows.
+ *
+ * Orchestrates interactive multi-turn agent conversations with thinking indicator states,
+ * streaming text response simulations, tool usage chips, and interactive cards (diffs,
+ * recommendations, schedule approval actions). Also renders a side rail with active channel
+ * status and autonomous queue rules.
+ *
+ * State & Lifecycle:
+ * - Appends user and agent message pairs on prompt submission, transitioning agent state
+ *   through thinking -> tool execution -> streaming text -> interactive cards.
+ * - `handleReset` resets chat history back to the initial welcoming agent state.
+ *
+ * @param props.onScheduleAction - Optional callback triggered when user approves generated post
+ *   schedules inside the ApprovalCard primitive.
+ */
 export function PostizHarness({
   onScheduleAction,
 }: {

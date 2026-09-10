@@ -30,12 +30,28 @@ import type {
   PostSubmissionItem,
 } from '@/api/types';
 import { isVideoPath } from '@/lib/media';
+/**
+ * Per-destination overrides for post body content and platform-specific settings.
+ * Enables customizing post text or configurations (e.g. YouTube titles, Instagram reel flags)
+ * for an individual channel without detaching it from the multi-channel post group.
+ */
 interface ChannelOverride {
   content: string;
   hasOverride: boolean;
   settings: Record<string, unknown>;
 }
 
+/**
+ * Multi-channel post composer supporting shared message authoring, media attachments,
+ * per-destination content/settings overrides, scheduling cadence suggestions, and direct publication.
+ *
+ * Manages draft persistence in browser `localStorage` keyed by active brand/customer workspace ID,
+ * hydration from existing post groups during editing flows, and transactional submission dispatch
+ * to `api.createPost` with state preservation across network failures.
+ *
+ * @param props.initialGroup - Optional UUID post group identifier to fetch and edit an existing post.
+ * @param props.onPostSuccess - Optional callback executed after successful schedule/publish/draft mutation.
+ */
 export function Composer({
   initialGroup,
   onPostSuccess,
@@ -150,14 +166,36 @@ export function Composer({
     selectedChannelIds.includes(ch.id)
   );
 
+  /**
+   * Appends an uploaded or library-selected media item to the shared post attachments list.
+   *
+   * @param media - Media descriptor containing file path, identifier, and display name.
+   * Side effect: Updates `sharedMedia` React state array.
+   */
   const handleAddMedia = (media: MediaItem) => {
     setSharedMedia((prev) => [...prev, media]);
   };
 
+  /**
+   * Removes a media attachment at a specified index from the shared media collection.
+   *
+   * @param index - 0-based array index of the media item to remove.
+   * Side effect: Filters `sharedMedia` React state by index exclusion.
+   */
   const handleRemoveMedia = (index: number) => {
     setSharedMedia((prev) => prev.filter((_, i) => i !== index));
   };
 
+  /**
+   * Merges partial override updates (custom text, override enablement flag, or platform settings)
+   * for a specific social destination channel.
+   *
+   * Preserves existing override fields or defaults them from current shared composer state if
+   * previously unset.
+   *
+   * @param channelId - Unique identifier of the target channel integration.
+   * @param updates - Partial override values to apply into channel override map.
+   */
   const handleChannelOverrideChange = (
     channelId: string,
     updates: Partial<ChannelOverride>
@@ -173,7 +211,13 @@ export function Composer({
     }));
   };
 
-  // Next slot suggestion
+  /**
+   * Queries the backend scheduling engine for the next optimal publication slot for the primary
+   * selected channel, converting the returned UTC date to the local browser timezone.
+   *
+   * Non-blocking advisory action: slot suggestions update the `scheduleDate` input state and display
+   * an informational notice without altering post body content or atomically reserving backend slots.
+   */
   const handleSuggestNextSlot = async () => {
     setIsSuggestingSlot(true);
     setSlotSuggestionNotice(null);
@@ -198,7 +242,18 @@ export function Composer({
     }
   };
 
-  // Submit action
+  /**
+   * Validates composer form state and constructs the multi-channel `CreatePostPayload` submission.
+   *
+   * Performs client-side validation (ensuring >=1 channel selected, non-empty text or media, valid date
+   * format for scheduled posts), builds per-channel payload items incorporating custom overrides when enabled,
+   * dispatches the API mutation, updates workspace state, and clears local draft storage on successful publication.
+   *
+   * Invariant: Retains all composer input and override state on error so creator work is never lost.
+   *
+   * @param type - Submission mode: `'draft'` (save without publishing), `'schedule'` (queue for future date),
+   *               or `'now'` (dispatch immediate social network publishing).
+   */
   const handleSubmit = async (type: 'draft' | 'schedule' | 'now') => {
     setErrorMessage(null);
     setSuccessMessage(null);

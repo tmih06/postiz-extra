@@ -16,15 +16,29 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Structure defining an external integration plugin, AI engine, or protocol tool.
+ */
 interface PlugItem {
+  /** Unique alphanumeric slug for the plugin integration. */
   id: string;
+  /** Display title of the plugin service. */
   name: string;
+  /** Categorization for filtering and grouping plugin capabilities. */
   category: 'AI Video' | 'Automation' | 'Intelligence' | 'Agent Protocol';
+  /** Descriptive explanation of what capability the plug brings to Postiz. */
   description: string;
+  /** Current connectivity and configuration status. */
   status: 'connected' | 'not_configured';
+  /** External documentation link for developer setup and API key generation. */
   docsUrl: string;
+  /** Environment variable or credential key identifier (e.g. 'HEYGEN_API_KEY'). */
   configKey?: string;
 }
+
+/**
+ * Catalog of supported external AI generation services, automation webhooks, and agent protocol plugs.
+ */
 
 const PLUGS: PlugItem[] = [
   {
@@ -82,17 +96,36 @@ const PLUGS: PlugItem[] = [
   },
 ];
 
+/**
+ * Plugs and third-party integrations directory view.
+ *
+ * Displays available integrations (HeyGen, ReelFarm, NanoClaw, MCP, Make.com, Resend) categorized
+ * by capability (AI Video, Automation, Intelligence, Agent Protocol). Allows users to inspect
+ * documentation, view connectivity status pills, and open a credential configuration modal to store API keys.
+ *
+ * @returns The rendered third-party plugs directory and configuration dialog.
+ */
 export function PlugsView() {
   const [selectedPlug, setSelectedPlug] = useState<PlugItem | null>(null);
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  /**
+   * Opens the configuration modal for a specific plugin and resets input fields.
+   *
+   * @param plug - The plugin item selected by the user for configuration.
+   */
   const handleOpenConfig = (plug: PlugItem) => {
     setSelectedPlug(plug);
     setApiKeyInput('');
     setSavedSuccess(false);
   };
 
+  /**
+   * Handles saving the entered plugin API credentials and displays temporary success confirmation.
+   *
+   * Triggers the success message state and schedules auto-dismissal of the modal after 1.2 seconds.
+   */
   const handleSaveConfig = () => {
     setSavedSuccess(true);
     setTimeout(() => {

@@ -1,3 +1,15 @@
+/**
+ * @file Local environment configuration initializer.
+ *
+ * Validates and scaffolds the root `.env` file from `.env.example` for local Docker development.
+ *
+ * Behavior:
+ * - Idempotent: If `.env` already exists, it is left completely untouched.
+ * - Overrides defaults with local ports (Postgres 15432, Redis 16379, Temporal 17233).
+ * - Generates a secure random 48-byte hex string for `JWT_SECRET`.
+ * - Creates the local temporary upload directory (`tmp/uploads`).
+ * - Writes the file using exclusive creation (`flag: 'wx'`) and restricted POSIX permissions (`0o600`).
+ */
 import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';

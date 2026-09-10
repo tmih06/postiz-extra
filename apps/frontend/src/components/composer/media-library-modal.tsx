@@ -15,12 +15,26 @@ import { Upload, Image as ImageIcon, Search, Check, Trash2, Loader2 } from 'luci
 import type { UploadedMedia, MediaItem } from '@/api/types';
 import { cn } from '@/lib/utils';
 import { isVideoPath } from '@/lib/media';
+/**
+ * Props for the media library asset selection and upload dialog modal.
+ */
 interface MediaLibraryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectMedia: (media: MediaItem) => void;
 }
 
+/**
+ * Dialog modal providing an asset manager for browsing previously uploaded workspace media
+ * and uploading new images or videos directly to the media store.
+ *
+ * Automatically queries workspace media items on modal open or search query changes, and
+ * invokes `onSelectMedia` upon selecting an asset or completing a file upload.
+ *
+ * @param props.open - Whether the modal dialog is currently visible.
+ * @param props.onOpenChange - Callback to toggle or dismiss the dialog.
+ * @param props.onSelectMedia - Callback receiving the chosen `MediaItem` (id, path, name) to insert into post attachments.
+ */
 export function MediaLibraryModal({
   open,
   onOpenChange,
@@ -33,6 +47,12 @@ export function MediaLibraryModal({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  /**
+   * Fetches paginated media assets from the workspace API filtered by an optional search term.
+   *
+   * @param query - Optional substring filter to match against asset names.
+   * Side effect: Sets `isLoading` state, updates `mediaList` state with retrieved assets, or resets to `[]` on error.
+   */
   const fetchMedia = useCallback(async (query = '') => {
     setIsLoading(true);
     try {
@@ -51,10 +71,16 @@ export function MediaLibraryModal({
     }
   }, [open, fetchMedia, search]);
 
+  /**
+   * Handles local file selection, executes direct upload via `api.uploadMedia`, and immediately
+   * selects the uploaded asset for composer attachment.
+   *
+   * @param e - Input change event containing the chosen image/video File object.
+   * Side effect: Sets `isUploading` and `uploadError` states, calls `onSelectMedia`, and closes dialog.
+   */
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setIsUploading(true);
     setUploadError(null);
     try {
@@ -69,8 +95,12 @@ export function MediaLibraryModal({
     }
   };
 
+  /**
+   * Selects an existing media library asset and closes the modal.
+   *
+   * @param item - The selected media record containing id, remote path, and filename.
+   */
   const handleSelect = (item: UploadedMedia) => {
-    onSelectMedia({ id: item.id, path: item.path, name: item.name });
     onOpenChange(false);
   };
 

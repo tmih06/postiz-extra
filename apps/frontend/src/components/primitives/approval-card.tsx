@@ -3,16 +3,37 @@ import { cn } from '@/lib/utils';
 import { Check, Clock, Send, FileText, CheckCircle2, ChevronRight } from 'lucide-react';
 import { StatusPill } from '@/components/atoms/status-pill';
 
+/**
+ * Props configuring the human-in-the-loop publication approval card.
+ */
 export interface ApprovalCardProps {
+  /** Header title describing the action or batch under review (defaults to `'Approve publication batch'`). */
   title?: string;
+  /** Descriptive copy summarizing channel variants, post counts, or payload info. */
   summary?: string;
+  /** List of available destination account/channel display labels. */
   channels?: string[];
+  /** Human-readable optimal schedule timestamp displayed in helper texts and summary states. */
   suggestedTime?: string;
+  /** Callback invoked when the user confirms publication with the chosen timing strategy (`'schedule'`, `'now'`, or `'draft'`). */
   onApprove?: (action: 'schedule' | 'now' | 'draft') => void;
+  /** Callback invoked when the user dismisses the approval card. */
   onReject?: () => void;
+  /** Optional extra CSS classes applied to the root card container. */
   className?: string;
 }
 
+/**
+ * Interactive human-in-the-loop review card for AI-generated or queued publication batches.
+ *
+ * Allows operators to inspect target destination channels, toggle individual platform
+ * selections, choose between timing actions (next optimal schedule slot, immediate broadcast,
+ * or draft save), and approve or dismiss the batch. Maintains internal review stage state
+ * (`'review'`, `'approved'`, or `'rejected'`) and presents feedback banners upon terminal action.
+ *
+ * @param props Configuration options, initial channels, and approval/rejection event callbacks.
+ * @returns An interactive approval panel with destination checkboxes, timing buttons, and confirmation triggers.
+ */
 export function ApprovalCard({
   title = 'Approve publication batch',
   summary = '3 tailored posts ready to schedule across Twitter/X, LinkedIn, and Threads.',

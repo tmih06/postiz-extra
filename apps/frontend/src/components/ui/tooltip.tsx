@@ -2,10 +2,38 @@ import * as React from 'react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { cn } from '@/lib/utils';
 
+/**
+ * Global provider wrapping the application or subtree to manage tooltip delay timing and coordination.
+ */
 export const TooltipProvider = TooltipPrimitive.Provider;
+
+/**
+ * Root state wrapper managing open/closed lifecycle for an individual tooltip.
+ */
 export const Tooltip = TooltipPrimitive.Root;
+
+/**
+ * Interactive trigger element that opens the associated tooltip on hover or keyboard focus.
+ */
 export const TooltipTrigger = TooltipPrimitive.Trigger;
 
+/**
+ * Portaled popup content element rendered when the tooltip is active.
+ *
+ * Automatically portals into `document.body`, animating with zoom/fade transitions and directional
+ * slide offsets based on positioning side (`top`, `right`, `bottom`, `left`).
+ *
+ * @param props - Radix TooltipContent props with default `sideOffset = 4`, forwarding element ref.
+ * @returns The portaled tooltip content bubble.
+ *
+ * @example
+ * ```tsx
+ * <Tooltip>
+ *   <TooltipTrigger asChild><button>Info</button></TooltipTrigger>
+ *   <TooltipContent>Detailed hint text</TooltipContent>
+ * </Tooltip>
+ * ```
+ */
 export const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>

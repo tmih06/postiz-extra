@@ -16,6 +16,9 @@ import type {
   InstagramSettings,
 } from '@/api/types';
 
+/**
+ * Properties for configuring channel-specific social network publication settings.
+ */
 interface PlatformSettingsProps {
   provider: string;
   channelName: string;
@@ -23,6 +26,10 @@ interface PlatformSettingsProps {
   onChange: (newSettings: Record<string, unknown>) => void;
 }
 
+/**
+ * Predefined Facebook background visual styling cards for short text-only posts (<=130 characters).
+ * Maps preset identifiers to human-readable names.
+ */
 const FACEBOOK_PRESETS = [
   { id: '', name: 'Standard Text (No Background)' },
   { id: '106018623298955', name: 'Solid Purple' },
@@ -36,6 +43,17 @@ const FACEBOOK_PRESETS = [
   { id: '1881421442117417', name: 'Solid Black' },
 ];
 
+/**
+ * Dynamic platform-specific settings editor for social destinations (YouTube, TikTok, Facebook, Instagram, Threads).
+ *
+ * Renders provider-specific inputs (e.g., video titles, tags, audience privacy, stitch/duet switches,
+ * trial reel toggles, text card backgrounds) based on the destination's normalized provider identifier.
+ *
+ * @param props.provider - Social platform provider identifier (e.g. 'youtube', 'tiktok', 'facebook', 'instagram').
+ * @param props.channelName - Display name of the connected channel destination.
+ * @param props.settings - Key-value map of current platform configuration values.
+ * @param props.onChange - Callback receiving updated settings map whenever any parameter changes.
+ */
 export function PlatformSettings({
   provider,
   channelName,
@@ -44,6 +62,12 @@ export function PlatformSettings({
 }: PlatformSettingsProps) {
   const normalizedProvider = provider.toLowerCase();
 
+  /**
+   * Helper that produces an updated settings map with a single key-value change and triggers `onChange`.
+   *
+   * @param key - The settings property name to set or update.
+   * @param value - New value for the specified setting key.
+   */
   const updateSetting = (key: string, value: unknown) => {
     onChange({
       ...settings,
@@ -55,6 +79,14 @@ export function PlatformSettings({
     const yt = settings as Partial<YoutubeSettings>;
     const tagsString = (yt.tags ?? []).map((t: { label: string }) => t.label).join(', ');
 
+    /**
+     * Parses a comma-delimited tag string into an array of label/value tag objects required by YouTube API.
+     *
+     * Trims whitespace and filters empty entries.
+     * Example: `"tech, news, dev"` -> `[{ value: "tech", label: "tech" }, { value: "news", label: "news" }, { value: "dev", label: "dev" }]`
+     *
+     * @param val - Raw comma-separated string from the tag input.
+     */
     const handleTagsChange = (val: string) => {
       const parsed = val
         .split(',')
@@ -63,7 +95,6 @@ export function PlatformSettings({
         .map((tag: string) => ({ value: tag, label: tag }));
       updateSetting('tags', parsed);
     };
-
     return (
       <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between">

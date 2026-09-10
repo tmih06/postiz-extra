@@ -39,6 +39,18 @@ export interface WorkspaceContextValue {
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
+/**
+ * Top-level context provider managing workspace domain state, active customer/organization profile,
+ * connected social channels, selection filters, and authentication lifecycle.
+ *
+ * On mount, initializes the API client and invokes `loadData()` to concurrently fetch user profile,
+ * customer profiles, and connected channel integrations. Preselects the first available customer profile
+ * and active (non-disabled, valid) channels. Exposes helper callbacks for profile switching, channel toggling,
+ * workspace data refreshing, and session teardown.
+ *
+ * @param props.children - Child components wrapped within this workspace context.
+ * @param props.initialApi - Optional custom `ApiClient` instance (useful for test injection and mocking).
+ */
 export function WorkspaceProvider({
   children,
   initialApi,
@@ -57,6 +69,12 @@ export function WorkspaceProvider({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Fetches user profile, customer organizations, and channel integrations from backend.
+   *
+   * Handles error state gracefully: if profile fetching fails, sets user to null and records error message.
+   * Preselects the first available customer profile and its active channels on initial load.
+   */
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -113,6 +131,14 @@ export function WorkspaceProvider({
     loadData();
   }, [loadData]);
 
+  /**
+   * Switches active customer profile filter and updates selected channels accordingly.
+   *
+   * When set to `'all'`, selects all active (non-disabled, valid) channels across all customer profiles.
+   * When set to a specific customer ID, selects all active channels belonging to that customer profile.
+   *
+   * @param id - Specific customer ID string or `'all'`.
+   */
   const setSelectedCustomerId = useCallback(
     (id: string | 'all') => {
       setSelectedCustomerIdState(id);
@@ -137,6 +163,11 @@ export function WorkspaceProvider({
     [integrations]
   );
 
+  /**
+   * Toggles inclusion of a specific channel integration in current publication selection.
+   *
+   * @param channelId - ID of the channel integration to toggle.
+   */
   const toggleChannelSelection = useCallback((channelId: string) => {
     setSelectedChannelIds((prev) =>
       prev.includes(channelId)
@@ -175,6 +206,11 @@ export function WorkspaceProvider({
     });
   }, [integrations]);
 
+  /**
+   * Logs out current session via backend API and redirects the browser to `/login`.
+   *
+   * Clears in-memory user state in the finally block to ensure cleanup even on network failure.
+   */
   const logout = useCallback(async () => {
     try {
       await api.logout();
@@ -225,6 +261,17 @@ export function WorkspaceProvider({
   );
 }
 
+/**
+ * Hook providing access to global workspace state, authenticated user, channels, and filters.
+ *
+ * Must be called within child components of `WorkspaceProvider`.
+ * Throws an error immediately if invoked outside of a `WorkspaceProvider` hierarchy.
+ *
+ * @returns The current `WorkspaceContextValue` object.
+ *
+ * @example
+ * const { user, selectedChannelIds, setSelectedCustomerId } = useWorkspace();
+ */
 export function useWorkspace(): WorkspaceContextValue {
   const ctx = useContext(WorkspaceContext);
   if (!ctx) {

@@ -2,9 +2,21 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
 
+/**
+ * Props for configuring the interactive Button component.
+ */
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * When true, delegates rendering to its child element using Radix Slot composition,
+   * merging styles and props onto the child (e.g. Next.js Link or custom anchor tags).
+   * @defaultValue `false`
+   */
   asChild?: boolean;
+  /**
+   * Visual style variant representing intent, hierarchy, or visual weight.
+   * @defaultValue `'default'`
+   */
   variant?:
     | 'default'
     | 'destructive'
@@ -12,9 +24,16 @@ export interface ButtonProps
     | 'secondary'
     | 'ghost'
     | 'link';
+  /**
+   * Size presets configuring height, padding, typography, and icon dimensions.
+   * @defaultValue `'default'`
+   */
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
+/**
+ * Mapping of visual intent variants to corresponding Tailwind token classes.
+ */
 const variantStyles: Record<NonNullable<ButtonProps['variant']>, string> = {
   default:
     'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:scale-[0.98]',
@@ -28,6 +47,9 @@ const variantStyles: Record<NonNullable<ButtonProps['variant']>, string> = {
   link: 'text-foreground underline-offset-4 hover:underline',
 };
 
+/**
+ * Mapping of button size presets to layout and padding classes.
+ */
 const sizeStyles: Record<NonNullable<ButtonProps['size']>, string> = {
   default: 'h-9 px-4 py-2',
   sm: 'h-8 rounded-md px-3 text-xs',
@@ -35,6 +57,30 @@ const sizeStyles: Record<NonNullable<ButtonProps['size']>, string> = {
   icon: 'size-9',
 };
 
+/**
+ * Core interactive button component supporting multiple variants, sizes, and slot composition.
+ *
+ * Handles focus-visible rings, disabled opacity/pointer states, active micro-scaling,
+ * and standard SVG icon sizing. When `asChild` is enabled, delegates rendering to the direct child.
+ *
+ * @param className - Optional CSS class overrides merged with computed variant and size styles.
+ * @param variant - Visual style variant determining color and hover treatment.
+ * @param size - Size preset determining dimensions, padding, and text scale.
+ * @param asChild - When true, delegates rendering to child via Radix Slot.
+ * @param props - Standard HTML button attributes forwarded to the underlying element.
+ * @param ref - Forwarded DOM reference to the HTML button or slot element.
+ *
+ * @example
+ * ```tsx
+ * <Button variant="outline" size="sm" onClick={handleSave}>
+ *   Save Changes
+ * </Button>
+ *
+ * <Button asChild variant="ghost" size="icon">
+ *   <a href="/settings" aria-label="Settings"><SettingsIcon /></a>
+ * </Button>
+ * ```
+ */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {

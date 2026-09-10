@@ -3,13 +3,66 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Root container for dropdown menus built on Radix DropdownMenu.
+ *
+ * Manages open/closed state, modal trapping, focus management, and keyboard navigation.
+ *
+ * @example
+ * ```tsx
+ * <DropdownMenu>
+ *   <DropdownMenuTrigger asChild><Button variant="ghost">Options</Button></DropdownMenuTrigger>
+ *   <DropdownMenuContent>
+ *     <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+ *     <DropdownMenuSeparator />
+ *     <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
+ *   </DropdownMenuContent>
+ * </DropdownMenu>
+ * ```
+ */
 export const DropdownMenu = DropdownMenuPrimitive.Root;
+
+/**
+ * Interactive button or element that toggles the dropdown menu visibility.
+ *
+ * Usually wraps a button component via `asChild` prop.
+ */
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+
+/**
+ * Groups related {@link DropdownMenuItem} elements under an accessible category.
+ */
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+
+/**
+ * Portals dropdown menu items into `document.body` to avoid clipping by overflow or z-index constraints.
+ */
 export const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+
+/**
+ * Root container for nested submenu flyouts within a dropdown menu.
+ */
 export const DropdownMenuSub = DropdownMenuPrimitive.Sub;
+
+/**
+ * Container for grouping mutually exclusive {@link DropdownMenuRadioItem} components.
+ *
+ * Manages controlled (`value`, `onValueChange`) radio selection state.
+ */
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
+/**
+ * Submenu trigger item that reveals a nested {@link DropdownMenuSubContent} on hover or arrow-right keypress.
+ *
+ * Renders an automatic trailing chevron icon indicating an expandable submenu.
+ *
+ * @param inset - When true, adds left padding (`pl-8`) to align text with items that have leading icons or indicators.
+ * @param className - Optional CSS classes for custom styling.
+ * @param children - Trigger label or content.
+ * @param props - Radix SubTrigger props.
+ * @param ref - Forwarded ref to the subtrigger element.
+ * @returns Styled submenu trigger item.
+ */
 export const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
@@ -32,6 +85,16 @@ export const DropdownMenuSubTrigger = React.forwardRef<
 DropdownMenuSubTrigger.displayName =
   DropdownMenuPrimitive.SubTrigger.displayName;
 
+/**
+ * Floating panel containing nested submenu items.
+ *
+ * Features slide/fade entrance and zoom animations positioned relative to the parent trigger.
+ *
+ * @param className - Optional CSS classes for width, padding, or borders.
+ * @param props - Radix SubContent props.
+ * @param ref - Forwarded ref.
+ * @returns Styled submenu content overlay.
+ */
 export const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
@@ -48,6 +111,18 @@ export const DropdownMenuSubContent = React.forwardRef<
 DropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName;
 
+/**
+ * Main floating popover menu panel rendered inside a {@link DropdownMenuPortal}.
+ *
+ * Includes built-in elevation shadows, popover theme tokens, collision avoidance,
+ * and directional slide/zoom animations on open and close.
+ *
+ * @param sideOffset - Distance in pixels from the trigger (defaults to 4px).
+ * @param className - Optional CSS classes for custom width, max-height, or styling.
+ * @param props - Remaining Radix Content props.
+ * @param ref - Forwarded ref.
+ * @returns Styled portalled dropdown content container.
+ */
 export const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
@@ -67,6 +142,18 @@ export const DropdownMenuContent = React.forwardRef<
 ));
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
+/**
+ * Actionable item within a dropdown menu.
+ *
+ * Handles mouse click and keyboard selection, visual focus highlighting (`focus:bg-accent`),
+ * disabled state opacity, and icon sizing constraints.
+ *
+ * @param inset - When true, indents the item (`pl-8`) to align with checkbox/radio items.
+ * @param className - Optional CSS classes.
+ * @param props - Radix Item props.
+ * @param ref - Forwarded ref.
+ * @returns Styled dropdown menu item.
+ */
 export const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
@@ -85,6 +172,18 @@ export const DropdownMenuItem = React.forwardRef<
 ));
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
+/**
+ * Toggleable checkbox item within a dropdown menu.
+ *
+ * Renders a left-aligned checkmark indicator icon when `checked` is true.
+ *
+ * @param checked - Checked state (boolean or 'indeterminate').
+ * @param className - Optional CSS classes.
+ * @param children - Item label.
+ * @param props - Radix CheckboxItem props.
+ * @param ref - Forwarded ref.
+ * @returns Styled dropdown checkbox item with indicator.
+ */
 export const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
@@ -109,6 +208,18 @@ export const DropdownMenuCheckboxItem = React.forwardRef<
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName;
 
+/**
+ * Selectable radio option within a {@link DropdownMenuRadioGroup}.
+ *
+ * Renders a left-aligned bullet circle indicator when active.
+ *
+ * @param value - Value of this radio option.
+ * @param className - Optional CSS classes.
+ * @param children - Option label.
+ * @param props - Radix RadioItem props.
+ * @param ref - Forwarded ref.
+ * @returns Styled dropdown radio item with indicator.
+ */
 export const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
@@ -131,6 +242,15 @@ export const DropdownMenuRadioItem = React.forwardRef<
 ));
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
+/**
+ * Non-interactive category header label within a dropdown menu.
+ *
+ * @param inset - When true, indents the label (`pl-8`) to align with checkbox/radio items.
+ * @param className - Optional CSS classes.
+ * @param props - Radix Label props.
+ * @param ref - Forwarded ref.
+ * @returns Styled section label.
+ */
 export const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
@@ -149,6 +269,14 @@ export const DropdownMenuLabel = React.forwardRef<
 ));
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 
+/**
+ * Visual separator dividing items or groups within a dropdown menu.
+ *
+ * @param className - Optional CSS classes.
+ * @param props - Radix Separator props.
+ * @param ref - Forwarded ref.
+ * @returns Styled menu separator line.
+ */
 export const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>

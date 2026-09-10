@@ -6,7 +6,17 @@ import { cn } from '@/lib/utils';
 import type { AnimatedIconProps } from './types';
 import { useIconLoop } from './use-icon-loop';
 
-// 1. Composer: SquarePen icon with animated pen stroke
+/**
+ * Animated post composer icon featuring a writing square and dynamic pen stroke motion.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Pen Stroke Simulation**: On hover loop, articulates the pen path across rotational (`[-4°, +4°]`)
+ *   and translational offsets (`x: [-1, +1.5px]`, `y: [-1, +1.5px]`) to mimic a handwriting motion over 0.65s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated composer icon element.
+ */
 export function AnimatedSquarePen({
   size,
   className,
@@ -61,7 +71,17 @@ export function AnimatedSquarePen({
   );
 }
 
-// 2. AI Studio: Sparkles with radiant rotating main star and blinking satellites
+/**
+ * Animated AI Studio sparkles icon with radiant primary star rotation and blinking secondary satellites.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Radiant Center & Twinkle**: On hover loop, rotates and scales the primary sparkle (`scale: [1, 1.14, 1]`, `rotate: [0, 15, -12, 6, 0]`)
+ *   while secondary satellite stars blink with staggered opacity drops (`opacity: [1, 0.2, 1]`) and scale pulses over 0.8s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated AI sparkles icon element.
+ */
 export function AnimatedSparkles({
   size,
   className,
@@ -141,7 +161,17 @@ export function AnimatedSparkles({
   );
 }
 
-// 3. Scheduled: Clock with fast-forward spinning hour and minute hands
+/**
+ * Animated scheduled clock icon with spinning hour and fast-forward minute hands.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Dual-Hand Clockwork**: On hover loop, completes a full 360° rotation on the hour hand and a 720° (2x)
+ *   fast-forward rotation on the minute hand over 0.9s with spring-like overshoot physics (`[0.34, 1.3, 0.64, 1]`).
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated clock icon element.
+ */
 export function AnimatedClock({
   size,
   className,
@@ -213,7 +243,17 @@ export function AnimatedClock({
   );
 }
 
-// 4. Calendar: CalendarDays with tactile bounce and staggered day-grid pulse
+/**
+ * Animated calendar icon with tactile vertical bounce and staggered day-grid dot pulses.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Tactile Bounce & Dot Wave**: On hover loop, lifts the calendar frame vertically (`y: [4, 2.5, 4]`)
+ *   while 6 day-grid dots pulse in sequence with staggered animation delays (0.04s to 0.24s) and scale bursts (`1.5x`).
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated calendar icon element.
+ */
 export function AnimatedCalendar({
   size,
   className,
@@ -293,7 +333,17 @@ export function AnimatedCalendar({
   );
 }
 
-// 5. Publications: ListFilter with cascading horizontal filter sliders
+/**
+ * Animated publications/filter icon with cascading horizontal slider bar shifts.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Cascading Slider Slits**: On hover loop, shifts 3 horizontal filter lines in opposing staggered
+ *   directions (`top: +2.5px`, `mid: -2.5px`, `bottom: +2.5px`) with 0.08s cascaded delays over 0.55s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated list filter icon element.
+ */
 export function AnimatedListFilter({
   size,
   className,
@@ -364,7 +414,17 @@ export function AnimatedListFilter({
   );
 }
 
-// 6. Drafts: FileText with animated typing/drawing lines
+/**
+ * Animated drafts/file icon with progressive typing line draw effect.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Staggered Text Stroke**: On hover loop, slides and modulates opacity across 3 document text lines
+ *   (`x: [0, 2.5, 0]`, `opacity: [1, 0.35, 1]`) with 0.08s/0.16s delays to simulate content drafting.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated file text icon element.
+ */
 export function AnimatedFileText({
   size,
   className,
@@ -439,7 +499,17 @@ export function AnimatedFileText({
   );
 }
 
-// 7. Media Library: Image with floating sun and breathing landscape
+/**
+ * Animated media library icon with rising sun and rolling landscape horizon.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Floating Sun & Hill Drift**: On hover loop, elevates the sun circle (`y: -2px`, `scale: 1.2`)
+ *   while gently undulating the mountain ridge line (`y: [0, 1, -0.5, 0]`) over 0.65s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated media image icon element.
+ */
 export function AnimatedImage({
   size,
   className,
@@ -507,7 +577,17 @@ export function AnimatedImage({
   );
 }
 
-// 8. Analytics: BarChart3 with ascending staggered column growth
+/**
+ * Animated analytics bar chart icon with staggered vertical column growth.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Staggered Bar Growth**: On hover loop, grows each chart column along its Y-origin (16px)
+ *   (`scaleY: [1, 1.4, 0.9, 1]`) with 0.08s and 0.16s staggered delays over 0.55s to convey performance momentum.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated bar chart icon element.
+ */
 export function AnimatedBarChart({
   size,
   className,
@@ -585,7 +665,17 @@ export function AnimatedBarChart({
   );
 }
 
-// 9. Social Channels: Share2 with pulsing nodes and connecting line tension
+/**
+ * Animated social channels share network icon with pulsing nodes and connector tension.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Network Pulse**: On hover loop, pulses the 3 channel node circles (`scale: 1.3x`) alongside
+ *   translucent opacity flickers (`opacity: [1, 0.35, 1]`) across the connecting link lines over 0.55s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated share network icon element.
+ */
 export function AnimatedShare({
   size,
   className,
@@ -690,7 +780,17 @@ export function AnimatedShare({
   );
 }
 
-// 10. Integrations: Puzzle with tactile snap-and-wiggle
+/**
+ * Animated integrations puzzle icon with tactile snap-and-wiggle engagement.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Snap & Wiggle**: On hover loop, rotates the puzzle piece back-and-forth (`[-9°, +9°]`)
+ *   combined with an elastic pop scale (`scale: [1, 1.08, 0.98, 1]`) using spring overshoot easing over 0.65s.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated puzzle icon element.
+ */
 export function AnimatedPuzzle({
   size,
   className,
@@ -744,7 +844,17 @@ export function AnimatedPuzzle({
   );
 }
 
-// 11. Settings: Gear with tactile smooth precision spin
+/**
+ * Animated settings gear icon with precision mechanical rotation.
+ *
+ * Feature requirements & motion behaviors:
+ * - **90° Precision Index**: On hover loop, indexes the gear wheel 90° clockwise using snappy
+ *   spring physics (`[0.34, 1.4, 0.64, 1]`) over 0.5s to communicate mechanical responsiveness.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated settings gear icon element.
+ */
 export function AnimatedSettings({
   size,
   className,

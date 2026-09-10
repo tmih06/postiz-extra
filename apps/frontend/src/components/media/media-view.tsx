@@ -23,10 +23,25 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Configuration props for the {@link MediaView} component.
+ */
 export interface MediaViewProps {
+  /** Optional callback invoked when the user selects a media item to attach/insert into the active post composer. */
   onUseInComposer?: (media: UploadedMedia) => void;
 }
 
+/**
+ * Media library management view for browsing, uploading, previewing, and deleting media assets.
+ *
+ * Serves as the central repository for images and videos used across post compositions.
+ * Handles remote asset fetching with pagination and search queries, multipart file uploads,
+ * media type filtering (all, image, video), clipboard URL copying, modal previewing,
+ * and insertion into the active post composer.
+ *
+ * @param props - Component properties conforming to {@link MediaViewProps}.
+ * @returns The rendered media library interface containing search/filter controls, grid gallery, and preview modal.
+ */
 export function MediaView({ onUseInComposer }: MediaViewProps) {
   const { api } = useWorkspace();
   const [mediaList, setMediaList] = useState<UploadedMedia[]>([]);
@@ -41,6 +56,14 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * Fetches paginated media records from the backend API based on search and page parameters.
+   *
+   * Updates the `mediaList`, `total`, and `isLoading` states upon completion. Catches and logs errors to console.
+   *
+   * @param pageIdx - Zero-based page offset index (defaults to 0).
+   * @param query - Substring search term to filter media filenames (defaults to empty string).
+   */
   const fetchMedia = async (pageIdx = 0, query = '') => {
     setIsLoading(true);
     try {
@@ -58,6 +81,14 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
     fetchMedia(page, search);
   }, [page, search]);
 
+  /**
+   * Handles file input changes to upload one or more local assets sequentially.
+   *
+   * Triggers file uploads via the workspace API client, resets the file input DOM element,
+   * manages `isUploading` indicator state, and refreshes page 0 of the media list upon success.
+   *
+   * @param e - React change event from the hidden file `<input>`.
+   */
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -76,6 +107,15 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
     }
   };
 
+  /**
+   * Deletes a media asset by ID after confirming the action and preventing event propagation.
+   *
+   * Sends a deletion request to the workspace API, removes the item from local state (`mediaList`),
+   * decrements `total`, and dismisses the preview modal if the active previewed asset was deleted.
+   *
+   * @param id - Unique identifier string of the media asset to remove.
+   * @param e - React mouse click event used to stop bubbling up to parent card clicks.
+   */
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
@@ -88,6 +128,16 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
     }
   };
 
+  /**
+   * Copies the direct media public URL to the user's system clipboard and shows temporary feedback.
+   *
+   * Prevents click propagation, calls `navigator.clipboard.writeText`, and sets `copiedId`
+   * for 1800ms to display a temporary checkmark indicator.
+   *
+   * @param url - Full public URL string of the media file.
+   * @param id - Unique media identifier used to track which card displays the copied status icon.
+   * @param e - React mouse event stopped from triggering card selection.
+   */
   const handleCopyUrl = (url: string, id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(url);

@@ -17,6 +17,16 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Analytics and cross-platform performance dashboard view.
+ *
+ * Computes and renders high-level audience reach and engagement metrics (impressions,
+ * engagements, shortlink clicks, follower net growth), provides interactive date range filtering
+ * (`7d`, `30d`, `90d`), displays channel-by-channel breakdown tables, embeds AI-driven performance
+ * insight cards, and lists top-performing published posts ranked by engagement volume.
+ *
+ * @returns The rendered cross-platform analytics and reporting dashboard.
+ */
 export function AnalyticsView() {
   const { integrations } = useWorkspace();
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d'>('30d');

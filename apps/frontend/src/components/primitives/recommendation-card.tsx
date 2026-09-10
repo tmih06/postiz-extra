@@ -3,19 +3,35 @@ import { cn } from '@/lib/utils';
 import { Sparkles, Check, ChevronRight } from 'lucide-react';
 import { StatusPill } from '@/components/atoms/status-pill';
 
+/**
+ * Data structure representing a single actionable AI recommendation option.
+ */
 export type RecommendationOption = {
+  /** Unique identifier for the recommendation choice. */
   key: string;
+  /** Short summary line of the recommendation headline. */
   short: string;
+  /** Extended rationale or impact explanation displayed when the item is active. */
   detail: string;
+  /** Visual confidence / impact signal strength on a 1-3 scale. */
   signal: 1 | 2 | 3;
+  /** Badge label accompanying the tone status pill (e.g. `'High impact'`, `'Recommended'`). */
   label: string;
+  /** Status pill color tone indicating urgency or sentiment. */
   tone: 'green' | 'orange' | 'accent';
 };
 
+/**
+ * Props configuring the AI recommendation card component.
+ */
 export interface RecommendationCardProps {
+  /** Header title text for the recommendation card (defaults to `'AI Publishing Recommendations'`). */
   title?: string;
+  /** Selectable recommendation choices with impact signals and descriptions. */
   options?: RecommendationOption[];
+  /** Callback invoked with the currently selected option when the user clicks 'Apply Recommendation'. */
   onAccept?: (option: RecommendationOption) => void;
+  /** Optional extra CSS classes applied to the root card container. */
   className?: string;
 }
 
@@ -46,6 +62,16 @@ const DEFAULT_OPTIONS: RecommendationOption[] = [
   },
 ];
 
+/**
+ * Card primitive displaying prioritized AI optimization recommendations.
+ *
+ * Renders a list of actionable optimization recommendations with 1-3 dot signal strength
+ * meters, expandable detailed explanations for the selected item, and a single-click
+ * confirmation flow. Once accepted, transitions into a persistent success confirmation pill.
+ *
+ * @param props Configuration options, selectable recommendation items, and acceptance handler.
+ * @returns An interactive recommendation selector card.
+ */
 export function RecommendationCard({
   title = 'AI Publishing Recommendations',
   options = DEFAULT_OPTIONS,

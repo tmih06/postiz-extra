@@ -4,13 +4,23 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Configuration properties for the `SidebarGlideHighlight` component.
+ */
 export interface SidebarGlideHighlightProps {
+  /** React ref attached to the parent container whose children will be tracked. */
   containerRef: React.RefObject<HTMLElement | null>;
+  /** CSS selector identifying navigable item elements within the container. Defaults to `[data-sidebar-item]`. */
   itemSelector?: string;
+  /** Optional additional CSS classes applied to the gliding motion container. */
   className?: string;
+  /** Maximum pixel distance from cursor to candidate item edge for snapping to activate. Defaults to 52px. */
   snapThreshold?: number;
 }
 
+/**
+ * Coordinate and dimension bounding box for positioning the highlight pill.
+ */
 interface BoxRect {
   top: number;
   left: number;
@@ -19,6 +29,19 @@ interface BoxRect {
   borderRadius?: string;
 }
 
+/**
+ * Renders a physics-spring gliding background highlight that tracks cursor position
+ * across sidebar items, snapping to the nearest valid target within a threshold.
+ *
+ * Features & Mechanics:
+ * - Measures bounding boxes of child elements matching `itemSelector` relative to `containerRef`.
+ * - Calculates Euclidean distance to nearest element boundary when not directly hovering.
+ * - On initial entry, fades in from bottom without sliding; once active, slides smoothly via spring physics.
+ * - Synchronizes position dynamically via `ResizeObserver` and scroll capture listeners.
+ *
+ * @param props - Configuration properties including container ref and snapping threshold.
+ * @returns Animated highlight pill overlay element or hidden motion container.
+ */
 export function SidebarGlideHighlight({
   containerRef,
   itemSelector = '[data-sidebar-item]',
@@ -32,7 +55,16 @@ export function SidebarGlideHighlight({
   const visibleRef = useRef(false);
   const currentTargetRef = useRef<HTMLElement | null>(null);
   const firstEntryTimeoutRef = useRef<number | null>(null);
-  // Computes the nearest sidebar section to the cursor coordinates
+  /**
+   * Identifies the target item element closest to the given viewport coordinates.
+   *
+   * Performs direct hit-testing first, then falls back to Euclidean distance snapping
+   * against all visible candidate items matching `itemSelector` within `snapThreshold` (px).
+   *
+   * @param clientX - Viewport X coordinate of the cursor.
+   * @param clientY - Viewport Y coordinate of the cursor.
+   * @returns The matching HTMLElement if within snap distance, or `null`.
+   */
   const getTargetElement = useCallback(
     (clientX: number, clientY: number): HTMLElement | null => {
       const container = containerRef.current;
@@ -85,7 +117,12 @@ export function SidebarGlideHighlight({
     [containerRef, itemSelector, snapThreshold]
   );
 
-  // Updates box dimensions relative to the container
+  /**
+   * Computes relative bounding coordinates and computed border radius of the target element
+   * relative to `containerRef`, updating the active `targetBox` state.
+   *
+   * @param element - The DOM element to measure and highlight.
+   */
   const updateBoxForElement = useCallback(
     (element: HTMLElement) => {
       const container = containerRef.current;

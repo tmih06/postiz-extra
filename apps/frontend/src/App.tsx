@@ -14,6 +14,15 @@ import { LoginView } from '@/components/auth/login-view';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Agentation } from 'agentation';
+/**
+ * Internal workspace router orchestrating view switching, browser history synchronization,
+ * loading states, and unauthenticated redirects.
+ *
+ * Listens to `popstate` events to support browser back/forward navigation across views
+ * (`/composer`, `/calendar`, `/scheduled`, `/list`, `/drafts`, `/media`, `/agent`, `/analytics`, `/channels`, `/plugs`, `/settings`).
+ * Renders the `LoginView` when user is unauthenticated, a skeleton placeholder during initial load,
+ * or `NavigationShell` with the active view.
+ */
 function WorkspaceRouter() {
   const { user, isLoading } = useWorkspace();
   const [currentView, setCurrentView] = useState<WorkspaceView>(() => {
@@ -53,6 +62,11 @@ function WorkspaceRouter() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  /**
+   * Navigates to a specific workspace view and updates browser URL via `history.pushState`.
+   *
+   * @param view - Target workspace view identifier.
+   */
   const handleNavigate = (view: WorkspaceView) => {
     setCurrentView(view);
     const newPath = view === 'composer' ? '/' : `/${view}`;
@@ -162,6 +176,12 @@ function WorkspaceRouter() {
   );
 }
 
+/**
+ * Root application component bootstrapping the workspace context provider, routing shell,
+ * and Agentation developer agent tools.
+ *
+ * Serves as the top-level React tree entry point.
+ */
 export function App() {
   return (
     <WorkspaceProvider>

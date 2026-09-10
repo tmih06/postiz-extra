@@ -1,6 +1,26 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Horizontal multi-segment selector component with an animated active indicator.
+ *
+ * Renders an accessible tablist where all options occupy equal width within an inline CSS grid.
+ * An absolute background indicator pill slides smoothly across segments using CSS transforms
+ * with cubic-bezier easing based on the active selection index.
+ *
+ * @template T - String literal union representing selectable segment values
+ * @param props.options - Ordered array of distinct selectable option strings
+ * @param props.value - Currently selected option value
+ * @param props.onChange - Callback invoked when a user clicks an option
+ * @param props.className - Optional classes to merge into the outer track container
+ *
+ * @example
+ * <SegmentedControl
+ *   options={['day', 'week', 'month'] as const}
+ *   value={interval}
+ *   onChange={setInterval}
+ * />
+ */
 export function SegmentedControl<T extends string>({
   options,
   value,

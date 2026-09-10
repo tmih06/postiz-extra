@@ -2,17 +2,31 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Check, X, GitCommit } from 'lucide-react';
 
+/**
+ * Data structure representing a single comparison field before and after revisions.
+ */
 export type DiffItem = {
+  /** Unique identifier for the diff row. */
   id: string;
+  /** Name of the property or content section being modified (e.g. `'Hook Line'`, `'Tags'`). */
   field: string;
+  /** Original content prior to proposed modification. */
   original: string;
+  /** Revised proposed content. */
   revised: string;
 };
 
+/**
+ * Props configuring the visual before/after diff table component.
+ */
 export interface DiffTableProps {
+  /** Header title text for the diff card (defaults to `'Proposed Post Improvements'`). */
   title?: string;
+  /** List of field differences to compare and toggle. */
   items?: DiffItem[];
+  /** Callback triggered when the user applies changes, receiving the array of accepted item IDs. */
   onApply?: (acceptedIds: string[]) => void;
+  /** Optional extra CSS classes applied to the root card container. */
   className?: string;
 }
 
@@ -37,6 +51,16 @@ const DEFAULT_DIFF_ITEMS: DiffItem[] = [
   },
 ];
 
+/**
+ * Structured comparison card displaying granular before-and-after text improvements.
+ *
+ * Renders strikethrough red original text vs highlighted green proposed text with
+ * per-item toggle buttons (`Included` / `Excluded`). Provides a batch action to apply
+ * all currently accepted item IDs.
+ *
+ * @param props Component options, diff item collection, and apply event handler.
+ * @returns A structured difference comparison table with inclusion toggles.
+ */
 export function DiffTable({
   title = 'Proposed Post Improvements',
   items = DEFAULT_DIFF_ITEMS,

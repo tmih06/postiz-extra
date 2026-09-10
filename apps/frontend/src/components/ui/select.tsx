@@ -3,10 +3,51 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Root context container for custom select dropdowns built on Radix Select.
+ *
+ * Manages open/closed state, selected value, focus trapping, and ARIA listbox accessibility.
+ * Supports both controlled (`value`, `onValueChange`) and uncontrolled (`defaultValue`) modes.
+ *
+ * @example
+ * ```tsx
+ * <Select value={role} onValueChange={setRole}>
+ *   <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
+ *   <SelectContent>
+ *     <SelectItem value="admin">Admin</SelectItem>
+ *     <SelectItem value="member">Member</SelectItem>
+ *   </SelectContent>
+ * </Select>
+ * ```
+ */
 export const Select = SelectPrimitive.Root;
+
+/**
+ * Groups related {@link SelectItem} options under an accessible section.
+ *
+ * Typically paired with {@link SelectLabel} to categorize options within large lists.
+ */
 export const SelectGroup = SelectPrimitive.Group;
+
+/**
+ * Renders the active selection value or a fallback placeholder inside {@link SelectTrigger}.
+ *
+ * Automatically updates text content when a {@link SelectItem} is chosen.
+ */
 export const SelectValue = SelectPrimitive.Value;
 
+/**
+ * Interactive trigger button that toggles the select dropdown menu.
+ *
+ * Displays the current value, truncates overflowing text with `line-clamp-1`, renders a trailing
+ * chevron icon, and handles keyboard interactions (Space, Enter, Arrow keys).
+ *
+ * @param className - Optional CSS classes for custom sizing, background, or borders.
+ * @param children - Trigger content, usually {@link SelectValue}.
+ * @param props - Radix Trigger props forwarded to the button element.
+ * @param ref - Forwarded ref to the underlying HTML button element.
+ * @returns Styled select trigger button.
+ */
 export const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
@@ -27,6 +68,16 @@ export const SelectTrigger = React.forwardRef<
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
+/**
+ * Scroll control button appearing at the top of the select viewport when options overflow upwards.
+ *
+ * Automatically managed by Radix Select primitive during mouse hover or keyboard scrolling.
+ *
+ * @param className - Optional CSS classes.
+ * @param props - Radix ScrollUpButton props.
+ * @param ref - Forwarded ref.
+ * @returns Scroll up indicator button.
+ */
 export const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
@@ -44,6 +95,16 @@ export const SelectScrollUpButton = React.forwardRef<
 ));
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 
+/**
+ * Scroll control button appearing at the bottom of the select viewport when options overflow downwards.
+ *
+ * Automatically managed by Radix Select primitive during mouse hover or keyboard scrolling.
+ *
+ * @param className - Optional CSS classes.
+ * @param props - Radix ScrollDownButton props.
+ * @param ref - Forwarded ref.
+ * @returns Scroll down indicator button.
+ */
 export const SelectScrollDownButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
@@ -62,6 +123,20 @@ export const SelectScrollDownButton = React.forwardRef<
 SelectScrollDownButton.displayName =
   SelectPrimitive.ScrollDownButton.displayName;
 
+/**
+ * Floating popover container holding the selectable listbox items.
+ *
+ * Portalled to `document.body` to avoid parent clipping/overflow issues. Configured by default
+ * with `position="popper"` for floating alignment, dynamic viewport sizing, and animated
+ * entrance/exit transitions (`animate-in`, `zoom-in-95`, directional slide).
+ *
+ * @param className - Optional CSS classes for custom dimensions or padding.
+ * @param children - Group, Item, Label, and Separator children.
+ * @param position - Positioning strategy: 'popper' (default) or 'item-aligned'.
+ * @param props - Remaining Radix Content props.
+ * @param ref - Forwarded ref to the content container.
+ * @returns Portalled select dropdown content.
+ */
 export const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
@@ -94,6 +169,14 @@ export const SelectContent = React.forwardRef<
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
+/**
+ * Non-interactive label heading for grouping items within {@link SelectGroup}.
+ *
+ * @param className - Optional CSS classes.
+ * @param props - Radix Label props.
+ * @param ref - Forwarded ref.
+ * @returns Styled group header label.
+ */
 export const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
@@ -106,6 +189,20 @@ export const SelectLabel = React.forwardRef<
 ));
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
+/**
+ * Selectable item option within {@link SelectContent}.
+ *
+ * Includes keyboard navigation support, focus highlighting (`focus:bg-accent`), disabled state
+ * handling, and an absolute right-aligned checkmark indicator when selected.
+ *
+ * @param value - Unique string value assigned to this option.
+ * @param disabled - Optional boolean to disable selection of this option.
+ * @param className - Optional CSS classes.
+ * @param children - Display label or custom JSX rendered inside the option.
+ * @param props - Radix Item props.
+ * @param ref - Forwarded ref.
+ * @returns Styled select item element.
+ */
 export const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
@@ -128,6 +225,14 @@ export const SelectItem = React.forwardRef<
 ));
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
+/**
+ * Visual separator divider line placed between select options or groups.
+ *
+ * @param className - Optional CSS classes.
+ * @param props - Radix Separator props.
+ * @param ref - Forwarded ref.
+ * @returns Styled separator rule.
+ */
 export const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>

@@ -1,6 +1,12 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Circular monogram badge rendering an avatar letter or icon node against a colored background.
+ *
+ * @param props - Monogram child content, optional background color hex/var (default: '#6366f1'), and styling classes.
+ * @returns A fixed 16x16 circular badge container.
+ */
 export function Monogram({
   children,
   color = '#6366f1',
@@ -23,6 +29,21 @@ export function Monogram({
   );
 }
 
+/**
+ * Compact pill-shaped chip representing a workspace entity, social channel, user, or platform.
+ *
+ * Renders a circular initial/monogram icon alongside the truncated entity name (capped at 120px with ellipsis).
+ * If no custom `monogram` node is provided, extracts and uppercases the first letter of `name`.
+ *
+ * @example
+ * ```tsx
+ * <EntityChip name="Twitter / X" color="#1DA1F2" />
+ * <EntityChip name="Marketing Team" monogram={<UsersIcon className="size-2.5" />} />
+ * ```
+ *
+ * @param props - Entity name, accent color, optional monogram override, and class overrides.
+ * @returns An inline pill badge with monogram and truncated text label.
+ */
 export function EntityChip({
   name,
   color,

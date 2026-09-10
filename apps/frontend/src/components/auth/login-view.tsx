@@ -9,6 +9,21 @@ interface LoginViewProps {
   onLoginSuccess?: () => void;
 }
 
+/**
+ * Session-based authentication form view for creator and organization login.
+ *
+ * Collects user email and password credentials, validates presence of required fields,
+ * calls `api.login`, triggers workspace state hydration via `refreshWorkspace()`, and
+ * notifies parent callers via `onLoginSuccess` on success. Renders inline error alerts
+ * on failure and disables form submission while network requests are in-flight.
+ *
+ * State & Side Effects:
+ * - Mutates local `email`, `password`, `isLoading`, and `error` states.
+ * - Triggers backend session cookie / token creation via `api.login` and workspace context reload.
+ *
+ * @param props.onLoginSuccess - Optional callback executed after successful credential validation
+ *   and workspace session refresh.
+ */
 export function LoginView({ onLoginSuccess }: LoginViewProps) {
   const { api, refreshWorkspace } = useWorkspace();
   const [email, setEmail] = useState('');

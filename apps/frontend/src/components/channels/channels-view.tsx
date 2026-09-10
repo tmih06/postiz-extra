@@ -17,13 +17,25 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Metadata definition for a supported external social or publishing platform.
+ */
 interface PlatformMeta {
+  /** Unique platform slug identifier (e.g., 'x', 'linkedin', 'instagram'). */
   id: string;
+  /** Human-readable display label of the platform. */
   name: string;
+  /** Broad category classification of the publishing destination. */
   category: 'social' | 'video' | 'blog' | 'community';
+  /** Brief description of supported post formats and features on this platform. */
   description: string;
+  /** Optional flag indicating whether the platform is currently linked. */
   connected?: boolean;
 }
+
+/**
+ * Catalog of all third-party social media, video sharing, blogging, and community platforms supported by Postiz.
+ */
 
 const SUPPORTED_PLATFORMS: PlatformMeta[] = [
   { id: 'x', name: 'Twitter / X', category: 'social', description: 'Threads, polls, media, and scheduled posts' },
@@ -43,6 +55,15 @@ const SUPPORTED_PLATFORMS: PlatformMeta[] = [
   { id: 'wordpress', name: 'WordPress', category: 'blog', description: 'Self-hosted or WordPress.com posts and pages' },
 ];
 
+/**
+ * Channels and integrations management view for social publishing destinations.
+ *
+ * Displays active social account integrations grouped and badged with their connection status,
+ * provides re-authentication and disconnection actions, and presents a directory of available
+ * third-party platforms with direct OAuth 2.0 connection triggers.
+ *
+ * @returns The rendered channels management page with connected and available platform tabs.
+ */
 export function ChannelsView() {
   const { integrations, selectedCustomer } = useWorkspace();
   const [activeTab, setActiveTab] = useState<'connected' | 'all'>('connected');
@@ -50,6 +71,14 @@ export function ChannelsView() {
 
   const connectedList = integrations;
 
+  /**
+   * Initiates the OAuth 2.0 authorization redirect flow for a selected social provider.
+   *
+   * Sets the connecting platform state and redirects the browser `window.location`
+   * to the backend OAuth initialization endpoint for the given platform.
+   *
+   * @param platformId - Unique slug identifier of the target provider (e.g. 'x', 'linkedin').
+   */
   const handleConnect = (platformId: string) => {
     setConnectingPlatform(platformId);
     // Trigger OAuth redirect arrangement

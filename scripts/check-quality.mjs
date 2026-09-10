@@ -1,9 +1,30 @@
+/**
+ * @file Monorepo quality check orchestrator.
+ *
+ * Runs TypeScript type checking (`tsc`), ESLint (with zero-warning enforcement), and JSCPD code
+ * duplication analysis sequentially across specified workspaces (`frontend`, `backend`, or `all`).
+ *
+ * Resource protection & system stability:
+ * - Lowers CPU priority (`setPriority(0, 10)`) in non-CI environments to prevent workstation freezes.
+ * - Allocates an 8 GB V8 heap ceiling (`--max-old-space-size=8192`) per child process.
+ * - Executes checks strictly sequentially.
+ * - Immediately halts execution if an out-of-memory error (exit 134/137) or kill signal occurs.
+ *
+ * Exit codes:
+ * - `0`: All quality checks passed successfully.
+ * - `1`: One or more quality check stages reported errors or warnings.
+ * - `2`: Invalid CLI arguments or unrecognized scope passed.
+ *
+ * Usage:
+ * ```bash
+ * node scripts/check-quality.mjs <frontend|backend|all>
+ * ```
+ */
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { setPriority } from 'node:os';
 import { dirname, resolve } from 'node:path';
-
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL('..', import.meta.url));
 const scopes = {

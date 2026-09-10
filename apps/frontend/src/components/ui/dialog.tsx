@@ -3,11 +3,39 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Root state container managing open/closed state and keyboard focus trap for modal dialogs.
+ * Direct alias for Radix Dialog `Root`.
+ */
 export const Dialog = DialogPrimitive.Root;
+
+/**
+ * Interactive button or element that toggles the dialog open state on click.
+ * Direct alias for Radix Dialog `Trigger`.
+ */
 export const DialogTrigger = DialogPrimitive.Trigger;
+
+/**
+ * Portals dialog overlay and content to the document body to prevent stacking context clipping.
+ * Direct alias for Radix Dialog `Portal`.
+ */
 export const DialogPortal = DialogPrimitive.Portal;
+
+/**
+ * Element that closes the dialog when triggered.
+ * Direct alias for Radix Dialog `Close`.
+ */
 export const DialogClose = DialogPrimitive.Close;
 
+/**
+ * Fullscreen backdrop overlay behind the active modal dialog.
+ *
+ * Implements backdrop blur and darkened background token with fade in/out animation transitions.
+ *
+ * @param className - Optional styling class overrides.
+ * @param props - Radix Dialog Overlay properties.
+ * @param ref - Forwarded DOM reference to the overlay element.
+ */
 export const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -23,6 +51,30 @@ export const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+/**
+ * Centered modal dialog content card with automated backdrop rendering, zoom/fade animations, and dismiss button.
+ *
+ * Traps focus, handles Escape key dismissals, and renders a top-right close icon.
+ *
+ * @param className - Class overrides for modal dimensions, layout grid, or paddings.
+ * @param children - Modal body contents (typically DialogHeader, form fields, DialogFooter).
+ * @param props - Radix Dialog Content properties.
+ * @param ref - Forwarded DOM reference to the modal container element.
+ *
+ * @example
+ * ```tsx
+ * <Dialog>
+ *   <DialogTrigger asChild><Button>Open Dialog</Button></DialogTrigger>
+ *   <DialogContent>
+ *     <DialogHeader>
+ *       <DialogTitle>Edit Profile</DialogTitle>
+ *       <DialogDescription>Update account preferences here.</DialogDescription>
+ *     </DialogHeader>
+ *     <DialogFooter><Button type="submit">Save</Button></DialogFooter>
+ *   </DialogContent>
+ * </Dialog>
+ * ```
+ */
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -47,6 +99,12 @@ export const DialogContent = React.forwardRef<
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
+/**
+ * Header section of a dialog containing title and description elements with responsive alignment.
+ *
+ * @param className - Class overrides for header alignment and spacing.
+ * @param props - HTML div attributes forwarded to the header container.
+ */
 export const DialogHeader = ({
   className,
   ...props
@@ -61,6 +119,14 @@ export const DialogHeader = ({
 );
 DialogHeader.displayName = 'DialogHeader';
 
+/**
+ * Footer action container positioned at the bottom of the dialog.
+ *
+ * Stacks action buttons vertically on mobile screens and aligns them to the right on desktop views.
+ *
+ * @param className - Class overrides for action alignment.
+ * @param props - HTML div attributes forwarded to the footer container.
+ */
 export const DialogFooter = ({
   className,
   ...props
@@ -75,6 +141,15 @@ export const DialogFooter = ({
 );
 DialogFooter.displayName = 'DialogFooter';
 
+/**
+ * Accessible title heading for the dialog.
+ *
+ * Automatically announces itself as the modal's primary label for screen readers via aria-labelledby.
+ *
+ * @param className - Class overrides for typography or text colors.
+ * @param props - Radix Dialog Title properties.
+ * @param ref - Forwarded DOM reference to the title heading element.
+ */
 export const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
@@ -90,6 +165,15 @@ export const DialogTitle = React.forwardRef<
 ));
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
+/**
+ * Accessible description paragraph providing secondary explanatory text for the dialog modal.
+ *
+ * Linked to the dialog container via aria-describedby for accessibility.
+ *
+ * @param className - Class overrides for description text styles.
+ * @param props - Radix Dialog Description properties.
+ * @param ref - Forwarded DOM reference to the description element.
+ */
 export const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>

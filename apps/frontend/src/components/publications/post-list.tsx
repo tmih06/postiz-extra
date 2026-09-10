@@ -25,6 +25,21 @@ interface PostListProps {
   onEditPost?: (group: string) => void;
 }
 
+/**
+ * Paginated publication feed displaying post groups with per-channel delivery outcomes.
+ *
+ * Supports status filtering (`all`, `scheduled`, `published`, `draft`), pagination controls,
+ * single-post group deletion with confirmation prompt, and direct transition to composer
+ * editing via `onEditPost`. Renders visual indicators and error details for each social integration.
+ *
+ * Invariants:
+ * - Resets pagination `page` index to 0 when status filter changes.
+ * - Normalizes post group identifier using `postGroup.group || postGroup.id`.
+ * - Refetches post list after successful post deletion.
+ *
+ * @param props.initialStateFilter - Initial publication filter status (defaults to `'all'`).
+ * @param props.onEditPost - Optional callback invoked with post group id to open composer editor.
+ */
 export function PostList({
   initialStateFilter = 'all',
   onEditPost,

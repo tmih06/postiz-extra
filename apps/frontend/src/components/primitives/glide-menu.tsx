@@ -1,13 +1,32 @@
 import React, { useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Configuration properties for the `GlideMenu` component.
+ */
 export interface GlideMenuProps {
+  /** Menu content containing rows selectable by hover/focus. */
   children: ReactNode;
+  /** Optional class name applied to the outer wrapper container. */
   className?: string;
+  /** Class name customizing highlight pill appearance (e.g. background, borders, radius). Defaults to `inset-x-0 rounded-[8px] bg-hover`. */
   highlightClassName?: string;
+  /** Selector used to identify target items for highlight alignment. Defaults to `[data-menu-row]`. */
   rowSelector?: string;
 }
 
+/**
+ * Wraps interactive menu lists with a smooth gliding background indicator pill
+ * that tracks hovered or focused items matching `rowSelector`.
+ *
+ * Features & Mechanics:
+ * - Listens for `mouseOver` and `focusCapture` events to identify target items.
+ * - Measures target row bounding rect relative to container and slides highlight with cubic-bezier easing.
+ * - Handles `mouseLeave` and `blurCapture` to fade out highlight when focus/pointer moves outside.
+ *
+ * @param props - Children, styling classes, and row selector.
+ * @returns Rendered container element with sliding highlight pill.
+ */
 export function GlideMenu({
   children,
   className = '',
@@ -18,6 +37,11 @@ export function GlideMenu({
   const [box, setBox] = useState<{ top: number; height: number } | null>(null);
   const [visible, setVisible] = useState(false);
 
+  /**
+   * Moves the highlight box to encompass the closest row element matching `rowSelector`.
+   *
+   * @param target - Event target from mouse movement or focus event.
+   */
   const moveTo = (target: EventTarget | null) => {
     const container = ref.current;
     if (!(target instanceof Element) || !container) return;

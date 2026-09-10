@@ -1,3 +1,18 @@
+/**
+ * @file Vite configuration for the Postiz frontend application.
+ *
+ * Configures the development server, build pipeline, dependency pre-bundling, path aliases,
+ * and reverse proxy mappings for both the NestJS backend and legacy Next.js services.
+ *
+ * Key configuration aspects:
+ * - Dev Server: Listens on `0.0.0.0:4200`.
+ * - Path Aliases: Maps `@/` to `apps/frontend/src/`.
+ * - API Proxy: Rewrites and forwards `/api/*` to the NestJS backend on port 3000 (`BACKEND_INTERNAL_URL`).
+ * - Legacy Next.js Proxy: Forwards `/integrations/social`, `/provider`, `/p`, `/modal`, and `/api/uploads`
+ *   to the legacy Next.js server on port 4201 during migration coexistence.
+ * - Optimization: Pre-bundles common React and Radix UI dependencies for faster cold starts.
+ * - Build: Emits clean production artifacts into `dist/`.
+ */
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';

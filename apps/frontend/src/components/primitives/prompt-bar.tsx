@@ -2,10 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Sparkles, ArrowUp, AtSign, Command, Paperclip, Calendar, BarChart3, Hash } from 'lucide-react';
 
+/**
+ * Configuration properties for the `PromptBar` component.
+ */
 export interface PromptBarProps {
+  /** Placeholder text displayed inside the prompt input textarea. */
   placeholder?: string;
+  /** Callback invoked when the user submits a non-empty prompt. */
   onSubmit?: (prompt: string) => void;
+  /** Whether input and submission interactions are disabled. Defaults to `false`. */
   disabled?: boolean;
+  /** Optional additional CSS classes applied to the root container. */
   className?: string;
 }
 
@@ -16,6 +23,18 @@ const QUICK_ACTIONS = [
   { label: 'Hashtag audit', prompt: 'Audit hashtag usage across all channels and remove low-performing tags' },
 ];
 
+/**
+ * Renders an AI command prompt bar with quick-action suggestion chips, contextual syntax helper tags,
+ * keyboard submission shortcuts (Enter submits, Shift+Enter inserts newline), and auto-focus management.
+ *
+ * Features:
+ * - Suggestion pills (`QUICK_ACTIONS`) for one-click prompt presets.
+ * - Shortcut tag insertions (`@` for channels, `/schedule` for time booking, `/analytics` for reporting).
+ * - Clean submit handling resetting form state upon non-empty dispatch.
+ *
+ * @param props - Custom placeholder, submit callback, disabled state, and styling.
+ * @returns Rendered prompt bar container with quick action pills and input form.
+ */
 export function PromptBar({
   placeholder = 'Ask Postiz AI to plan, draft, or optimize social campaigns…',
   onSubmit,
@@ -25,6 +44,11 @@ export function PromptBar({
   const [prompt, setPrompt] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  /**
+   * Handles form submission, trims prompt content, and invokes `onSubmit` if valid and enabled.
+   *
+   * @param e - Optional form submission event.
+   */
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!prompt.trim() || disabled) return;
@@ -32,6 +56,11 @@ export function PromptBar({
     setPrompt('');
   };
 
+  /**
+   * Intercepts keydown events to submit on plain Enter while allowing multiline input on Shift+Enter.
+   *
+   * @param e - Keyboard event from textarea.
+   */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -39,6 +68,11 @@ export function PromptBar({
     }
   };
 
+  /**
+   * Replaces current prompt text with chosen quick action and restores focus to textarea.
+   *
+   * @param text - Suggested prompt preset text.
+   */
   const selectQuickAction = (text: string) => {
     setPrompt(text);
     textareaRef.current?.focus();
