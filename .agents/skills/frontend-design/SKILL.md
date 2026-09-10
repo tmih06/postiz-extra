@@ -45,17 +45,18 @@ Consult these specialized sub-files for specific implementation domains:
 
 Execute frontend tasks using this disciplined sequence:
 
-### 1. Source Existing Open-Source Implementations (`Existing > Rebuild`)
-Always search online for free, open-source implementations matching the UI design requirements before authoring custom components:
-- **Search Open-Source First**: Query component registries and repositories (e.g., shadcn registries, 21st.dev, v0, Radix, Tailwind UI open-source implementations, GitHub) for existing components fulfilling the requirement.
-- **Inspect License**: Verify the candidate's license. Only accept permissive licenses compatible with the workspace (e.g., MIT, Apache-2.0, BSD, ISC, Unlicense). Reject copyleft or proprietary terms.
-- **Surface to User**: When a qualifying implementation is found, notify the user before writing custom code:
-  - Report that the component has already been implemented open-source online.
-  - Provide the component name, source URL, and verified license.
-  - Ask if they want to adopt and adapt the existing component instead of recreating it from scratch (`existing > rebuild`).
+### 1. Check Installed Libraries & Prebuilt Sourcing (`Installed > Online > Rebuild`)
+Always inspect existing installed libraries and local components before searching externally or authoring custom components:
+- **Check Installed Dependencies First**: Inspect `package.json` dependencies and existing workspace components (`components/ui`, `components/atoms`, `components/primitives`). If an installed library (e.g., `@radix-ui/react-*`, `lucide-react`, `motion`) or local component already satisfies or composes the requested UI element, use it directly.
+- **No Unneeded Research**: If an installed library or workspace component fulfills the requirement, proceed directly to implementation. Do not perform external research unless the user explicitly asked for research.
+- **External Research (Only When Missing or Explicitly Requested)**:
+  - Run external research only when installed libraries lack the required component, or when the user explicitly requested research.
+  - Query component registries and repositories (e.g., shadcn registries, 21st.dev, v0, Radix, Tailwind UI open-source implementations, GitHub) for existing implementations fulfilling the requirement.
+  - Verify candidate license compatibility: accept permissive licenses only (e.g., MIT, Apache-2.0, BSD, ISC, Unlicense); reject copyleft or proprietary terms.
+  - Surface qualifying candidates to the user with component name, source URL, and verified license before writing custom code.
 - **Proceed by User Choice**:
-  - **Adopt**: Bring in the open-source component, adapt its styling to Beautiful UI tokens (`bg-surface`, `text-ink`, `border-line`, `shadow-card`), and wire props.
-  - **Rebuild or Not Found**: If no suitable open-source implementation exists, or if the user explicitly prefers a custom build, proceed to Step 2.
+  - **Adopt**: Bring in the prebuilt component, adapt styling to Beautiful UI tokens (`bg-surface`, `text-ink`, `border-line`, `shadow-card`), and wire props.
+  - **Rebuild or Not Found**: If no suitable prebuilt implementation exists, or if the user explicitly prefers a custom build, proceed to Step 2.
 
 ### 2. Structure the View
 - Determine user workflow, primary call-to-action, and data states (loading, empty, populated).
@@ -80,7 +81,7 @@ Always search online for free, open-source implementations matching the UI desig
 ## Quality Floor & Critique Checklist
 
 Before finalizing any frontend implementation, verify against this bar:
-- [ ] **Existing > Rebuild Audit**: Verified whether a permissive open-source implementation already exists before building from scratch; surfaced candidate and license to the user when found.
+- [ ] **Component Sourcing Audit (`Installed > Online > Rebuild`)**: Checked installed libraries and workspace components first. Skipped external research when an installed package already satisfied the requirement; verified permissive license only when external research was required or requested.
 - [ ] **Design Token Hygiene**: All surfaces, text, borders, and shadows use the design tokens (`--page`, `--surface`, `--ink`, `--line`, `--shadow-card`).
 - [ ] **Accessibility & Contrast**: Text contrast meets WCAG AA standards (minimum 4.5:1). Keyboard navigation works smoothly across all controls.
 - [ ] **Collapsible Layout**: Sidebar transitions cleanly between expanded (240px) and collapsed (56px) without icon drift or text clipping.

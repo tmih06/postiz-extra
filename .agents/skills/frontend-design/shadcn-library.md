@@ -73,8 +73,8 @@ Use standard slot patterns (`asChild`) on buttons when wrapping links, and ensur
 </Button>
 ```
 
-### 3. Open-Source Sourcing & Adaptation (`Existing > Rebuild`)
-Prioritize finding and adopting existing permissive open-source components before custom recreation:
-- Query open registries and repositories (e.g. shadcn registries, 21st.dev, Radix UI) for components matching design requirements.
-- Verify open-source license compatibility (MIT, Apache-2.0, BSD, ISC, Unlicense).
-- Restyle imported markup with local design tokens (`bg-surface`, `text-ink`, `border-line`, `shadow-card`) to preserve Beautiful UI aesthetic consistency.
+### 3. Prebuilt Component Sourcing & Adaptation (`Installed > Online > Rebuild`)
+Prioritize existing installed libraries and workspace components before external research or custom recreation:
+- **Check Installed Dependencies First**: Inspect `package.json` dependencies and existing primitives (`components/ui`, `components/atoms`, `components/primitives`). When installed libraries (e.g., Radix primitives, Lucide icons, Motion) already satisfy the component or requested feature, compose them directly.
+- **No Unneeded Research**: Do not conduct external online research if an installed library or existing component already fulfills the requirement, unless the user explicitly requested research.
+- **External Research Fallback**: Only when installed libraries lack the component—or when the user explicitly asks for research—query open registries (e.g. shadcn registries, 21st.dev, Radix UI), verify permissive open-source licenses (MIT, Apache-2.0, BSD, ISC, Unlicense), and restyle imported markup with local design tokens (`bg-surface`, `text-ink`, `border-line`, `shadow-card`).
