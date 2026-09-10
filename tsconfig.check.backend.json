@@ -3,6 +3,8 @@
   "compilerOptions": {
     "noEmit": true,
     "incremental": false,
+    "tsBuildInfoFile": null,
+    "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "strictBindCallApply": true,

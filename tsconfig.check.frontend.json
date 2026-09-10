@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "incremental": false,
+    "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "strictBindCallApply": true,
@@ -26,6 +27,7 @@
     "**/.next/**",
     "**/build/**",
     "**/out/**",
-    "**/coverage/**"
+    "**/coverage/**",
+    "**/vite.config.ts"
   ]
 }

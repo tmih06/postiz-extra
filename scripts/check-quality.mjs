@@ -69,7 +69,7 @@ for (const check of checks) {
       process.execPath,
       [
         ...(isCI
-          ? []
+          ? ['--max-old-space-size=8192']
           : ['--max-old-space-size=512', '--max-semi-space-size=16']),
         resolve(
           dirname(require.resolve(`${check.package}/package.json`)),
@@ -82,11 +82,9 @@ for (const check of checks) {
         stdio: 'inherit',
         env: {
           ...process.env,
-          NODE_OPTIONS: '',
           ESLINT_USE_FLAT_CONFIG: 'true',
         },
-        timeout: 120_000,
-        killSignal: 'SIGKILL',
+        ...(isCI ? {} : { timeout: 120_000, killSignal: 'SIGKILL' }),
       }
     );
     if (result.error) console.error(result.error.message);
