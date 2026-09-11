@@ -3,6 +3,7 @@ import { useWorkspace } from '@/context/workspace.context';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusPill } from '@/components/atoms/status-pill';
+import { PlatformIcon } from '@/components/primitives/platform-icon';
 import {
   Share2,
   Plus,
@@ -193,8 +194,8 @@ export function ChannelsView({ initialTab }: ChannelsViewProps = {}) {
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="flex size-9 items-center justify-center rounded-control bg-foreground text-background font-bold text-xs uppercase shadow-hairline">
-                          {channel.providerIdentifier.slice(0, 2)}
+                        <div className="flex size-9 items-center justify-center rounded-control bg-page border border-line shadow-hairline">
+                          <PlatformIcon provider={channel.providerIdentifier} className="size-4.5" />
                         </div>
                         <div className="flex flex-col truncate">
                           <span className="font-semibold text-ink text-[13.5px] truncate capitalize">
@@ -262,8 +263,8 @@ export function ChannelsView({ initialTab }: ChannelsViewProps = {}) {
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex size-8 items-center justify-center rounded-control bg-line font-bold text-ink text-xs uppercase">
-                        {platform.id.slice(0, 2)}
+                      <div className="flex size-8 items-center justify-center rounded-control bg-page border border-line shadow-hairline">
+                        <PlatformIcon provider={platform.id} className="size-4" />
                       </div>
                       <span className="font-semibold text-ink text-[14px]">
                         {platform.name}

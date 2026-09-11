@@ -80,6 +80,7 @@ export const DropdownMenuSubTrigger = React.forwardRef<
     )}
     {...props}
   >
+    {children}
     <ChevronRight className="ml-auto size-4" />
   </DropdownMenuPrimitive.SubTrigger>
 ));

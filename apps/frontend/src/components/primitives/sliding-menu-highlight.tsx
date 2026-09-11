@@ -48,30 +48,53 @@ export function SlidingMenuHighlight({
   const [targetBox, setTargetBox] = useState<TargetBox | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const isFirstEntryRef = useRef(true);
+  const lastItemRef = useRef<HTMLElement | null>(null);
 
   const updateBox = useCallback(
     (item: HTMLElement | null) => {
       const container = containerRef.current;
       if (!container || !item) {
+        lastItemRef.current = null;
         setIsVisible(false);
         isFirstEntryRef.current = true;
         return;
       }
 
+      // Avoid recalculating or re-rendering when pointer moves within the same item
+      if (lastItemRef.current === item && isVisible) {
+        return;
+      }
+      lastItemRef.current = item;
+
       const containerRect = container.getBoundingClientRect();
       const itemRect = item.getBoundingClientRect();
 
-      setTargetBox({
-        top: itemRect.top - containerRect.top + container.scrollTop,
-        left: itemRect.left - containerRect.left + container.scrollLeft,
-        width: itemRect.width,
-        height: itemRect.height,
+      const newTop = itemRect.top - containerRect.top + container.scrollTop;
+      const newLeft = itemRect.left - containerRect.left + container.scrollLeft;
+      const newWidth = itemRect.width;
+      const newHeight = itemRect.height;
+
+      setTargetBox((prev) => {
+        if (
+          prev &&
+          prev.top === newTop &&
+          prev.left === newLeft &&
+          prev.width === newWidth &&
+          prev.height === newHeight
+        ) {
+          return prev;
+        }
+        return {
+          top: newTop,
+          left: newLeft,
+          width: newWidth,
+          height: newHeight,
+        };
       });
       setIsVisible(true);
     },
-    [containerRef]
+    [containerRef, isVisible]
   );
-
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -90,6 +113,7 @@ export function SlidingMenuHighlight({
     };
 
     const handlePointerLeave = () => {
+      lastItemRef.current = null;
       setIsVisible(false);
       isFirstEntryRef.current = true;
     };

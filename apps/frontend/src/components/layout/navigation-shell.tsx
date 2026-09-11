@@ -135,7 +135,7 @@ export function NavigationShell({
         )}
 
         {/* Main Content Area: edge-to-edge locked viewport without page scroll */}
-        <main className="flex-1 overflow-hidden min-h-0 min-w-0 p-3 sm:p-5 lg:p-6 flex flex-col">
+        <main className="flex-1 overflow-y-auto min-h-0 min-w-0 p-3 sm:p-5 lg:p-6 flex flex-col">
           <div className="w-full h-full flex flex-col min-h-0 min-w-0">
             {children}
           </div>
