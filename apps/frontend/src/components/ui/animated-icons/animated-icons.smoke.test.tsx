@@ -21,6 +21,8 @@ import {
   AnimatedCollapseToggle,
   AnimatedLogOut,
   AnimatedX,
+  AnimatedLayoutGrid,
+  AnimatedLayers,
   useIconLoop,
 } from './index';
 
@@ -52,8 +54,9 @@ describe('Sidebar Animated Lucide Icons', () => {
       AnimatedShare,
       AnimatedPuzzle,
       AnimatedSettings,
+      AnimatedLayoutGrid,
+      AnimatedLayers,
     ];
-
     for (const Icon of icons) {
       const html = renderToStaticMarkup(<Icon className="size-4" isHovered={true} />);
       expect(html).toContain('<svg');
@@ -131,22 +134,19 @@ describe('Sidebar Animated Lucide Icons', () => {
   describe('SidebarNav integration with animated icons', () => {
     it('renders SidebarNav with all primary animated nav icons and toggle controls', () => {
       const html = renderToStaticMarkup(
-        <SidebarNav currentView="composer" onNavigate={() => {}} />
+        <SidebarNav currentView="posts" onNavigate={() => {}} />
       );
 
-      // Navigation items
-      expect(html).toContain('Composer');
+      // Navigation items (unified Posts section + top-level items)
+      expect(html).toContain('Connections');
+      expect(html).toContain('Posts');
+      expect(html).toContain('Overview');
+      expect(html).toContain('Queues');
       expect(html).toContain('AI Studio');
-      expect(html).toContain('Scheduled');
-      expect(html).toContain('Calendar');
-      expect(html).toContain('Publications');
-      expect(html).toContain('Drafts');
       expect(html).toContain('Media Library');
       expect(html).toContain('Analytics');
-      expect(html).toContain('Social Channels');
       expect(html).toContain('Integrations');
       expect(html).toContain('Settings');
-
       // Toggle controls
       expect(html).toMatch(/title="Switch to (Dark|Light) mode"/);
       expect(html).toContain('title="Collapse sidebar"');
@@ -160,7 +160,7 @@ describe('Sidebar Animated Lucide Icons', () => {
 
     it('renders the SidebarGlideHighlight container inside the flex-1 nav range with initial bottom-up transform and solid muted background', () => {
       const html = renderToStaticMarkup(
-        <SidebarNav currentView="composer" onNavigate={() => {}} />
+        <SidebarNav currentView="posts" onNavigate={() => {}} />
       );
 
       // Gliding box rendered at z-0 with non-transparent var(--hover) background and initial bottom-up translateY

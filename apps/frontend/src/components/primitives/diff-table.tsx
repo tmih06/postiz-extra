@@ -151,7 +151,7 @@ export function DiffTable({
         <button
           type="button"
           onClick={handleApply}
-          className="rounded-control bg-foreground px-4 py-1.5 text-[13px] font-semibold text-background shadow-btn hover:opacity-90 active:scale-[0.98] transition-all"
+          className="rounded-control bg-foreground px-4 py-1.5 text-[13px] font-semibold text-background shadow-btn hover:opacity-90 transition-opacity"
         >
           Apply Changes ({Object.values(accepted).filter(Boolean).length}/{items.length})
         </button>

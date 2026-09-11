@@ -1,19 +1,43 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useWorkspace, type ChannelStatusInfo } from '@/context/workspace.context';
 import type { ChannelIntegration } from '@/api/types';
+import type { WorkspaceView } from '@/components/layout/navigation-shell';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Check, AlertCircle, Share2, Layers } from 'lucide-react';
+import { Check, AlertCircle, Share2, Layers, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+/**
+ * Optional callback configuration for the DestinationSelector toolbar.
+ */
+export interface DestinationSelectorProps {
+  /**
+   * Optional navigation handler to transition between workspace views.
+   * Accepts optional query options (e.g. `{ search: '?tab=add' }`) to deep link into sub-tabs.
+   */
+  onNavigate?: (view: WorkspaceView, options?: { search?: string }) => void;
+  /**
+   * Optional direct callback to trigger the channel connection flow or open a connection modal.
+   */
+  onAddChannel?: () => void;
+}
 
 /**
  * Destination channel selector toolbar for choosing target social media accounts.
  *
  * Filters connected integrations according to the currently active workspace brand profile
  * (including ungrouped channels), displays real-time connection status badges (disabled, expired token,
- * incomplete setup), and handles multi-select toggling via workspace context.
+ * incomplete setup), handles multi-select toggling via workspace context, and provides quick navigation
+ * buttons to seamlessly transition into adding or connecting new social channels.
+ *
+ * @param props - Navigation and channel addition action handlers.
+ * @returns The rendered destination toolbar with selection pills and quick-add actions.
  */
-export function DestinationSelector() {
+export function DestinationSelector({
+  onNavigate,
+  onAddChannel,
+}: DestinationSelectorProps = {}) {
   const {
     integrations,
     selectedCustomerId,
@@ -21,6 +45,27 @@ export function DestinationSelector() {
     channelStatuses,
     toggleChannelSelection,
   } = useWorkspace();
+  /**
+   * Dispatches quick navigation to the channels view with the add-channel platform directory tab active.
+   *
+   * Uses `onAddChannel` when supplied; otherwise triggers `onNavigate('channels', { search: '?tab=add' })`.
+   * When rendered without props, falls back to direct browser `history.pushState` and synthetic `popstate`.
+   */
+  const handleAddChannel = useCallback(() => {
+    if (onAddChannel) {
+      onAddChannel();
+      return;
+    }
+    if (onNavigate) {
+      onNavigate('channels', { search: '?tab=add' });
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/channels?tab=add');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  }, [onAddChannel, onNavigate]);
+
 
   // Channels to display: if 'all', all channels; else channels matching selected profile + ungrouped
   const displayedChannels = integrations.filter((ch: ChannelIntegration) => {
@@ -43,16 +88,38 @@ export function DestinationSelector() {
               {selectedCount} selected
             </Badge>
           </div>
-          {selectedCustomerId !== 'all' && (
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Layers className="size-3" /> Filtered by active profile
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {selectedCustomerId !== 'all' && (
+              <span className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+                <Layers className="size-3" /> Filtered by active profile
+              </span>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddChannel}
+              className="h-7 gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+            >
+              <Plus className="size-3.5" />
+              <span>Add Channel</span>
+            </Button>
+          </div>
         </div>
 
         {displayedChannels.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
-            No social channels connected for this profile.
+          <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+            <p>No social channels connected for this profile.</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddChannel}
+              className="h-8 gap-1.5 px-3 text-xs font-medium text-foreground hover:bg-muted"
+            >
+              <Plus className="size-3.5" />
+              <span>Connect a channel</span>
+            </Button>
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -111,7 +178,7 @@ export function DestinationSelector() {
                   type="button"
                   onClick={() => toggleChannelSelection(channel.id)}
                   className={cn(
-                    'group flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]',
+                    'group flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                     isSelected
                       ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                       : 'border-border bg-background text-foreground hover:bg-muted'
@@ -152,6 +219,15 @@ export function DestinationSelector() {
                 </button>
               );
             })}
+            <button
+              type="button"
+              onClick={handleAddChannel}
+              className="group flex items-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-foreground/40 hover:text-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              title="Add or connect a new social channel"
+            >
+              <Plus className="size-3.5" />
+              <span>Add Channel</span>
+            </button>
           </div>
         )}
       </div>

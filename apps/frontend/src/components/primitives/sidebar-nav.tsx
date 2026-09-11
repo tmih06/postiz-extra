@@ -6,10 +6,6 @@ import type { CustomerProfile } from '@/api/types';
 import {
   AnimatedSquarePen,
   AnimatedSparkles,
-  AnimatedClock,
-  AnimatedCalendar,
-  AnimatedListFilter,
-  AnimatedFileText,
   AnimatedImage,
   AnimatedBarChart,
   AnimatedShare,
@@ -23,6 +19,8 @@ import {
   AnimatedCollapseToggle,
   AnimatedLogOut,
   AnimatedX,
+  AnimatedLayoutGrid,
+  AnimatedLayers,
 } from '@/components/ui/animated-icons';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { SidebarGlideHighlight } from './sidebar-glide-highlight';
@@ -31,17 +29,29 @@ import { SidebarGlideHighlight } from './sidebar-glide-highlight';
  * Identifier union of all navigable top-level workspace views.
  */
 export type WorkspaceView =
-  | 'composer'
+  | 'posts'
   | 'agent'
-  | 'scheduled'
-  | 'calendar'
-  | 'list'
-  | 'drafts'
   | 'media'
   | 'analytics'
   | 'channels'
   | 'plugs'
   | 'settings';
+
+/**
+ * Specification for a secondary sub-navigation item.
+ */
+export interface NavSubItem {
+  /** Unique sub-item identifier. */
+  id: string;
+  /** Display text label. */
+  label: string;
+  /** Icon component with animation support. */
+  icon: React.ComponentType<{ className?: string; isHovered?: boolean }>;
+  /** Target workspace view. */
+  view: WorkspaceView;
+  /** Optional query string options. */
+  search?: string;
+}
 
 /**
  * Specification for a single primary sidebar navigation item.
@@ -55,6 +65,8 @@ export interface NavItem {
   icon: React.ComponentType<{ className?: string; isHovered?: boolean }>;
   /** Optional badge indicator label (e.g. 'AI'). */
   badge?: string;
+  /** Optional nested sub-navigation destinations. */
+  subItems?: NavSubItem[];
 }
 
 /**
@@ -64,26 +76,30 @@ export interface SidebarNavProps {
   /** Currently active workspace view identifier. */
   currentView: WorkspaceView;
   /** Callback invoked when the user selects a navigation row or view trigger. */
-  onNavigate: (view: WorkspaceView) => void;
+  onNavigate: (view: WorkspaceView, options?: { search?: string }) => void;
   /** Optional callback invoked when selecting a recent post item. */
   onSelectRecent?: (postId: string) => void;
   /** Additional CSS class names applied to the root `<aside>` container. */
   className?: string;
 }
+
 const PRIMARY_NAV_ITEMS: NavItem[] = [
-  { id: 'composer', label: 'Composer', icon: AnimatedSquarePen },
+  { id: 'channels', label: 'Connections', icon: AnimatedShare },
+  {
+    id: 'posts',
+    label: 'Posts',
+    icon: AnimatedSquarePen,
+    subItems: [
+      { id: 'overview', label: 'Overview', icon: AnimatedLayoutGrid, view: 'posts' },
+      { id: 'queues', label: 'Queues', icon: AnimatedLayers, view: 'posts', search: '?status=scheduled' },
+    ],
+  },
   { id: 'agent', label: 'AI Studio', icon: AnimatedSparkles, badge: 'AI' },
-  { id: 'scheduled', label: 'Scheduled', icon: AnimatedClock },
-  { id: 'calendar', label: 'Calendar', icon: AnimatedCalendar },
-  { id: 'list', label: 'Publications', icon: AnimatedListFilter },
-  { id: 'drafts', label: 'Drafts', icon: AnimatedFileText },
   { id: 'media', label: 'Media Library', icon: AnimatedImage },
   { id: 'analytics', label: 'Analytics', icon: AnimatedBarChart },
-  { id: 'channels', label: 'Social Channels', icon: AnimatedShare },
   { id: 'plugs', label: 'Integrations', icon: AnimatedPuzzle },
   { id: 'settings', label: 'Settings', icon: AnimatedSettings },
 ];
-
 /**
  * Properties for the workspace profile selection popover.
  */
@@ -270,6 +286,188 @@ function QuickSearch({
     </div>
   );
 }
+
+interface SidebarNavItemRowProps {
+  item: NavItem;
+  currentView: WorkspaceView;
+  collapsed: boolean;
+  hoveredNavId: WorkspaceView | null;
+  postsExpanded: boolean;
+  onHover: (id: WorkspaceView | null) => void;
+  onTogglePosts: () => void;
+  onNavigate: (view: WorkspaceView, options?: { search?: string }) => void;
+}
+
+/**
+ * Renders a single sidebar navigation row or expandable section with nested destinations.
+ */
+function SidebarNavItemRow({
+  item,
+  currentView,
+  collapsed,
+  hoveredNavId,
+  postsExpanded,
+  onHover,
+  onTogglePosts,
+  onNavigate,
+}: SidebarNavItemRowProps) {
+  const Icon = item.icon;
+  const isPostItem = item.id === 'posts';
+  const isActive = currentView === item.id;
+  const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
+  const [hoveredSubId, setHoveredSubId] = useState<string | null>(null);
+
+  const handleClick = () => {
+    if (isPostItem && hasSubItems && !collapsed) {
+      onNavigate(item.id);
+      if (!postsExpanded) onTogglePosts();
+    } else {
+      onNavigate(item.id);
+    }
+  };
+
+  return (
+    <div className="flex flex-col">
+      <button
+        data-nav-row
+        type="button"
+        onClick={handleClick}
+        onMouseEnter={() => onHover(item.id)}
+        onMouseLeave={() => onHover(null)}
+        className={cn(
+          'relative z-10 flex h-8 items-center rounded-[7px] text-left transition-colors',
+          'px-1.5',
+          isActive && (!hasSubItems || collapsed)
+            ? 'bg-hover-2 font-semibold text-ink group-hover/glide:bg-transparent'
+            : isActive
+            ? 'text-ink font-semibold'
+            : 'text-ink-2 hover:text-ink font-medium'
+        )}
+        title={collapsed ? item.label : undefined}
+      >
+        <span
+          className={cn(
+            'flex size-7 shrink-0 items-center justify-center',
+            isActive ? 'text-ink' : 'text-ink-2'
+          )}
+        >
+          <Icon className="size-4" isHovered={hoveredNavId === item.id} />
+        </span>
+
+        <AnimatePresence initial={false}>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -4 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="ml-1.5 flex flex-1 items-center justify-between overflow-hidden"
+            >
+              <span className="truncate text-[13.5px] tracking-tight">
+                {item.label}
+              </span>
+              {hasSubItems ? (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTogglePosts();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.stopPropagation();
+                      onTogglePosts();
+                    }
+                  }}
+                  className="p-1 text-ink-3 hover:text-ink transition-transform cursor-pointer"
+                >
+                  <AnimatedChevronDown
+                    className={cn(
+                      'size-3.5 transition-transform duration-200',
+                      postsExpanded ? 'rotate-0' : '-rotate-90'
+                    )}
+                  />
+                </span>
+              ) : item.badge ? (
+                <span className="ml-auto rounded-full bg-accent-tint px-1.5 py-0.5 text-[10px] font-bold text-accent-ink uppercase leading-none">
+                  {item.badge}
+                </span>
+              ) : null}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </button>
+
+      {/* Render Expandable Sub-items with smooth sliding collapse/expand */}
+      <AnimatePresence initial={false}>
+        {!collapsed && hasSubItems && postsExpanded && (
+          <motion.div
+            key="sub-items-container"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{
+              height: 'auto',
+              opacity: 1,
+              transition: {
+                height: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.16, delay: 0.05 },
+              },
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+              transition: {
+                height: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.1 },
+              },
+            }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-0.5 pl-2.5 pt-0.5 pb-0.5">
+          {item.subItems?.map((sub) => {
+            const SubIcon = sub.icon;
+            const isQueueSub = sub.id === 'queues';
+            const isQueueActive =
+              typeof window !== 'undefined' &&
+              window.location.search.includes('status=scheduled');
+            const isSubActive = isQueueSub
+              ? isQueueActive
+              : currentView === 'posts' && !isQueueActive;
+            return (
+              <button
+                key={sub.id}
+                data-nav-row
+                type="button"
+                onMouseEnter={() => setHoveredSubId(sub.id)}
+                onMouseLeave={() => setHoveredSubId(null)}
+                onClick={() =>
+                  onNavigate(
+                    sub.view,
+                    sub.search ? { search: sub.search } : undefined
+                  )
+                }
+                className={cn(
+                  'relative z-10 flex h-7 items-center rounded-[6px] text-left transition-colors pl-6 pr-2 text-[12.5px]',
+                  isSubActive
+                    ? 'bg-hover-2 font-semibold text-ink shadow-xs'
+                    : 'text-ink-2 hover:text-ink hover:bg-hover font-medium'
+                )}
+              >
+                <SubIcon
+                  className="size-3.5 mr-2 shrink-0 text-ink-3"
+                  isHovered={hoveredSubId === sub.id}
+                />
+                <span className="truncate">{sub.label}</span>
+              </button>
+            );
+          })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 /**
  * Renders the primary collapsible application navigation sidebar.
  *
@@ -307,11 +505,11 @@ export function SidebarNav({
     return false;
   });
   const [hoveredNavId, setHoveredNavId] = useState<WorkspaceView | null>(null);
+  const [postsExpanded, setPostsExpanded] = useState(true);
   const [themeHovered, setThemeHovered] = useState(false);
   const [collapseHovered, setCollapseHovered] = useState(false);
   const [wsHovered, setWsHovered] = useState(false);
   const navRef = useRef<HTMLElement>(null);
-
   const workspaceMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -373,7 +571,7 @@ export function SidebarNav({
   return (
     <aside
       className={cn(
-        'relative flex flex-col border-r border-line bg-surface select-none transition-[width] duration-300',
+        'relative flex flex-col h-full border-r border-line bg-surface select-none transition-[width] duration-300',
         collapsed ? 'w-[56px]' : 'w-[240px]',
         className
       )}
@@ -387,7 +585,7 @@ export function SidebarNav({
               onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
               onMouseEnter={() => setWsHovered(true)}
               onMouseLeave={() => setWsHovered(false)}
-              className="flex w-full items-center rounded-control p-1.5 text-left transition-colors hover:bg-hover active:scale-[0.98]"
+              className="flex w-full items-center rounded-control p-1.5 text-left transition-colors hover:bg-hover"
               title={currentBrandName}
             >
               <div className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-foreground text-background font-black text-xs shadow-hairline">
@@ -453,59 +651,19 @@ export function SidebarNav({
       <nav ref={navRef} className="relative flex-1 overflow-y-auto px-2 py-2 hide-scrollbar">
         <SidebarGlideHighlight containerRef={navRef} itemSelector="[data-nav-row]" />
         <div className="flex flex-col gap-0.5">
-          {filteredNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-
-            return (
-              <button
-                key={item.id}
-                data-nav-row
-                type="button"
-                onClick={() => onNavigate(item.id)}
-                onMouseEnter={() => setHoveredNavId(item.id)}
-                onMouseLeave={() => setHoveredNavId(null)}
-                className={cn(
-                  'relative z-10 flex h-8 items-center rounded-[7px] text-left transition-colors active:scale-[0.98]',
-                  'px-1.5',
-                  isActive
-                    ? 'bg-hover-2 font-semibold text-ink group-hover/glide:bg-transparent'
-                    : 'text-ink-2 hover:text-ink font-medium'
-                )}
-                title={collapsed ? item.label : undefined}
-              >
-                <span
-                  className={cn(
-                    'flex size-7 shrink-0 items-center justify-center',
-                    isActive ? 'text-ink' : 'text-ink-2'
-                  )}
-                >
-                  <Icon className="size-4" isHovered={hoveredNavId === item.id} />
-                </span>
-
-                <AnimatePresence initial={false}>
-                  {!collapsed && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -4 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -4 }}
-                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="ml-1.5 flex flex-1 items-center justify-between overflow-hidden"
-                    >
-                      <span className="truncate text-[13.5px] tracking-tight">
-                        {item.label}
-                      </span>
-                      {item.badge && (
-                        <span className="ml-auto rounded-full bg-accent-tint px-1.5 py-0.5 text-[10px] font-bold text-accent-ink uppercase leading-none">
-                          {item.badge}
-                        </span>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </button>
-            );
-          })}
+          {filteredNavItems.map((item) => (
+            <SidebarNavItemRow
+              key={item.id}
+              item={item}
+              currentView={currentView}
+              collapsed={collapsed}
+              hoveredNavId={hoveredNavId}
+              postsExpanded={postsExpanded}
+              onHover={setHoveredNavId}
+              onTogglePosts={() => setPostsExpanded((p) => !p)}
+              onNavigate={onNavigate}
+            />
+          ))}
         </div>
       </nav>
 

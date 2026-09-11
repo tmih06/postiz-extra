@@ -904,3 +904,193 @@ export function AnimatedSettings({
     </div>
   );
 }
+
+/**
+ * Animated overview layout grid icon with clockwise pulsating square cell wave.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Clockwise Wave Pulse**: On hover loop, articulates the four quadrant grid rectangles in sequence
+ *   with scale expansion (`[1, 1.2, 1]`) and staggered delays (0.07s intervals) over 0.6s to communicate
+ *   content aggregation and live workspace activity.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated 4-cell layout grid icon element.
+ */
+export function AnimatedLayoutGrid({
+  size,
+  className,
+  isHovered: externalHovered,
+  onMouseEnter,
+  onMouseLeave,
+  ...props
+}: AnimatedIconProps) {
+  const [internalHovered, setInternalHovered] = useState(false);
+  const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
+
+  return (
+    <div
+      className={cn('inline-flex items-center justify-center shrink-0', className)}
+      style={size ? { width: size, height: size } : undefined}
+      onMouseEnter={(e) => {
+        setInternalHovered(true);
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        setInternalHovered(false);
+        onMouseLeave?.(e);
+      }}
+      {...props}
+    >
+      <svg
+        className="size-full"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <motion.rect
+          width="7"
+          height="7"
+          x="3"
+          y="3"
+          rx="1"
+          animate={controls}
+          variants={{
+            normal: { scale: 1 },
+            animate: {
+              scale: [1, 1.2, 1],
+              transition: { duration: 0.6, delay: 0, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
+          style={{ originX: '6.5px', originY: '6.5px' }}
+        />
+        <motion.rect
+          width="7"
+          height="7"
+          x="14"
+          y="3"
+          rx="1"
+          animate={controls}
+          variants={{
+            normal: { scale: 1 },
+            animate: {
+              scale: [1, 1.2, 1],
+              transition: { duration: 0.6, delay: 0.08, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
+          style={{ originX: '17.5px', originY: '6.5px' }}
+        />
+        <motion.rect
+          width="7"
+          height="7"
+          x="14"
+          y="14"
+          rx="1"
+          animate={controls}
+          variants={{
+            normal: { scale: 1 },
+            animate: {
+              scale: [1, 1.2, 1],
+              transition: { duration: 0.6, delay: 0.16, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
+          style={{ originX: '17.5px', originY: '17.5px' }}
+        />
+        <motion.rect
+          width="7"
+          height="7"
+          x="3"
+          y="14"
+          rx="1"
+          animate={controls}
+          variants={{
+            normal: { scale: 1 },
+            animate: {
+              scale: [1, 1.2, 1],
+              transition: { duration: 0.6, delay: 0.24, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
+          style={{ originX: '6.5px', originY: '17.5px' }}
+        />
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * Animated queue layers icon with tactile vertical stack expansion.
+ *
+ * Feature requirements & motion behaviors:
+ * - **Stack Accordion Motion**: On hover loop, vertically lifts the upper layer (`y: [0, -2.8, 0]`)
+ *   and middle layer (`y: [0, -1.4, 0]`) using overshoot spring physics over 0.65s to represent queued items.
+ * - Supports internal hover tracking and external `isHovered` prop synchronisation via {@link useIconLoop}.
+ *
+ * @param props - Animated icon properties including `size`, `className`, and hover event handlers.
+ * @returns Rendered animated layers queue icon element.
+ */
+export function AnimatedLayers({
+  size,
+  className,
+  isHovered: externalHovered,
+  onMouseEnter,
+  onMouseLeave,
+  ...props
+}: AnimatedIconProps) {
+  const [internalHovered, setInternalHovered] = useState(false);
+  const active = externalHovered || internalHovered;
+  const controls = useIconLoop(active);
+
+  return (
+    <div
+      className={cn('inline-flex items-center justify-center shrink-0', className)}
+      style={size ? { width: size, height: size } : undefined}
+      onMouseEnter={(e) => {
+        setInternalHovered(true);
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        setInternalHovered(false);
+        onMouseLeave?.(e);
+      }}
+      {...props}
+    >
+      <svg
+        className="size-full"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <motion.path
+          d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"
+          animate={controls}
+          variants={{
+            normal: { y: 0 },
+            animate: {
+              y: [0, -2.8, 0],
+              transition: { duration: 0.65, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
+        />
+        <motion.path
+          d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"
+          animate={controls}
+          variants={{
+            normal: { y: 0 },
+            animate: {
+              y: [0, -1.4, 0],
+              transition: { duration: 0.65, delay: 0.08, ease: [0.34, 1.56, 0.64, 1] },
+            },
+          }}
+        />
+        <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+      </svg>
+    </div>
+  );
+}

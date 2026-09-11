@@ -17,12 +17,14 @@ export type RecommendationOption = {
   signal: 1 | 2 | 3;
   /** Badge label accompanying the tone status pill (e.g. `'High impact'`, `'Recommended'`). */
   label: string;
-  /** Status pill color tone indicating urgency or sentiment. */
-  tone: 'green' | 'orange' | 'accent';
+  /** Semantic tone theme for the status pill indicator. */
+  tone?: 'green' | 'orange' | 'red' | 'accent' | 'neutral';
 };
 
+const SIGNAL_DOT_KEYS = ['dot-1', 'dot-2', 'dot-3'];
+
 /**
- * Props configuring the AI recommendation card component.
+ * Props configuring the interactive `RecommendationCard` container.
  */
 export interface RecommendationCardProps {
   /** Header title text for the recommendation card (defaults to `'AI Publishing Recommendations'`). */
@@ -150,9 +152,9 @@ export function RecommendationCard({
                 )}
               </div>
               <div className="flex items-center gap-1 shrink-0 ml-2">
-                {Array.from({ length: 3 }).map((_, i) => (
+                {SIGNAL_DOT_KEYS.map((dotKey, i) => (
                   <span
-                    key={i}
+                    key={dotKey}
                     className={cn(
                       'size-1.5 rounded-full',
                       i < opt.signal ? 'bg-accent' : 'bg-line-strong'
@@ -169,7 +171,7 @@ export function RecommendationCard({
         <button
           type="button"
           onClick={handleAccept}
-          className="flex items-center gap-1.5 rounded-control bg-foreground px-4 py-1.5 text-[13px] font-semibold text-background shadow-btn hover:opacity-90 active:scale-[0.98] transition-all"
+          className="flex items-center gap-1.5 rounded-control bg-foreground px-4 py-1.5 text-[13px] font-semibold text-background shadow-btn hover:opacity-90 transition-opacity"
         >
           <span>Apply Recommendation</span>
           <ChevronRight className="size-3.5" />

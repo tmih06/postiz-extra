@@ -5,11 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   PenSquare,
   Sparkles,
-  Calendar,
-  ListFilter,
-  FileText,
   Image as ImageIcon,
-  Clock,
   BarChart3,
   Share2,
   Puzzle,
@@ -19,25 +15,20 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
 export type { WorkspaceView };
 
 interface NavigationShellProps {
   currentView: WorkspaceView;
-  onNavigate: (view: WorkspaceView) => void;
+  onNavigate: (view: WorkspaceView, options?: { search?: string }) => void;
   children: React.ReactNode;
 }
 
 const MOBILE_NAV_ITEMS: { id: WorkspaceView; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'composer', label: 'Composer', icon: PenSquare },
+  { id: 'channels', label: 'Connections', icon: Share2 },
+  { id: 'posts', label: 'Posts', icon: PenSquare },
   { id: 'agent', label: 'AI Studio', icon: Sparkles },
-  { id: 'scheduled', label: 'Upcoming', icon: Clock },
-  { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'list', label: 'Publications', icon: ListFilter },
-  { id: 'drafts', label: 'Drafts', icon: FileText },
   { id: 'media', label: 'Media Library', icon: ImageIcon },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { id: 'channels', label: 'Social Channels', icon: Share2 },
   { id: 'plugs', label: 'Integrations', icon: Puzzle },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
@@ -73,14 +64,14 @@ export function NavigationShell({
   };
 
   return (
-    <div className="flex min-h-screen bg-transparent text-ink antialiased">
+    <div className="flex h-screen h-dvh w-screen overflow-hidden bg-transparent text-ink antialiased">
       {/* Desktop Collapsible Sidebar */}
-      <div className="hidden lg:flex shrink-0">
+      <div className="hidden lg:flex shrink-0 h-full">
         <SidebarNav currentView={currentView} onNavigate={onNavigate} />
       </div>
 
       {/* Main Column */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0 h-full">
         {/* Mobile Header */}
         <header className="lg:hidden flex h-14 items-center justify-between border-b border-line bg-surface/90 backdrop-blur-md px-4 shrink-0">
           <div className="flex items-center gap-2">
@@ -132,7 +123,9 @@ export function NavigationShell({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={logout}
+                onClick={() => {
+                  logout().catch(() => {});
+                }}
                 className="text-xs text-red hover:bg-red-tint hover:text-red"
               >
                 <LogOut className="size-3.5 mr-1" /> Log out
@@ -141,9 +134,9 @@ export function NavigationShell({
           </div>
         )}
 
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-6xl flex flex-col gap-6">
+        {/* Main Content Area: edge-to-edge locked viewport without page scroll */}
+        <main className="flex-1 overflow-hidden min-h-0 min-w-0 p-3 sm:p-5 lg:p-6 flex flex-col">
+          <div className="w-full h-full flex flex-col min-h-0 min-w-0">
             {children}
           </div>
         </main>

@@ -1,19 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWorkspace } from '@/context/workspace.context';
-import type { ChannelIntegration } from '@/api/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusPill } from '@/components/atoms/status-pill';
 import {
   Share2,
   Plus,
-  ExternalLink,
   CheckCircle2,
-  AlertCircle,
   RefreshCw,
   Trash2,
-  Lock,
-  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -56,19 +51,53 @@ const SUPPORTED_PLATFORMS: PlatformMeta[] = [
 ];
 
 /**
+ * Props for configuring the ChannelsView management screen.
+ */
+export interface ChannelsViewProps {
+  /**
+   * Initial active tab to display. Defaults to checking the URL query parameter
+   * (`?tab=all` or `?tab=add`), otherwise defaulting to `'connected'`.
+   */
+  initialTab?: 'connected' | 'all';
+}
+
+/**
  * Channels and integrations management view for social publishing destinations.
  *
  * Displays active social account integrations grouped and badged with their connection status,
  * provides re-authentication and disconnection actions, and presents a directory of available
- * third-party platforms with direct OAuth 2.0 connection triggers.
+ * third-party platforms with direct OAuth 2.0 connection triggers. Deep-links directly to the
+ * add-channels directory when navigated with `?tab=add` or `?tab=all`.
  *
+ * @param props - Optional initial tab configuration.
  * @returns The rendered channels management page with connected and available platform tabs.
  */
-export function ChannelsView() {
+export function ChannelsView({ initialTab }: ChannelsViewProps = {}) {
   const { integrations, selectedCustomer } = useWorkspace();
-  const [activeTab, setActiveTab] = useState<'connected' | 'all'>('connected');
+  const [activeTab, setActiveTab] = useState<'connected' | 'all'>(() => {
+    if (initialTab) return initialTab;
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'all' || tab === 'add') return 'all';
+    }
+    return 'connected';
+  });
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'all' || tab === 'add') {
+        setActiveTab('all');
+      }
+    }
+  }, [initialTab]);
   const connectedList = integrations;
 
   /**

@@ -181,7 +181,7 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
           <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="rounded-control bg-foreground text-background font-semibold shadow-btn hover:opacity-90 active:scale-[0.98]"
+            className="rounded-control bg-foreground text-background font-semibold shadow-btn hover:opacity-90"
           >
             <UploadCloud className="size-4 mr-2" />
             <span>{isUploading ? 'Uploading…' : 'Upload Assets'}</span>
@@ -273,7 +273,7 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
                     <button
                       type="button"
                       onClick={(e) => handleCopyUrl(item.path, item.id, e)}
-                      className="flex size-8 items-center justify-center rounded-control bg-surface text-ink shadow-btn hover:scale-105 active:scale-95 transition-all"
+                      className="flex size-8 items-center justify-center rounded-control bg-surface text-ink shadow-btn hover:bg-hover transition-colors"
                       title="Copy URL"
                     >
                       {copiedId === item.id ? (
@@ -290,7 +290,7 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
                           e.stopPropagation();
                           onUseInComposer(item);
                         }}
-                        className="flex size-8 items-center justify-center rounded-control bg-surface text-ink shadow-btn hover:scale-105 active:scale-95 transition-all"
+                        className="flex size-8 items-center justify-center rounded-control bg-surface text-ink shadow-btn hover:bg-hover transition-colors"
                         title="Use in Composer"
                       >
                         <PenSquare className="size-4" />
@@ -300,7 +300,7 @@ export function MediaView({ onUseInComposer }: MediaViewProps) {
                     <button
                       type="button"
                       onClick={(e) => handleDelete(item.id, e)}
-                      className="flex size-8 items-center justify-center rounded-control bg-surface text-red shadow-btn hover:bg-red-tint hover:scale-105 active:scale-95 transition-all"
+                      className="flex size-8 items-center justify-center rounded-control bg-surface text-red shadow-btn hover:bg-red-tint transition-colors"
                       title="Delete asset"
                     >
                       <Trash2 className="size-4" />

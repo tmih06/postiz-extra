@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Check, Clock, Send, FileText, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Check, Clock, Send, FileText, ChevronRight } from 'lucide-react';
 import { StatusPill } from '@/components/atoms/status-pill';
 
 /**
@@ -221,7 +221,7 @@ export function ApprovalCard({
           type="button"
           disabled={selectedChannels.length === 0}
           onClick={handleConfirm}
-          className="flex items-center gap-1.5 rounded-control bg-foreground px-4 py-1.5 text-[13px] font-semibold text-background shadow-btn hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-control bg-foreground px-4 py-1.5 text-[13px] font-semibold text-background shadow-btn hover:opacity-90 transition-opacity disabled:opacity-40"
         >
           <span>Confirm & Proceed</span>
           <ChevronRight className="size-3.5" />

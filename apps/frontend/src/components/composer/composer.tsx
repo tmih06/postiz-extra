@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useWorkspace } from '@/context/workspace.context';
 import { DestinationSelector } from '@/components/workspace/destination-selector';
+import type { WorkspaceView } from '@/components/layout/navigation-shell';
 import { PlatformSettings } from './platform-settings';
 import { MediaLibraryModal } from './media-library-modal';
 import { Button } from '@/components/ui/button';
@@ -51,14 +52,19 @@ interface ChannelOverride {
  *
  * @param props.initialGroup - Optional UUID post group identifier to fetch and edit an existing post.
  * @param props.onPostSuccess - Optional callback executed after successful schedule/publish/draft mutation.
+ * @param props.onNavigate - Optional callback to navigate to another workspace view with optional search options.
  */
+export interface ComposerProps {
+  initialGroup?: string;
+  onPostSuccess?: () => void;
+  onNavigate?: (view: WorkspaceView, options?: { search?: string }) => void;
+}
+
 export function Composer({
   initialGroup,
   onPostSuccess,
-}: {
-  initialGroup?: string;
-  onPostSuccess?: () => void;
-}) {
+  onNavigate,
+}: ComposerProps) {
   const {
     api,
     integrations,
@@ -352,7 +358,7 @@ export function Composer({
           </p>
         </div>
 
-        <DestinationSelector />
+        <DestinationSelector onNavigate={onNavigate} />
       </div>
 
       {/* Error & Success Banners */}

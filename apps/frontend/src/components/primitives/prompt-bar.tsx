@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Sparkles, ArrowUp, AtSign, Command, Paperclip, Calendar, BarChart3, Hash } from 'lucide-react';
+import { Sparkles, ArrowUp, AtSign, Calendar, BarChart3 } from 'lucide-react';
 
 /**
  * Configuration properties for the `PromptBar` component.
@@ -81,9 +81,9 @@ export function PromptBar({
   return (
     <div className={cn('w-full flex flex-col gap-2', className)}>
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
-        {QUICK_ACTIONS.map((action, idx) => (
+        {QUICK_ACTIONS.map((action) => (
           <button
-            key={idx}
+            key={action.label}
             type="button"
             onClick={() => selectQuickAction(action.prompt)}
             className="flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface/80 px-3 py-1 text-[12px] font-medium text-ink-2 hover:bg-hover hover:text-ink transition-colors shadow-hairline"
@@ -143,7 +143,7 @@ export function PromptBar({
           <button
             type="submit"
             disabled={!prompt.trim() || disabled}
-            className="flex size-7 items-center justify-center rounded-control bg-foreground text-background shadow-btn hover:opacity-90 active:scale-[0.96] transition-all disabled:opacity-30 disabled:pointer-events-none"
+            className="flex size-7 items-center justify-center rounded-control bg-foreground text-background shadow-btn hover:opacity-90 transition-opacity disabled:opacity-30 disabled:pointer-events-none"
           >
             <ArrowUp className="size-4" />
           </button>

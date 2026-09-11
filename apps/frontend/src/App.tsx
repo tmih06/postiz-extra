@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WorkspaceProvider, useWorkspace } from '@/context/workspace.context';
 import { NavigationShell, type WorkspaceView } from '@/components/layout/navigation-shell';
-import { Composer } from '@/components/composer/composer';
-import { PostList } from '@/components/publications/post-list';
-import { CalendarView } from '@/components/publications/calendar-view';
+import { PostsView } from '@/components/posts/posts-view';
 import { PostizHarness } from '@/components/harness/postiz-harness';
 import { MediaView } from '@/components/media/media-view';
 import { AnalyticsView } from '@/components/analytics/analytics-view';
@@ -14,48 +12,36 @@ import { LoginView } from '@/components/auth/login-view';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Agentation } from 'agentation';
+const PATH_MAP: Record<string, WorkspaceView> = {
+  media: 'media',
+  agent: 'agent',
+  harness: 'agent',
+  analytics: 'analytics',
+  channels: 'channels',
+  integrations: 'channels',
+  plugs: 'plugs',
+  'third-party': 'plugs',
+  settings: 'settings',
+};
+function resolvePathToView(pathname: string): WorkspaceView {
+  const clean = pathname.replace(/^\//, '');
+  return PATH_MAP[clean] || 'posts';
+}
 /**
  * Internal workspace router orchestrating view switching, browser history synchronization,
  * loading states, and unauthenticated redirects.
- *
- * Listens to `popstate` events to support browser back/forward navigation across views
- * (`/composer`, `/calendar`, `/scheduled`, `/list`, `/drafts`, `/media`, `/agent`, `/analytics`, `/channels`, `/plugs`, `/settings`).
- * Renders the `LoginView` when user is unauthenticated, a skeleton placeholder during initial load,
- * or `NavigationShell` with the active view.
  */
 function WorkspaceRouter() {
   const { user, isLoading } = useWorkspace();
-  const [currentView, setCurrentView] = useState<WorkspaceView>(() => {
-    const path = window.location.pathname.replace(/^\//, '');
-    if (path === 'calendar') return 'calendar';
-    if (path === 'scheduled') return 'scheduled';
-    if (path === 'list') return 'list';
-    if (path === 'drafts') return 'drafts';
-    if (path === 'media') return 'media';
-    if (path === 'agent' || path === 'harness') return 'agent';
-    if (path === 'analytics') return 'analytics';
-    if (path === 'channels' || path === 'integrations') return 'channels';
-    if (path === 'plugs' || path === 'third-party') return 'plugs';
-    if (path === 'settings') return 'settings';
-    return 'composer';
-  });
-  const [editingGroupId, setEditingGroupId] = useState<string | undefined>(undefined);
+  const [currentView, setCurrentView] = useState<WorkspaceView>(() =>
+    resolvePathToView(window.location.pathname)
+  );
+  const [editingGroupId] = useState<string | undefined>(undefined);
 
   // Sync with browser history
   useEffect(() => {
     const handlePopState = () => {
-      const path = window.location.pathname.replace(/^\//, '');
-      if (path === 'calendar') setCurrentView('calendar');
-      else if (path === 'scheduled') setCurrentView('scheduled');
-      else if (path === 'list') setCurrentView('list');
-      else if (path === 'drafts') setCurrentView('drafts');
-      else if (path === 'media') setCurrentView('media');
-      else if (path === 'agent' || path === 'harness') setCurrentView('agent');
-      else if (path === 'analytics') setCurrentView('analytics');
-      else if (path === 'channels' || path === 'integrations') setCurrentView('channels');
-      else if (path === 'plugs' || path === 'third-party') setCurrentView('plugs');
-      else if (path === 'settings') setCurrentView('settings');
-      else setCurrentView('composer');
+      setCurrentView(resolvePathToView(window.location.pathname));
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -65,12 +51,22 @@ function WorkspaceRouter() {
   /**
    * Navigates to a specific workspace view and updates browser URL via `history.pushState`.
    *
+   * Accepts optional query options (e.g. `{ search: '?tab=add' }`) to deep-link directly into
+   * sub-views such as the add-channel platform directory.
+   *
    * @param view - Target workspace view identifier.
+   * @param options - Optional navigation configuration containing search query string.
    */
-  const handleNavigate = (view: WorkspaceView) => {
+  const handleNavigate = (view: WorkspaceView, options?: { search?: string }) => {
     setCurrentView(view);
-    const newPath = view === 'composer' ? '/' : `/${view}`;
-    if (window.location.pathname !== newPath) {
+    const query = options?.search
+      ? options.search.startsWith('?')
+        ? options.search
+        : `?${options.search}`
+      : '';
+
+    const newPath = (view === 'posts' ? '/' : `/${view}`) + query;
+    if (window.location.pathname + window.location.search !== newPath) {
       window.history.pushState(null, '', newPath);
     }
   };
@@ -96,63 +92,21 @@ function WorkspaceRouter() {
   }
 
   if (!user) {
-    return <LoginView onLoginSuccess={() => handleNavigate('composer')} />;
+    return <LoginView onLoginSuccess={() => handleNavigate('posts')} />;
   }
 
   return (
     <NavigationShell currentView={currentView} onNavigate={handleNavigate}>
-      {currentView === 'composer' && (
-        <Composer
-          initialGroup={editingGroupId}
-          onPostSuccess={() => {
-            setEditingGroupId(undefined);
-            handleNavigate('scheduled');
-          }}
+      {currentView === 'posts' && (
+        <PostsView
+          initialGroupId={editingGroupId}
+          onNavigate={handleNavigate}
         />
       )}
       {currentView === 'agent' && (
         <PostizHarness
           onScheduleAction={() => {
-            handleNavigate('scheduled');
-          }}
-        />
-      )}
-
-      {currentView === 'scheduled' && (
-        <PostList
-          initialStateFilter="scheduled"
-          onEditPost={(group: string) => {
-            setEditingGroupId(group);
-            handleNavigate('composer');
-          }}
-        />
-      )}
-
-      {currentView === 'calendar' && (
-        <CalendarView
-          onSelectPost={(group: string) => {
-            setEditingGroupId(group);
-            handleNavigate('composer');
-          }}
-        />
-      )}
-
-      {currentView === 'list' && (
-        <PostList
-          initialStateFilter="all"
-          onEditPost={(group: string) => {
-            setEditingGroupId(group);
-            handleNavigate('composer');
-          }}
-        />
-      )}
-
-      {currentView === 'drafts' && (
-        <PostList
-          initialStateFilter="draft"
-          onEditPost={(group: string) => {
-            setEditingGroupId(group);
-            handleNavigate('composer');
+            handleNavigate('posts', { search: '?status=scheduled' });
           }}
         />
       )}
@@ -160,7 +114,7 @@ function WorkspaceRouter() {
       {currentView === 'media' && (
         <MediaView
           onUseInComposer={() => {
-            handleNavigate('composer');
+            handleNavigate('posts');
           }}
         />
       )}
@@ -186,7 +140,7 @@ export function App() {
   return (
     <WorkspaceProvider>
       <WorkspaceRouter />
-      <Agentation endpoint={import.meta.env.VITE_AGENTATION_ENDPOINT} />
+      <Agentation endpoint={(import.meta.env.VITE_AGENTATION_ENDPOINT as string | undefined) || ''} />
     </WorkspaceProvider>
   );
 }

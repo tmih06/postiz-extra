@@ -37,7 +37,7 @@ export interface WorkspaceContextValue {
   logout: () => Promise<void>;
 }
 
-const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
+export const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
 /**
  * Top-level context provider managing workspace domain state, active customer/organization profile,

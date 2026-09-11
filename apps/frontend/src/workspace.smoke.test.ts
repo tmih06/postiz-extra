@@ -1,12 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type {
-  ApiClient,
   UserProfile,
   CustomerProfile,
   ChannelIntegration,
   PostGroup,
-  CreatePostPayload,
-  MediaListResponse,
 } from './api/types';
 
 describe('publishing workspace business logic and state invariants', () => {
