@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWorkspace } from '@/context/workspace.context';
 import { DestinationSelector } from '@/components/workspace/destination-selector';
 import type { WorkspaceView } from '@/components/layout/navigation-shell';
@@ -9,14 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   Image as ImageIcon,
   Calendar,
   Send,
   Save,
-  Clock,
   Sparkles,
   AlertCircle,
   CheckCircle2,
@@ -51,17 +50,47 @@ interface ChannelOverride {
  * to `api.createPost` with state preservation across network failures.
  *
  * @param props.initialGroup - Optional UUID post group identifier to fetch and edit an existing post.
+ * @param props.initialDate - Optional Date or ISO string pre-populating the schedule date/time.
  * @param props.onPostSuccess - Optional callback executed after successful schedule/publish/draft mutation.
  * @param props.onNavigate - Optional callback to navigate to another workspace view with optional search options.
  */
 export interface ComposerProps {
   initialGroup?: string;
+  initialDate?: Date | string;
   onPostSuccess?: () => void;
   onNavigate?: (view: WorkspaceView, options?: { search?: string }) => void;
 }
 
+/**
+ * Formats a Date object or ISO string into a local HTML datetime-local input string ('YYYY-MM-DDTHH:mm').
+ *
+ * If the input represents midnight (00:00) with no explicit time set, defaults to 10:00 AM local time
+ * on that date to provide a realistic daytime scheduling default.
+ *
+ * @param dateOrStr - Date object or ISO timestamp string to format.
+ * @returns Local datetime string in 'YYYY-MM-DDTHH:mm' format.
+ */
+function formatInitialScheduleDate(dateOrStr: Date | string): string {
+  const d = typeof dateOrStr === 'string' ? new Date(dateOrStr) : new Date(dateOrStr.getTime());
+  if (isNaN(d.getTime())) {
+    const fallback = new Date(Date.now() + 1000 * 60 * 60 * 2);
+    fallback.setMinutes(fallback.getMinutes() - fallback.getTimezoneOffset());
+    return fallback.toISOString().slice(0, 16);
+  }
+  if (d.getHours() === 0 && d.getMinutes() === 0) {
+    d.setHours(10, 0, 0, 0);
+  }
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 export function Composer({
   initialGroup,
+  initialDate,
   onPostSuccess,
   onNavigate,
 }: ComposerProps) {
@@ -81,6 +110,9 @@ export function Composer({
   >({});
   const [activeTab, setActiveTab] = useState<string>('shared');
   const [scheduleDate, setScheduleDate] = useState<string>(() => {
+    if (initialDate) {
+      return formatInitialScheduleDate(initialDate);
+    }
     const d = new Date(Date.now() + 1000 * 60 * 60 * 2);
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().slice(0, 16);
@@ -94,6 +126,11 @@ export function Composer({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (initialDate && !initialGroup) {
+      setScheduleDate(formatInitialScheduleDate(initialDate));
+    }
+  }, [initialDate, initialGroup]);
   const storageKey = `postiz_composer_draft_${selectedCustomerId}`;
 
   // Load existing post group if initialGroup is provided

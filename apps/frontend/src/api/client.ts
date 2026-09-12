@@ -10,6 +10,7 @@ import type {
   UploadedMedia,
   UserProfile,
 } from './types';
+import { expandPosts, expandPostsList } from '@gitroom/helpers/utils/posts.list.minify';
 
 /**
  * Custom error type thrown when an API request fails with a non-2xx HTTP status.
@@ -209,13 +210,14 @@ export function createApiClient(config: ApiClientConfig = {}) {
     },
 
     /**
-     * Retrieves posts within a specified date range, optionally filtered by customer profile ID.
+     * Retrieves and expands posts within a specified date range, optionally filtered by customer profile ID.
      *
-     * Used primarily by calendar and timeline views.
+     * Serves calendar views with complete post ranges, transparently decoding backend-minified keys
+     * (`p`, `i`, `c`, `d`, etc.) into typed `PostGroup` structures via `expandPosts`.
      *
-     * @route GET /posts?startDate=...&endDate=...&customer=...
-     * @param query - Query parameters containing ISO `startDate`, `endDate`, and optional `customer` ID.
-     * @returns Array of grouped posts (`PostGroup[]`).
+     * @param query - Range query with ISO `startDate`, `endDate`, and optional customer profile filter.
+     * @returns Promise resolving to an array of expanded `PostGroup` items; returns empty array on empty result.
+     * @throws ApiClientError on network failures or non-2xx responses.
      */
     async getPosts(query: {
       startDate: string;
@@ -229,17 +231,21 @@ export function createApiClient(config: ApiClientConfig = {}) {
       if (query.customer) {
         params.set('customer', query.customer);
       }
-      return request<PostGroup[]>(`/posts?${params.toString()}`);
+      const res = await request<unknown>(`/posts?${params.toString()}`);
+      if (Array.isArray(res)) return res as PostGroup[];
+      const expanded = expandPosts(res);
+      return (expanded.posts || []) as PostGroup[];
     },
 
     /**
-     * Retrieves paginated list of posts with optional state and customer filtering.
+     * Retrieves and expands a paginated collection of posts filtered by lifecycle state and customer profile.
      *
-     * Used by list views, scheduled queues, drafts, and publication tables.
+     * Serves list, queue, and publication views, decoding minified response keys (`p`, `t`, `pg`, `l`)
+     * into `{ posts: PostGroup[], total?: number }` via `expandPostsList`.
      *
-     * @route GET /posts/list?...
-     * @param query - Pagination and filtering options (page, limit, state, customer).
-     * @returns Paginated posts response containing posts list and metadata.
+     * @param query - Optional pagination (`page`, `limit`) and filter (`state`, `customer`) options.
+     * @returns Promise resolving to `PostsListResponse` with expanded post items and total count.
+     * @throws ApiClientError on network failures or non-2xx responses.
      */
     async getPostsList(
       query: {
@@ -257,7 +263,15 @@ export function createApiClient(config: ApiClientConfig = {}) {
 
       const queryString = params.toString();
       const endpoint = queryString ? `/posts/list?${queryString}` : '/posts/list';
-      return request<PostsListResponse>(endpoint);
+      const res = await request<Record<string, unknown>>(endpoint);
+      if (res && (res.p !== undefined || res.pg !== undefined || res.posts !== undefined)) {
+        const expanded = expandPostsList(res) as { posts?: PostGroup[]; total?: number };
+        return {
+          posts: expanded.posts || [],
+          total: expanded.total,
+        };
+      }
+      return (res || { posts: [] }) as unknown as PostsListResponse;
     },
 
     /**

@@ -3,7 +3,6 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SlidingMenuHighlight } from '@/components/primitives/sliding-menu-highlight';
-
 /**
  * Root container for dropdown menus built on Radix DropdownMenu.
  *
@@ -90,7 +89,8 @@ DropdownMenuSubTrigger.displayName =
 /**
  * Floating panel containing nested submenu items.
  *
- * Features slide/fade entrance and zoom animations positioned relative to the parent trigger.
+ * Uses a stable Popper position with opacity-only entrance/exit feedback so the
+ * submenu does not fight Radix's positioning transform during opening.
  *
  * @param className - Optional CSS classes for width, padding, or borders.
  * @param props - Radix SubContent props.
@@ -108,7 +108,7 @@ export const DropdownMenuSubContent = React.forwardRef<
       if (typeof ref === 'function') {
         ref(node);
       } else if (ref) {
-        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        ref.current = node;
       }
     },
     [ref]
@@ -119,7 +119,7 @@ export const DropdownMenuSubContent = React.forwardRef<
       ref={setRefs}
       className={cn(
         'relative z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg select-none',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         className
       )}
       {...props}
@@ -131,12 +131,11 @@ export const DropdownMenuSubContent = React.forwardRef<
 });
 DropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName;
-
 /**
  * Main floating popover menu panel rendered inside a {@link DropdownMenuPortal}.
  *
- * Includes built-in elevation shadows, popover theme tokens, collision avoidance,
- * and directional slide/zoom animations on open and close.
+ * Uses a stable Popper position with opacity-only entrance/exit feedback so the
+ * menu does not fight Radix's positioning transform during opening.
  *
  * @param sideOffset - Distance in pixels from the trigger (defaults to 4px).
  * @param className - Optional CSS classes for custom width, max-height, or styling.
@@ -149,14 +148,13 @@ export const DropdownMenuContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
 >(({ className, sideOffset = 4, children, ...props }, ref) => {
   const contentRef = React.useRef<HTMLDivElement | null>(null);
-
   const setRefs = React.useCallback(
     (node: HTMLDivElement | null) => {
       contentRef.current = node;
       if (typeof ref === 'function') {
         ref(node);
       } else if (ref) {
-        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        ref.current = node;
       }
     },
     [ref]
@@ -169,7 +167,7 @@ export const DropdownMenuContent = React.forwardRef<
         sideOffset={sideOffset}
         className={cn(
           'relative z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md select-none',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           className
         )}
         {...props}

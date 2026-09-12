@@ -52,54 +52,14 @@ export const PostListTableView = React.memo(function PostListTableView({
                 </div>
               </th>
               <th className="py-3 px-3 min-w-[100px]">Status</th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('likes-desc')}
-              >
-                Likes
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('comments-desc')}
-              >
-                Cmts
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('shares-desc')}
-              >
-                Shrs
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('saves-desc')}
-              >
-                Saves
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('clicks-desc')}
-              >
-                Clicks
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('views-desc')}
-              >
-                Views
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('impressions-desc')}
-              >
-                Impr.
-              </th>
-              <th
-                className="py-3 px-2 text-right font-mono cursor-pointer hover:text-ink"
-                onClick={() => onSortChange('reach-desc')}
-              >
-                Reach
-              </th>
+              <th className="py-3 px-2 text-right font-mono">Likes</th>
+              <th className="py-3 px-2 text-right font-mono">Cmts</th>
+              <th className="py-3 px-2 text-right font-mono">Shrs</th>
+              <th className="py-3 px-2 text-right font-mono">Saves</th>
+              <th className="py-3 px-2 text-right font-mono">Clicks</th>
+              <th className="py-3 px-2 text-right font-mono">Views</th>
+              <th className="py-3 px-2 text-right font-mono">Impr.</th>
+              <th className="py-3 px-2 text-right font-mono">Reach</th>
               <th className="py-3 pr-4 pl-3 text-right">Actions</th>
             </tr>
           </thead>

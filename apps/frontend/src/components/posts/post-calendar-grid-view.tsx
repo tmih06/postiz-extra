@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { normalizePostStatus } from './posts-helpers';
+import { normalizePostStatus, toLocalDateKey } from './posts-helpers';
 import type { PostGroup, CalendarDayCell } from './types';
 
 export interface PostCalendarGridViewProps {
@@ -63,9 +63,9 @@ export const PostCalendarGridView = React.memo(function PostCalendarGridView({
 
         <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-line">
           {calendarDays.map((cell) => {
-            const dateKey = cell.date.toISOString().slice(0, 10);
-            const dayPosts = posts.filter((g) => g.date.slice(0, 10) === dateKey);
-            const isToday = new Date().toISOString().slice(0, 10) === dateKey;
+            const dateKey = toLocalDateKey(cell.date);
+            const dayPosts = posts.filter((g) => toLocalDateKey(g.date) === dateKey);
+            const isToday = toLocalDateKey(new Date()) === dateKey;
 
             return (
               <div

@@ -8,19 +8,62 @@ export interface PlatformIconProps {
   /** Optional custom CSS classes for sizing and coloring. Defaults to 'size-4'. */
   className?: string;
 }
+type PlatformIconAsset = {
+  matcher: string;
+  src: string;
+  className?: string;
+};
+
+const SOURCED_PLATFORM_ASSETS: readonly PlatformIconAsset[] = [
+  {
+    matcher: 'threads',
+    src: '/icons/platforms/threads.svg',
+    className: 'dark:invert',
+  },
+  { matcher: 'pinterest', src: '/icons/platforms/pinterest.svg' },
+  { matcher: 'reddit', src: '/icons/platforms/reddit.svg' },
+  { matcher: 'telegram', src: '/icons/platforms/telegram.svg' },
+  { matcher: 'bluesky', src: '/icons/platforms/bluesky.svg' },
+  { matcher: 'mastodon', src: '/icons/platforms/mastodon.svg' },
+  { matcher: 'discord', src: '/icons/platforms/discord.svg' },
+  {
+    matcher: 'medium',
+    src: '/icons/platforms/medium.svg',
+    className: 'dark:invert',
+  },
+  { matcher: 'wordpress', src: '/icons/platforms/wordpress.svg' },
+];
 
 /**
- * Renders an optimized SVG vector logo for supported social media platforms.
+ * Finds a locally sourced logo for a normalized provider identifier.
+ *
+ * Provider identifiers may include legacy suffixes such as `-page` or `-custom`, so matching uses
+ * containment instead of exact equality. Unknown identifiers return `undefined` for the generic icon fallback.
+ *
+ * @param normalizedProvider - Lowercase provider identifier to resolve.
+ * @returns The matching local asset metadata, or `undefined` when no sourced logo exists.
+ */
+function findSourcedPlatformAsset(
+  normalizedProvider: string
+): PlatformIconAsset | undefined {
+  return SOURCED_PLATFORM_ASSETS.find((asset) =>
+    normalizedProvider.includes(asset.matcher)
+  );
+}
+
+/**
+ * Renders an optimized SVG vector logo or locally sourced theSVG asset for a social media platform.
  *
  * Feature & Design Invariants:
  * - Normalizes provider names case-insensitively and maps legacy aliases (e.g. 'twitter' -> 'x').
  * - Preserves brand-accurate vector paths and official color fills for Facebook, Instagram, TikTok,
  *   YouTube, X, and LinkedIn.
- * - Falls back to a generic `Share2` icon when an unrecognized provider string is supplied.
+ * - Uses locally vendored theSVG MIT-licensed assets for Threads, Pinterest, Reddit, Telegram, Bluesky,
+ *   Mastodon, Discord, Medium, and WordPress instead of a generic fallback.
  * - Wrapped in `React.memo` to prevent redundant virtual DOM reconciliations in high-frequency post lists.
  *
  * @param props - Provider slug and optional className styling.
- * @returns An SVG icon element corresponding to the target platform.
+ * @returns An SVG icon or decorative image asset corresponding to the target platform.
  *
  * @example
  * ```tsx
@@ -32,6 +75,17 @@ export const PlatformIcon = React.memo(function PlatformIcon({
   className = 'size-4',
 }: PlatformIconProps) {
   const norm = provider.toLowerCase();
+  const sourcedAsset = findSourcedPlatformAsset(norm);
+  if (sourcedAsset) {
+    return (
+      <img
+        src={sourcedAsset.src}
+        alt=""
+        aria-hidden="true"
+        className={cn(className, 'object-contain', sourcedAsset.className)}
+      />
+    );
+  }
 
   if (norm.includes('facebook')) {
     return (

@@ -201,4 +201,37 @@ describe('DestinationSelector quick navigate to add channel', () => {
     const oauthBadges = getAllByText('OAuth 2.0 Direct');
     expect(oauthBadges.length).toBeGreaterThan(0);
   });
+
+  it('renders every available platform with its local sourced logo', () => {
+    const mockContext = createMockWorkspaceContext(sampleChannels, 'c1');
+    const { container } = render(
+      <WorkspaceContext.Provider value={mockContext}>
+        <ChannelsView initialTab="all" />
+      </WorkspaceContext.Provider>
+    );
+
+    const sourcedLogoPaths = [
+      '/icons/platforms/threads.svg',
+      '/icons/platforms/pinterest.svg',
+      '/icons/platforms/reddit.svg',
+      '/icons/platforms/telegram.svg',
+      '/icons/platforms/bluesky.svg',
+      '/icons/platforms/mastodon.svg',
+      '/icons/platforms/discord.svg',
+      '/icons/platforms/medium.svg',
+      '/icons/platforms/wordpress.svg',
+    ];
+
+    for (const path of sourcedLogoPaths) {
+      expect(container.querySelector(`img[src="${path}"]`)).not.toBeNull();
+    }
+
+    const threadsLogo = container.querySelector(
+      'img[src="/icons/platforms/threads.svg"]'
+    );
+    expect(threadsLogo?.className).toContain('size-5');
+    expect(threadsLogo?.parentElement?.className).toContain('gap-2.5');
+    expect(threadsLogo?.parentElement?.className).not.toContain('border');
+    expect(threadsLogo?.parentElement?.className).not.toContain('bg-page');
+  });
 });

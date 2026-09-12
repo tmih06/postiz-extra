@@ -24,6 +24,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
+      '@gitroom/helpers': path.resolve(import.meta.dirname, '../../libraries/helpers/src'),
     },
   },
   optimizeDeps: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { WorkspaceProvider, useWorkspace } from '@/context/workspace.context';
 import { NavigationShell, type WorkspaceView } from '@/components/layout/navigation-shell';
-import type { PostStatusFilter } from '@/components/posts/types';
+import type { PostStatusFilter, PostViewMode } from '@/components/posts/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Agentation } from 'agentation';
@@ -161,6 +161,20 @@ function WorkspaceRouter() {
 
   const searchParams = new URLSearchParams(currentSearch);
   const statusParam = searchParams.get('status') as PostStatusFilter | null;
+  const viewParam = searchParams.get('view') as PostViewMode | null;
+  const cleanPath = window.location.pathname.replace(/^\//, '');
+  const initialViewMode: PostViewMode =
+    cleanPath === 'calendar'
+      ? 'calendar'
+      : cleanPath === 'composer'
+      ? 'composer'
+      : viewParam || 'list';
+  const initialStatusFilter: PostStatusFilter =
+    cleanPath === 'scheduled'
+      ? 'scheduled'
+      : cleanPath === 'drafts'
+      ? 'draft'
+      : statusParam || 'all';
 
   return (
     <NavigationShell currentView={currentView} onNavigate={handleNavigate}>
@@ -168,7 +182,8 @@ function WorkspaceRouter() {
         {currentView === 'posts' && (
           <PostsView
             initialGroupId={editingGroupId}
-            initialStatusFilter={statusParam || 'all'}
+            initialViewMode={initialViewMode}
+            initialStatusFilter={initialStatusFilter}
             onNavigate={handleNavigate}
           />
         )}

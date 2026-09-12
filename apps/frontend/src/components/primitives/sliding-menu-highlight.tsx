@@ -27,15 +27,12 @@ interface TargetBox {
 }
 
 /**
- * Renders a physics-spring gliding highlight pill behind active items inside dropdown menus and selects.
+ * Renders a sliding highlight pill behind active items inside dropdown menus and selects.
  *
- * Feature & Architecture:
- * - Detects active item changes via direct pointer tracking and a `MutationObserver` watching Radix UI
- *   `data-highlighted` and checked state attributes on menu items.
- * - Supports mouse hover, touch interaction, and keyboard arrow key navigation seamlessly.
- * - Computes relative bounding coordinates within the menu container, accounting for scroll offsets and padding.
- * - Applies a spring-based physics transition on subsequent item transitions while snapping instantly on first entry.
- * - Adheres to Beautiful UI theme tokens (`var(--hover)` and `var(--line-soft)`) matching the sidebar navigation glide.
+ * It measures the first highlighted item with no movement, then springs only when
+ * the pointer or keyboard moves to a different item. Repeated measurements of the
+ * same item are ignored so Radix Popper repositioning during menu entry cannot
+ * shake the overlay.
  *
  * @param props - Target container ref, custom item selector, and optional styling overrides.
  * @returns An absolute motion-animated highlight element rendered behind menu items.
@@ -47,6 +44,7 @@ export function SlidingMenuHighlight({
 }: SlidingMenuHighlightProps) {
   const [targetBox, setTargetBox] = useState<TargetBox | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
   const isFirstEntryRef = useRef(true);
   const lastItemRef = useRef<HTMLElement | null>(null);
 
@@ -55,45 +53,45 @@ export function SlidingMenuHighlight({
       const container = containerRef.current;
       if (!container || !item) {
         lastItemRef.current = null;
-        setIsVisible(false);
+        isVisibleRef.current = false;
         isFirstEntryRef.current = true;
+        setIsVisible(false);
         return;
       }
 
-      // Avoid recalculating or re-rendering when pointer moves within the same item
-      if (lastItemRef.current === item && isVisible) {
+      if (lastItemRef.current === item && isVisibleRef.current) {
         return;
       }
+
+      const shouldAnimate = lastItemRef.current !== null;
       lastItemRef.current = item;
+      isVisibleRef.current = true;
+      isFirstEntryRef.current = !shouldAnimate;
 
       const containerRect = container.getBoundingClientRect();
       const itemRect = item.getBoundingClientRect();
-
-      const newTop = itemRect.top - containerRect.top + container.scrollTop;
-      const newLeft = itemRect.left - containerRect.left + container.scrollLeft;
-      const newWidth = itemRect.width;
-      const newHeight = itemRect.height;
+      const nextBox = {
+        top: itemRect.top - containerRect.top + container.scrollTop,
+        left: itemRect.left - containerRect.left + container.scrollLeft,
+        width: itemRect.width,
+        height: itemRect.height,
+      };
 
       setTargetBox((prev) => {
         if (
           prev &&
-          prev.top === newTop &&
-          prev.left === newLeft &&
-          prev.width === newWidth &&
-          prev.height === newHeight
+          prev.top === nextBox.top &&
+          prev.left === nextBox.left &&
+          prev.width === nextBox.width &&
+          prev.height === nextBox.height
         ) {
           return prev;
         }
-        return {
-          top: newTop,
-          left: newLeft,
-          width: newWidth,
-          height: newHeight,
-        };
+        return nextBox;
       });
       setIsVisible(true);
     },
-    [containerRef, isVisible]
+    [containerRef]
   );
   useEffect(() => {
     const container = containerRef.current;
@@ -108,29 +106,27 @@ export function SlidingMenuHighlight({
       const item = findItemUnderPointer(e.clientX, e.clientY);
       if (item && container.contains(item)) {
         updateBox(item);
-        isFirstEntryRef.current = false;
       }
     };
 
     const handlePointerLeave = () => {
       lastItemRef.current = null;
-      setIsVisible(false);
+      isVisibleRef.current = false;
       isFirstEntryRef.current = true;
+      setIsVisible(false);
     };
 
-    // Watch for Radix attribute changes (e.g. data-highlighted when using keyboard or mouse)
+    // Watch for Radix attribute changes (e.g. data-highlighted when using keyboard or mouse).
     const observer = new MutationObserver(() => {
       const highlighted = container.querySelector<HTMLElement>(
         `${itemSelector}[data-highlighted], [data-highlighted]`
       );
       if (highlighted && container.contains(highlighted)) {
         updateBox(highlighted);
-        isFirstEntryRef.current = false;
       } else {
         const anyHovered = container.querySelector<HTMLElement>(`${itemSelector}:hover`);
         if (anyHovered) {
           updateBox(anyHovered);
-          isFirstEntryRef.current = false;
         }
       }
     });
@@ -177,7 +173,7 @@ export function SlidingMenuHighlight({
         width: targetBox?.width ?? 0,
         height: targetBox?.height ?? 0,
         opacity: isVisible && targetBox ? 1 : 0,
-        scale: isVisible && targetBox ? 1 : 0.96,
+        scale: 1,
       }}
       transition={{
         top: isFirstEntryRef.current
@@ -193,7 +189,6 @@ export function SlidingMenuHighlight({
           ? { duration: 0 }
           : { type: 'spring', stiffness: 450, damping: 32, mass: 0.8 },
         opacity: { duration: 0.14, ease: 'easeOut' },
-        scale: { type: 'spring', stiffness: 400, damping: 28 },
       }}
     />
   );

@@ -44,8 +44,8 @@ function createMockWorkspaceContext(overrides: Partial<WorkspaceContextValue> = 
 }
 
 describe('PostsView analytics computation', () => {
-  it('returns zeroed analytics for draft or scheduled posts', () => {
-    const draftGroup: PostGroup = {
+  it('returns truthful null analytics for post groups when metrics are unavailable', () => {
+    const postGroup: PostGroup = {
       id: 'grp-1',
       date: '2026-09-20T04:00:00Z',
       type: 'draft',
@@ -53,65 +53,18 @@ describe('PostsView analytics computation', () => {
       posts: [],
     };
 
-    const scheduledGroup: PostGroup = {
-      id: 'grp-2',
-      date: '2026-09-21T04:00:00Z',
-      type: 'schedule',
-      status: 'scheduled',
-      posts: [],
-    };
+    const analytics = getPostAnalytics(postGroup);
 
-    const draftAnalytics = getPostAnalytics(draftGroup);
-    const scheduledAnalytics = getPostAnalytics(scheduledGroup);
-
-    expect(draftAnalytics).toEqual({
-      likes: 0,
-      comments: 0,
-      shares: 0,
-      saves: 0,
-      clicks: 0,
-      views: 0,
-      impressions: 0,
-      reach: 0,
+    expect(analytics).toEqual({
+      likes: null,
+      comments: null,
+      shares: null,
+      saves: null,
+      clicks: null,
+      views: null,
+      impressions: null,
+      reach: null,
     });
-
-    expect(scheduledAnalytics).toEqual({
-      likes: 0,
-      comments: 0,
-      shares: 0,
-      saves: 0,
-      clicks: 0,
-      views: 0,
-      impressions: 0,
-      reach: 0,
-    });
-  });
-
-  it('calculates deterministic, positive analytics metrics for published posts', () => {
-    const publishedGroup: PostGroup = {
-      id: 'grp-pub-1',
-      group: 'group-unique-123',
-      date: '2026-09-19T18:57:00Z',
-      type: 'now',
-      status: 'published',
-      posts: [],
-    };
-
-    const analyticsA = getPostAnalytics(publishedGroup);
-    const analyticsB = getPostAnalytics(publishedGroup);
-
-    // Consistency guarantee: same post returns identical numbers
-    expect(analyticsA).toEqual(analyticsB);
-
-    // Must return all required analytics metrics
-    expect(analyticsA.views).toBeGreaterThan(0);
-    expect(analyticsA.impressions).toBeGreaterThan(0);
-    expect(analyticsA.reach).toBeGreaterThan(0);
-    expect(analyticsA.likes).toBeGreaterThan(0);
-    expect(analyticsA.comments).toBeGreaterThan(0);
-    expect(analyticsA.shares).toBeGreaterThan(0);
-    expect(analyticsA.saves).toBeGreaterThan(0);
-    expect(analyticsA.clicks).toBeGreaterThan(0);
   });
 });
 
@@ -128,8 +81,6 @@ describe('PostsView component rendering', () => {
     expect(html).toContain('Posts</h1>');
     expect(html).toContain('Manage your drafts, scheduled queues, publications, and analytics');
     expect(html).toContain('Create post');
-    expect(html).toContain('Import CSV');
-
     // View mode switchers
     expect(html).toContain('List</span>');
     expect(html).toContain('Calendar</span>');
@@ -158,7 +109,7 @@ describe('PostsView component rendering', () => {
     expect(html).toContain('>Reach</th>');
   });
 
-  it('renders grid view with card metrics and density control', () => {
+  it('renders grid view with density controls and truthful empty state', () => {
     const ctx = createMockWorkspaceContext();
     const html = renderToStaticMarkup(
       <WorkspaceContext.Provider value={ctx}>
@@ -170,15 +121,9 @@ describe('PostsView component rendering', () => {
     // Column density stepper
     expect(html).toContain('−');
     expect(html).toContain('+');
-    // Analytics labels inside cards
-    expect(html).toContain('Likes</span>');
-    expect(html).toContain('Cmts</span>');
-    expect(html).toContain('Shrs</span>');
-    expect(html).toContain('Saves</span>');
-    expect(html).toContain('Clicks</span>');
-    expect(html).toContain('Views</span>');
-    expect(html).toContain('Impr.</span>');
-    expect(html).toContain('Reach</span>');
+    // Empty state rendered when no posts exist
+    expect(html).toContain('No posts match filters');
+    expect(html).toContain('Create post');
   });
 
   it('renders calendar view with month navigation and 7-day grid', () => {

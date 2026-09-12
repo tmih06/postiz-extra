@@ -68,7 +68,8 @@ export interface ChannelsViewProps {
  * Displays active social account integrations grouped and badged with their connection status,
  * provides re-authentication and disconnection actions, and presents a directory of available
  * third-party platforms with direct OAuth 2.0 connection triggers. Deep-links directly to the
- * add-channels directory when navigated with `?tab=add` or `?tab=all`.
+ * add-channels directory when navigated with `?tab=add` or `?tab=all`; available platform cards
+ * use logo-only marks sourced locally from theSVG assets.
  *
  * @param props - Optional initial tab configuration.
  * @returns The rendered channels management page with connected and available platform tabs.
@@ -263,9 +264,10 @@ export function ChannelsView({ initialTab }: ChannelsViewProps = {}) {
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex size-8 items-center justify-center rounded-control bg-page border border-line shadow-hairline">
-                        <PlatformIcon provider={platform.id} className="size-4" />
-                      </div>
+                      <PlatformIcon
+                        provider={platform.id}
+                        className="size-5 shrink-0"
+                      />
                       <span className="font-semibold text-ink text-[14px]">
                         {platform.name}
                       </span>
